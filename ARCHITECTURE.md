@@ -270,10 +270,13 @@ No polling needed for subscribed paths. Mutations go through API routes, which w
 
 ## Authentication Pattern
 
-- Session-based: random session ID generated at creation/join, stored in `localStorage`
-- Sent as `x-session-id` header on all API requests
-- Server validates session ID against Firebase private data
-- No Firebase Auth SDK — custom lightweight session management
+Firebase Auth with email/password, using an HttpOnly session cookie for server-side verification:
+
+1. **Client** — `AuthProvider` subscribes to `onAuthStateChanged` and exposes `{ user, loading }` via `AuthContext`. The `useAuth()` hook consumes this context.
+2. **Sign-in / Sign-up** — `src/services/auth.ts` wraps Firebase SDK calls (`signIn`, `signUp`, `sendPasswordReset`, `signOut`). After a successful sign-in, the client posts the Firebase ID token to `POST /api/auth/session`.
+3. **Session cookie** — `POST /api/auth/session` exchanges the ID token for a Firebase session cookie (via Admin SDK `createSessionCookie`) and sets it as an HttpOnly, Secure, SameSite=Strict cookie. `DELETE /api/auth/session` clears it.
+4. **Middleware** — `src/middleware.ts` (Node.js runtime) reads the session cookie and calls `getAdminAuth().verifySessionCookie()` on every request. Unauthenticated users are redirected to `/sign-in`; authenticated users visiting auth pages are redirected to `/`.
+5. **Data access** — All RTDB paths are scoped to the authenticated user's `uid`, enforced by Firebase security rules.
 
 ## Key Packages
 

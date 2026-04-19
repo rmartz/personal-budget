@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth } from "@/lib/firebase/admin";
+import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
 
-const SESSION_COOKIE_NAME = "session";
+export const runtime = "nodejs";
 
 function isAuthRoute(pathname: string): boolean {
   return pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
 }
 
 function isExcludedPath(pathname: string): boolean {
-  return (
-    pathname.startsWith("/_next/") ||
-    pathname === "/api/auth/session" ||
-    pathname === "/favicon.ico"
-  );
+  return pathname.startsWith("/_next/") || pathname === "/favicon.ico";
 }
 
 export async function middleware(request: NextRequest) {

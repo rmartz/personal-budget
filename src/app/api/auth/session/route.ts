@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth } from "@/lib/firebase/admin";
+import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
 
-const SESSION_COOKIE_NAME = "session";
 const SESSION_EXPIRY_MS = 60 * 60 * 24 * 5 * 1000; // 5 days
 
 interface SessionRequestBody {
