@@ -28,7 +28,10 @@ export function LedgerList({
         </Button>
       </div>
       {isLoading ? (
-        <ul className="flex flex-col gap-2">
+        <ul
+          aria-label={LEDGERS_PAGE_COPY.loadingMessage}
+          className="flex flex-col gap-2"
+        >
           <li>
             <Skeleton className="h-12 w-full" />
           </li>

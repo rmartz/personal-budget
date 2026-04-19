@@ -1,5 +1,3 @@
-"use client";
-
 import type { Ledger } from "@/lib/types";
 
 interface LedgerListItemProps {
