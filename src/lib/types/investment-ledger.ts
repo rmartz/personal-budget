@@ -26,5 +26,5 @@ export interface CreateInvestmentLedgerInput {
 
 export interface UpdateInvestmentLedgerInput {
   name?: string;
-  targetAllocationPercent?: number | undefined;
+  targetAllocationPercent?: number;
 }

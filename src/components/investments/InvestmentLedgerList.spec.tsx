@@ -19,6 +19,36 @@ function makeInvestmentLedger(
 }
 
 describe("InvestmentLedgerList", () => {
+  describe("loading state", () => {
+    it("does not render the empty state heading", () => {
+      const { queryByText } = render(
+        <InvestmentLedgerList
+          ledgers={[]}
+          isLoading={true}
+          onNewLedger={vi.fn()}
+        />,
+      );
+      expect(
+        queryByText(INVESTMENT_LEDGER_LIST_COPY.emptyStateHeading),
+      ).toBeNull();
+    });
+
+    it("renders the loading container with aria-label", () => {
+      const { getByRole } = render(
+        <InvestmentLedgerList
+          ledgers={[]}
+          isLoading={true}
+          onNewLedger={vi.fn()}
+        />,
+      );
+      expect(
+        getByRole("generic", {
+          name: INVESTMENT_LEDGER_LIST_COPY.loadingLabel,
+        }),
+      ).toBeDefined();
+    });
+  });
+
   describe("empty state", () => {
     it("renders the empty state heading", () => {
       const { getByText } = render(

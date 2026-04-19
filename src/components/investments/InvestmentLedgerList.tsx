@@ -31,7 +31,10 @@ export function InvestmentLedgerList({
         )}
       </div>
       {isLoading ? (
-        <div className="flex flex-col gap-2">
+        <div
+          aria-label={INVESTMENT_LEDGER_LIST_COPY.loadingLabel}
+          className="flex flex-col gap-2"
+        >
           {[1, 2, 3].map((i) => (
             <div
               key={i}
