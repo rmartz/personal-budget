@@ -20,7 +20,7 @@ Timestamps are stored as ISO 8601 strings (e.g. `"2024-01-15T00:00:00.000Z"`). T
       {transactionId}/
         type            string        "deposit" | "expense"
         date            string        ISO 8601 timestamp
-        amount          number        Transaction amount (always positive)
+        amount          number        Transaction amount; sign is not enforced by the schema layer
         description     string        Free-text description
 
   budgetLedgerSavingsGoals/

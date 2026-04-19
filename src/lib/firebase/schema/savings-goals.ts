@@ -1,11 +1,11 @@
-export interface FirebaseSavingsGoal {
+export interface FirebaseBudgetLedgerSavingsGoal {
   name: string;
   targetAmount: number;
   fundedAmount: number;
   priority: number;
 }
 
-export interface SavingsGoal {
+export interface BudgetLedgerSavingsGoal {
   id: string;
   ledgerId: string;
   name: string;
@@ -14,9 +14,9 @@ export interface SavingsGoal {
   priority: number;
 }
 
-export function savingsGoalToFirebase(
-  goal: Omit<SavingsGoal, "id" | "ledgerId">,
-): FirebaseSavingsGoal {
+export function budgetLedgerSavingsGoalToFirebase(
+  goal: Omit<BudgetLedgerSavingsGoal, "id" | "ledgerId">,
+): FirebaseBudgetLedgerSavingsGoal {
   return {
     name: goal.name,
     targetAmount: goal.targetAmount,
@@ -25,11 +25,11 @@ export function savingsGoalToFirebase(
   };
 }
 
-export function firebaseToSavingsGoal(
+export function firebaseToBudgetLedgerSavingsGoal(
   id: string,
   ledgerId: string,
-  data: FirebaseSavingsGoal,
-): SavingsGoal {
+  data: FirebaseBudgetLedgerSavingsGoal,
+): BudgetLedgerSavingsGoal {
   return {
     id,
     ledgerId,

@@ -1,9 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { savingsGoalToFirebase, firebaseToSavingsGoal } from "./savings-goals";
+import {
+  budgetLedgerSavingsGoalToFirebase,
+  firebaseToBudgetLedgerSavingsGoal,
+} from "./savings-goals";
 
-describe("savingsGoalToFirebase", () => {
+describe("budgetLedgerSavingsGoalToFirebase", () => {
   it("serializes all fields", () => {
-    const result = savingsGoalToFirebase({
+    const result = budgetLedgerSavingsGoalToFirebase({
       name: "Emergency Fund",
       targetAmount: 10000,
       fundedAmount: 2500,
@@ -18,9 +21,9 @@ describe("savingsGoalToFirebase", () => {
   });
 });
 
-describe("firebaseToSavingsGoal", () => {
+describe("firebaseToBudgetLedgerSavingsGoal", () => {
   it("sets id and ledgerId from parameters", () => {
-    const result = firebaseToSavingsGoal("goal-1", "ledger-1", {
+    const result = firebaseToBudgetLedgerSavingsGoal("goal-1", "ledger-1", {
       name: "Emergency Fund",
       targetAmount: 10000,
       fundedAmount: 2500,
@@ -31,7 +34,7 @@ describe("firebaseToSavingsGoal", () => {
   });
 
   it("preserves all numeric fields", () => {
-    const result = firebaseToSavingsGoal("goal-1", "ledger-1", {
+    const result = firebaseToBudgetLedgerSavingsGoal("goal-1", "ledger-1", {
       name: "Car",
       targetAmount: 5000,
       fundedAmount: 1200,
@@ -49,8 +52,12 @@ describe("firebaseToSavingsGoal", () => {
       fundedAmount: 12000,
       priority: 1,
     };
-    const firebase = savingsGoalToFirebase(original);
-    const result = firebaseToSavingsGoal("goal-99", "ledger-abc", firebase);
+    const firebase = budgetLedgerSavingsGoalToFirebase(original);
+    const result = firebaseToBudgetLedgerSavingsGoal(
+      "goal-99",
+      "ledger-abc",
+      firebase,
+    );
     expect(result.name).toBe(original.name);
     expect(result.targetAmount).toBe(original.targetAmount);
     expect(result.fundedAmount).toBe(original.fundedAmount);
