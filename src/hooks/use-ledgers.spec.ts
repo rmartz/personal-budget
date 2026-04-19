@@ -6,7 +6,10 @@ import { useLedgers } from "./use-ledgers";
 import * as ledgersService from "@/services/ledgers";
 import type { Ledger } from "@/lib/types";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
   return {
