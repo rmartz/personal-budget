@@ -12,6 +12,7 @@ export interface FirebaseInvestmentLot {
 
 export interface InvestmentLot {
   id: string;
+  ledgerId: string;
   type: InvestmentLotType;
   date: Date;
   units: number;
@@ -19,7 +20,7 @@ export interface InvestmentLot {
 }
 
 export function investmentLotToFirebase(
-  lot: Omit<InvestmentLot, "id">,
+  lot: Omit<InvestmentLot, "id" | "ledgerId">,
 ): FirebaseInvestmentLot {
   return {
     type: lot.type,
@@ -31,10 +32,12 @@ export function investmentLotToFirebase(
 
 export function firebaseToInvestmentLot(
   id: string,
+  ledgerId: string,
   data: FirebaseInvestmentLot,
 ): InvestmentLot {
   return {
     id,
+    ledgerId,
     type: data.type,
     date: new Date(data.date),
     units: data.units,

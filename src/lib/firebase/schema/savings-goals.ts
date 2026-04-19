@@ -7,6 +7,7 @@ export interface FirebaseSavingsGoal {
 
 export interface SavingsGoal {
   id: string;
+  ledgerId: string;
   name: string;
   targetAmount: number;
   fundedAmount: number;
@@ -14,7 +15,7 @@ export interface SavingsGoal {
 }
 
 export function savingsGoalToFirebase(
-  goal: Omit<SavingsGoal, "id">,
+  goal: Omit<SavingsGoal, "id" | "ledgerId">,
 ): FirebaseSavingsGoal {
   return {
     name: goal.name,
@@ -26,10 +27,12 @@ export function savingsGoalToFirebase(
 
 export function firebaseToSavingsGoal(
   id: string,
+  ledgerId: string,
   data: FirebaseSavingsGoal,
 ): SavingsGoal {
   return {
     id,
+    ledgerId,
     name: data.name,
     targetAmount: data.targetAmount,
     fundedAmount: data.fundedAmount,
