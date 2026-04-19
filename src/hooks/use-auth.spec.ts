@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { describe, it, expect, afterEach } from "vitest";
+import { renderHook, cleanup } from "@testing-library/react";
 import { createElement } from "react";
 import { AuthContext } from "@/components/auth";
 import { useAuth } from "./use-auth";
 import type { AuthContextValue } from "@/components/auth";
+
+afterEach(cleanup);
 
 describe("useAuth", () => {
   it("returns the AuthContext value provided by the nearest AuthContext.Provider", () => {

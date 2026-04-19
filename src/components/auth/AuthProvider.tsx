@@ -14,6 +14,24 @@ export const AuthContext = createContext<AuthContextValue>({
   loading: true,
 });
 
+export interface AuthProviderViewProps {
+  user: User | null;
+  loading: boolean;
+  children: React.ReactNode;
+}
+
+export function AuthProviderView({
+  user,
+  loading,
+  children,
+}: AuthProviderViewProps) {
+  return (
+    <AuthContext.Provider value={{ user, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
 export interface AuthProviderProps {
   children: React.ReactNode;
 }
@@ -31,8 +49,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthProviderView user={user} loading={loading}>
       {children}
-    </AuthContext.Provider>
+    </AuthProviderView>
   );
 }
