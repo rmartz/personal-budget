@@ -6,7 +6,7 @@ export enum InvestmentLotType {
 export interface InvestmentLedger {
   id: string;
   name: string;
-  targetAllocationPercent: number | undefined;
+  targetAllocationPercent?: number;
   currentBalance: number;
 }
 
@@ -21,7 +21,7 @@ export interface InvestmentLot {
 
 export interface CreateInvestmentLedgerInput {
   name: string;
-  targetAllocationPercent: number | undefined;
+  targetAllocationPercent?: number;
 }
 
 export interface UpdateInvestmentLedgerInput {

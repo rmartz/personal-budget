@@ -12,7 +12,6 @@ function makeInvestmentLedger(
   return {
     id: "test-id",
     name: "Test Ledger",
-    targetAllocationPercent: undefined,
     currentBalance: 0,
     ...overrides,
   };
