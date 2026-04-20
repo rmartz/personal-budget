@@ -8,10 +8,7 @@ export const DropdownMenuTrigger = Menu.Trigger;
 export const DropdownMenuPortal = Menu.Portal;
 export const DropdownMenuPositioner = Menu.Positioner;
 
-function DropdownMenuPopup({
-  className,
-  ...props
-}: Menu.Popup.Props) {
+function DropdownMenuPopup({ className, ...props }: Menu.Popup.Props) {
   return (
     <Menu.Popup
       className={cn(
@@ -23,10 +20,7 @@ function DropdownMenuPopup({
   );
 }
 
-function DropdownMenuItem({
-  className,
-  ...props
-}: Menu.Item.Props) {
+function DropdownMenuItem({ className, ...props }: Menu.Item.Props) {
   return (
     <Menu.Item
       className={cn(

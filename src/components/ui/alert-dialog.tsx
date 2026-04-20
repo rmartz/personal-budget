@@ -13,10 +13,7 @@ function AlertDialogBackdrop({
 }: AlertDialogPrimitive.Backdrop.Props) {
   return (
     <AlertDialogPrimitive.Backdrop
-      className={cn(
-        "fixed inset-0 bg-black/50 backdrop-blur-sm",
-        className,
-      )}
+      className={cn("fixed inset-0 bg-black/50 backdrop-blur-sm", className)}
       {...props}
     />
   );
