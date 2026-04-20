@@ -45,6 +45,10 @@ export function ForgotPasswordFormView({
     return true;
   }
 
+  function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setEmail(e.target.value);
+  }
+
   function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     if (validate()) {
@@ -91,7 +95,7 @@ export function ForgotPasswordFormView({
               autoComplete="email"
               placeholder={FORGOT_PASSWORD_FORM_COPY.emailPlaceholder}
               value={email}
-              onChange={(e) => { setEmail(e.target.value); }}
+              onChange={handleEmailChange}
               aria-invalid={emailError !== undefined}
               aria-describedby={
                 emailError ? "forgot-password-email-error" : undefined

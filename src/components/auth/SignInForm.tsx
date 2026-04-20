@@ -55,6 +55,14 @@ export function SignInFormView({
     return valid;
   }
 
+  function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setEmail(e.target.value);
+  }
+
+  function handlePasswordChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setPassword(e.target.value);
+  }
+
   function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     if (validate()) {
@@ -78,7 +86,7 @@ export function SignInFormView({
               autoComplete="email"
               placeholder={SIGN_IN_FORM_COPY.emailPlaceholder}
               value={email}
-              onChange={(e) => { setEmail(e.target.value); }}
+              onChange={handleEmailChange}
               aria-invalid={emailError !== undefined}
               aria-describedby={emailError ? "sign-in-email-error" : undefined}
               disabled={isLoading}
@@ -112,7 +120,7 @@ export function SignInFormView({
               autoComplete="current-password"
               placeholder={SIGN_IN_FORM_COPY.passwordPlaceholder}
               value={password}
-              onChange={(e) => { setPassword(e.target.value); }}
+              onChange={handlePasswordChange}
               aria-invalid={passwordError !== undefined}
               aria-describedby={
                 passwordError ? "sign-in-password-error" : undefined
