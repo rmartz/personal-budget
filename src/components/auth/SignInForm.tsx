@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 import { SIGN_IN_FORM_COPY } from "./SignInForm.copy";
 
 export interface SignInFormViewProps {
@@ -77,9 +76,15 @@ export function SignInFormView({
         <CardDescription>{SIGN_IN_FORM_COPY.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="sign-in-email">{SIGN_IN_FORM_COPY.emailLabel}</Label>
+            <Label htmlFor="sign-in-email">
+              {SIGN_IN_FORM_COPY.emailLabel}
+            </Label>
             <Input
               id="sign-in-email"
               type="email"
@@ -141,7 +146,7 @@ export function SignInFormView({
           {error && (
             <p
               role="alert"
-              className={cn("rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive")}
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             >
               {error}
             </p>

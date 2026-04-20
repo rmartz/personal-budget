@@ -103,7 +103,9 @@ describe("ForgotPasswordFormView", () => {
         />,
       );
       expect(
-        screen.queryByPlaceholderText(FORGOT_PASSWORD_FORM_COPY.emailPlaceholder),
+        screen.queryByPlaceholderText(
+          FORGOT_PASSWORD_FORM_COPY.emailPlaceholder,
+        ),
       ).toBeNull();
     });
   });
@@ -134,7 +136,9 @@ describe("ForgotPasswordFormView", () => {
         />,
       );
       fireEvent.submit(
-        screen.getByText(FORGOT_PASSWORD_FORM_COPY.submitButton).closest("form")!,
+        screen
+          .getByText(FORGOT_PASSWORD_FORM_COPY.submitButton)
+          .closest("form")!,
       );
       expect(
         screen.getByText(FORGOT_PASSWORD_FORM_COPY.errorEmailRequired),
@@ -152,7 +156,9 @@ describe("ForgotPasswordFormView", () => {
         />,
       );
       fireEvent.submit(
-        screen.getByText(FORGOT_PASSWORD_FORM_COPY.submitButton).closest("form")!,
+        screen
+          .getByText(FORGOT_PASSWORD_FORM_COPY.submitButton)
+          .closest("form")!,
       );
       expect(onSubmit).not.toHaveBeenCalled();
     });

@@ -3,20 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignUpFormView } from "@/components/auth/SignUpForm";
+import { SIGN_UP_FORM_COPY } from "@/components/auth/SignUpForm.copy";
 import { signUp } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
   switch (code) {
     case "auth/email-already-in-use":
-      return "An account with this email address already exists.";
+      return SIGN_UP_FORM_COPY.errorEmailAlreadyInUse;
     case "auth/invalid-email":
-      return "The email address is not valid.";
+      return SIGN_UP_FORM_COPY.errorInvalidEmail;
     case "auth/weak-password":
-      return "Password is too weak. Please choose a stronger password.";
+      return SIGN_UP_FORM_COPY.errorWeakPassword;
     case "auth/operation-not-allowed":
-      return "Email/password sign-up is not enabled. Please contact support.";
+      return SIGN_UP_FORM_COPY.errorOperationNotAllowed;
     default:
-      return "An unexpected error occurred. Please try again.";
+      return SIGN_UP_FORM_COPY.errorDefault;
   }
 }
 

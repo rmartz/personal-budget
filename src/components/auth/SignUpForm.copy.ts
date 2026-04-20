@@ -17,4 +17,10 @@ export const SIGN_UP_FORM_COPY = {
   errorPasswordTooShort: "Password must be at least 8 characters.",
   errorConfirmPasswordRequired: "Please confirm your password.",
   errorPasswordMismatch: "Passwords do not match.",
+  errorEmailAlreadyInUse: "An account with this email address already exists.",
+  errorInvalidEmail: "The email address is not valid.",
+  errorWeakPassword: "Password is too weak. Please choose a stronger password.",
+  errorOperationNotAllowed:
+    "Email/password sign-up is not enabled. Please contact support.",
+  errorDefault: "An unexpected error occurred. Please try again.",
 } as const;

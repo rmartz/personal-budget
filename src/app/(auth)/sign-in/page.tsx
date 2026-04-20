@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SignInFormView } from "@/components/auth/SignInForm";
+import { SIGN_IN_FORM_COPY } from "@/components/auth/SignInForm.copy";
 import { signIn } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
@@ -10,17 +11,24 @@ function getAuthErrorMessage(code: string): string {
     case "auth/invalid-credential":
     case "auth/wrong-password":
     case "auth/user-not-found":
-      return "The email address or password is incorrect. Please try again.";
+      return SIGN_IN_FORM_COPY.errorInvalidCredential;
     case "auth/user-disabled":
-      return "This account has been disabled. Please contact support.";
+      return SIGN_IN_FORM_COPY.errorAccountDisabled;
     case "auth/too-many-requests":
-      return "Too many failed attempts. Please try again later.";
+      return SIGN_IN_FORM_COPY.errorTooManyRequests;
     default:
-      return "An unexpected error occurred. Please try again.";
+      return SIGN_IN_FORM_COPY.errorDefault;
   }
 }
 
-export default function SignInPage() {
+function sanitizeNext(raw: string | null): string {
+  if (raw !== null && raw.startsWith("/") && !raw.startsWith("//")) {
+    return raw;
+  }
+  return "/";
+}
+
+function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +39,7 @@ export default function SignInPage() {
     setError(undefined);
     try {
       await signIn(email, password);
-      const next = searchParams.get("next") ?? "/";
-      router.push(next);
+      router.push(sanitizeNext(searchParams.get("next")));
     } catch (err) {
       const code =
         err !== null &&
@@ -53,5 +60,13 @@ export default function SignInPage() {
       error={error}
       onSubmit={handleSubmit}
     />
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInContent />
+    </Suspense>
   );
 }

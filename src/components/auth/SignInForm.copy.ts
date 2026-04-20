@@ -13,4 +13,10 @@ export const SIGN_IN_FORM_COPY = {
   errorEmailRequired: "Email is required.",
   errorEmailInvalid: "Please enter a valid email address.",
   errorPasswordRequired: "Password is required.",
+  errorInvalidCredential:
+    "The email address or password is incorrect. Please try again.",
+  errorAccountDisabled:
+    "This account has been disabled. Please contact support.",
+  errorTooManyRequests: "Too many failed attempts. Please try again later.",
+  errorDefault: "An unexpected error occurred. Please try again.",
 } as const;

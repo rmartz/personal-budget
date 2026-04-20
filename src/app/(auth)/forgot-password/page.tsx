@@ -2,17 +2,15 @@
 
 import { useState } from "react";
 import { ForgotPasswordFormView } from "@/components/auth/ForgotPasswordForm";
+import { FORGOT_PASSWORD_FORM_COPY } from "@/components/auth/ForgotPasswordForm.copy";
 import { sendPasswordReset } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
   switch (code) {
     case "auth/invalid-email":
-      return "The email address is not valid.";
-    case "auth/user-not-found":
-      // Don't reveal whether the account exists — fall through to generic message
-      return "An unexpected error occurred. Please try again.";
+      return FORGOT_PASSWORD_FORM_COPY.errorInvalidEmail;
     default:
-      return "An unexpected error occurred. Please try again.";
+      return FORGOT_PASSWORD_FORM_COPY.errorDefault;
   }
 }
 
@@ -35,7 +33,11 @@ export default function ForgotPasswordPage() {
         typeof err.code === "string"
           ? err.code
           : "";
-      setError(getAuthErrorMessage(code));
+      if (code === "auth/user-not-found") {
+        setIsSubmitted(true);
+      } else {
+        setError(getAuthErrorMessage(code));
+      }
     } finally {
       setIsLoading(false);
     }

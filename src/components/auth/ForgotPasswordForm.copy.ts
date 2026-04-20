@@ -13,4 +13,6 @@ export const FORGOT_PASSWORD_FORM_COPY = {
   confirmationBackLink: "Back to sign in",
   errorEmailRequired: "Email is required.",
   errorEmailInvalid: "Please enter a valid email address.",
+  errorInvalidEmail: "The email address is not valid.",
+  errorDefault: "An unexpected error occurred. Please try again.",
 } as const;

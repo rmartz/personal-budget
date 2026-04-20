@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 import { SIGN_UP_FORM_COPY } from "./SignUpForm.copy";
 
 export interface SignUpFormViewProps {
@@ -98,9 +97,15 @@ export function SignUpFormView({
         <CardDescription>{SIGN_UP_FORM_COPY.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="sign-up-email">{SIGN_UP_FORM_COPY.emailLabel}</Label>
+            <Label htmlFor="sign-up-email">
+              {SIGN_UP_FORM_COPY.emailLabel}
+            </Label>
             <Input
               id="sign-up-email"
               type="email"
@@ -184,9 +189,7 @@ export function SignUpFormView({
           {error && (
             <p
               role="alert"
-              className={cn(
-                "rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive",
-              )}
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             >
               {error}
             </p>

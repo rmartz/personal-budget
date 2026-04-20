@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 import { FORGOT_PASSWORD_FORM_COPY } from "./ForgotPasswordForm.copy";
 
 export interface ForgotPasswordFormViewProps {
@@ -56,35 +55,37 @@ export function ForgotPasswordFormView({
     }
   }
 
-  if (isSubmitted) {
-    return (
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>{FORGOT_PASSWORD_FORM_COPY.confirmationTitle}</CardTitle>
-          <CardDescription>
-            {FORGOT_PASSWORD_FORM_COPY.confirmationDescription}
-          </CardDescription>
-        </CardHeader>
-        <CardFooter className="justify-center">
-          <Link
-            href="/sign-in"
-            className="text-sm font-medium underline-offset-4 hover:underline"
-          >
-            {FORGOT_PASSWORD_FORM_COPY.confirmationBackLink}
-          </Link>
-        </CardFooter>
-      </Card>
-    );
-  }
-
-  return (
+  return isSubmitted ? (
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>{FORGOT_PASSWORD_FORM_COPY.confirmationTitle}</CardTitle>
+        <CardDescription>
+          {FORGOT_PASSWORD_FORM_COPY.confirmationDescription}
+        </CardDescription>
+      </CardHeader>
+      <CardFooter className="justify-center">
+        <Link
+          href="/sign-in"
+          className="text-sm font-medium underline-offset-4 hover:underline"
+        >
+          {FORGOT_PASSWORD_FORM_COPY.confirmationBackLink}
+        </Link>
+      </CardFooter>
+    </Card>
+  ) : (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>{FORGOT_PASSWORD_FORM_COPY.title}</CardTitle>
-        <CardDescription>{FORGOT_PASSWORD_FORM_COPY.description}</CardDescription>
+        <CardDescription>
+          {FORGOT_PASSWORD_FORM_COPY.description}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="forgot-password-email">
               {FORGOT_PASSWORD_FORM_COPY.emailLabel}
@@ -116,9 +117,7 @@ export function ForgotPasswordFormView({
           {error && (
             <p
               role="alert"
-              className={cn(
-                "rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive",
-              )}
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             >
               {error}
             </p>
