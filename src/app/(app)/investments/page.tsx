@@ -7,6 +7,7 @@ import {
   useInvestmentLedgers,
   useUpdateInvestmentLedger,
 } from "@/hooks/use-investment-ledgers";
+import { useAuth } from "@/hooks/use-auth";
 import {
   InvestmentLedgerList,
   InvestmentLedgerFormDialog,
@@ -15,9 +16,9 @@ import {
 import type { InvestmentLedger } from "@/lib/types";
 
 export default function InvestmentsPage() {
-  // TODO: replace with authenticated user id from auth context
-  const uid = "";
-  const { ledgers, isLoading } = useInvestmentLedgers(uid);
+  const { user } = useAuth();
+  const uid = user?.uid;
+  const { ledgers, isLoading } = useInvestmentLedgers(uid ?? "");
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingLedger, setEditingLedger] = useState<
@@ -27,9 +28,9 @@ export default function InvestmentsPage() {
     InvestmentLedger | undefined
   >(undefined);
 
-  const createMutation = useCreateInvestmentLedger(uid);
-  const updateMutation = useUpdateInvestmentLedger(uid);
-  const deleteMutation = useDeleteInvestmentLedger(uid);
+  const createMutation = useCreateInvestmentLedger(uid ?? "");
+  const updateMutation = useUpdateInvestmentLedger(uid ?? "");
+  const deleteMutation = useDeleteInvestmentLedger(uid ?? "");
 
   const handleNewLedger = () => {
     setEditingLedger(undefined);
@@ -46,6 +47,7 @@ export default function InvestmentsPage() {
   };
 
   const handleFormSubmit = (data: { name: string }) => {
+    if (!uid) return;
     if (editingLedger) {
       updateMutation.mutate(
         { id: editingLedger.id, data },
@@ -65,6 +67,7 @@ export default function InvestmentsPage() {
   };
 
   const handleDeleteConfirm = () => {
+    if (!uid) return;
     if (!deletingLedger) return;
     deleteMutation.mutate(deletingLedger.id, {
       onSuccess: () => {

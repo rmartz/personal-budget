@@ -43,6 +43,11 @@ export function InvestmentLedgerFormDialog({
     onSubmit({ name: trimmed });
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+    if (nameError) setNameError("");
+  };
+
   const title = isEditMode
     ? INVESTMENT_LEDGER_FORM_DIALOG_COPY.editTitle
     : INVESTMENT_LEDGER_FORM_DIALOG_COPY.createTitle;
@@ -72,10 +77,7 @@ export function InvestmentLedgerFormDialog({
                 id="ledger-name"
                 type="text"
                 value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  if (nameError) setNameError("");
-                }}
+                onChange={handleNameChange}
                 placeholder={INVESTMENT_LEDGER_FORM_DIALOG_COPY.namePlaceholder}
                 aria-invalid={nameError ? true : undefined}
                 aria-describedby={nameError ? "ledger-name-error" : undefined}
