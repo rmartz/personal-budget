@@ -2,12 +2,14 @@
 
 import { LedgerList } from "@/components/ledgers";
 import { useLedgers } from "@/hooks/use-ledgers";
+import { useDeleteLedger } from "@/hooks/use-delete-ledger";
 
 // TODO: replace with real uid from auth context once auth is implemented
 const PLACEHOLDER_UID = "";
 
 export default function LedgersPage() {
   const { ledgers, isLoading } = useLedgers(PLACEHOLDER_UID);
+  const { mutate: deleteLedger } = useDeleteLedger(PLACEHOLDER_UID);
 
   const handleNewLedger = () => {
     // TODO: open new ledger dialog/modal
@@ -19,6 +21,7 @@ export default function LedgersPage() {
         ledgers={ledgers}
         isLoading={isLoading}
         onNewLedger={handleNewLedger}
+        onDeleteLedger={deleteLedger}
       />
     </div>
   );

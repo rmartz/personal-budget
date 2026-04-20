@@ -4,3 +4,13 @@ export const LEDGERS_PAGE_COPY = {
   newLedgerButton: "New Ledger",
   title: "Budget Ledgers",
 } as const;
+
+export const LEDGER_LIST_ITEM_COPY = {
+  deleteConfirmButton: "Delete",
+  deleteConfirmDescription:
+    "This will permanently delete this ledger and all its associated transactions and goals. This action cannot be undone.",
+  deleteConfirmTitle: "Delete ledger?",
+  deleteCancelButton: "Cancel",
+  deleteMenuLabel: "Delete",
+  overflowMenuLabel: "More options",
+} as const;
