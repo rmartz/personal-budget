@@ -6,11 +6,11 @@ export const LEDGERS_PAGE_COPY = {
 } as const;
 
 export const LEDGER_LIST_ITEM_COPY = {
+  deleteCancelButton: "Cancel",
   deleteConfirmButton: "Delete",
   deleteConfirmDescription:
     "This will permanently delete this ledger and all its associated transactions and goals. This action cannot be undone.",
   deleteConfirmTitle: "Delete ledger?",
-  deleteCancelButton: "Cancel",
   deleteMenuLabel: "Delete",
   overflowMenuLabel: "More options",
 } as const;

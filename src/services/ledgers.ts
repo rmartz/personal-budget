@@ -1,12 +1,4 @@
-import {
-  getDatabase,
-  ref,
-  get,
-  set,
-  update,
-  remove,
-  push,
-} from "firebase/database";
+import { getDatabase, ref, get, set, update, push } from "firebase/database";
 import { getClientApp } from "@/lib/firebase/client";
 import {
   firebaseToBudgetLedger,
@@ -77,5 +69,9 @@ export async function updateLedger(
 }
 
 export async function deleteLedger(uid: string, id: string): Promise<void> {
-  await remove(ledgerRef(uid, id));
+  await update(ref(db(), `users/${uid}`), {
+    [`budgetLedgers/${id}`]: null,
+    [`budgetLedgerTransactions/${id}`]: null,
+    [`budgetLedgerSavingsGoals/${id}`]: null,
+  });
 }
