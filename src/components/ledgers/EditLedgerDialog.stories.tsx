@@ -8,8 +8,7 @@ const meta: Meta<typeof EditLedgerDialog> = {
     ledgerId: "ledger-1",
     initialName: "Everyday Spending",
     initialCashCap: 2000,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onSave: () => {},
+    onSave: () => Promise.resolve(),
   },
 };
 

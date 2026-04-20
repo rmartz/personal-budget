@@ -27,9 +27,10 @@ export default function LedgersPage() {
     // TODO: open new ledger dialog/modal
   };
 
-  const handleEditLedger = (id: string, data: UpdateLedgerInput) => {
-    editMutation.mutate({ id, data });
-  };
+  const handleEditLedger = (
+    id: string,
+    data: UpdateLedgerInput,
+  ): Promise<void> => editMutation.mutateAsync({ id, data });
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8">

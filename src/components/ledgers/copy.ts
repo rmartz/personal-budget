@@ -7,6 +7,7 @@ export const LEDGERS_PAGE_COPY = {
 
 export const EDIT_LEDGER_DIALOG_COPY = {
   cancelButton: "Cancel",
+  cashCapInvalid: "Cash cap must be a positive number.",
   cashCapLabel: "Cash Cap (optional)",
   cashCapPlaceholder: "e.g. 1000",
   dialogTitle: "Edit Ledger",
@@ -14,6 +15,6 @@ export const EDIT_LEDGER_DIALOG_COPY = {
   nameLabel: "Name",
   namePlaceholder: "e.g. Everyday Spending",
   nameRequired: "Name is required.",
-  cashCapInvalid: "Cash cap must be a positive number.",
   saveButton: "Save",
+  submitError: "Failed to save. Please try again.",
 } as const;

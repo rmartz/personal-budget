@@ -10,7 +10,7 @@ interface LedgerListProps {
   ledgers: Ledger[];
   isLoading: boolean;
   onNewLedger: () => void;
-  onEditLedger: (id: string, data: UpdateLedgerInput) => void;
+  onEditLedger: (id: string, data: UpdateLedgerInput) => Promise<void>;
 }
 
 export function LedgerList({

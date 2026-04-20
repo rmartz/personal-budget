@@ -8,7 +8,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 
 interface LedgerListItemProps {
   ledger: Ledger;
-  onEdit: (id: string, data: UpdateLedgerInput) => void;
+  onEdit: (id: string, data: UpdateLedgerInput) => Promise<void>;
 }
 
 export function LedgerListItem({ ledger, onEdit }: LedgerListItemProps) {

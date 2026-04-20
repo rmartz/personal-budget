@@ -1,5 +1,11 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  cleanup,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { EditLedgerDialog } from "./EditLedgerDialog";
 import { EDIT_LEDGER_DIALOG_COPY } from "./copy";
 
@@ -8,7 +14,7 @@ afterEach(cleanup);
 function renderDialog(
   overrides: Partial<Parameters<typeof EditLedgerDialog>[0]> = {},
 ) {
-  const onSave = vi.fn();
+  const onSave = vi.fn().mockResolvedValue(undefined);
   const props = {
     ledgerId: "ledger-1",
     initialName: "Everyday Spending",
@@ -20,20 +26,20 @@ function renderDialog(
   return { ...result, onSave };
 }
 
-function openDialog() {
+function openDialog(ledgerName = "Everyday Spending") {
   const trigger = screen.getByRole("button", {
-    name: EDIT_LEDGER_DIALOG_COPY.editButton,
+    name: `${EDIT_LEDGER_DIALOG_COPY.editButton} ${ledgerName}`,
   });
   fireEvent.click(trigger);
 }
 
 describe("EditLedgerDialog", () => {
   describe("trigger button", () => {
-    it("renders an edit button", () => {
-      renderDialog();
+    it("renders an edit button with accessible name including the ledger name", () => {
+      renderDialog({ initialName: "My Ledger" });
       expect(
         screen.getByRole("button", {
-          name: EDIT_LEDGER_DIALOG_COPY.editButton,
+          name: `${EDIT_LEDGER_DIALOG_COPY.editButton} My Ledger`,
         }),
       ).toBeDefined();
     });
@@ -50,7 +56,7 @@ describe("EditLedgerDialog", () => {
 
     it("pre-populates the name field with the initial name", () => {
       renderDialog({ initialName: "Vacation" });
-      openDialog();
+      openDialog("Vacation");
       const nameInput = screen.getByLabelText(
         EDIT_LEDGER_DIALOG_COPY.nameLabel,
       );
@@ -77,12 +83,12 @@ describe("EditLedgerDialog", () => {
   });
 
   describe("form submission", () => {
-    it("calls onSave with the ledger id and updated values on valid submit", () => {
+    it("calls onSave with the ledger id and updated values on valid submit", async () => {
       const { onSave } = renderDialog({
         initialName: "Old Name",
         initialCashCap: undefined,
       });
-      openDialog();
+      openDialog("Old Name");
       const nameInput = screen.getByLabelText(
         EDIT_LEDGER_DIALOG_COPY.nameLabel,
       );
@@ -92,18 +98,20 @@ describe("EditLedgerDialog", () => {
           name: EDIT_LEDGER_DIALOG_COPY.saveButton,
         }),
       );
-      expect(onSave).toHaveBeenCalledWith("ledger-1", {
-        name: "New Name",
-        cashCap: undefined,
+      await waitFor(() => {
+        expect(onSave).toHaveBeenCalledWith("ledger-1", {
+          name: "New Name",
+          cashCap: undefined,
+        });
       });
     });
 
-    it("calls onSave with a numeric cashCap when provided", () => {
+    it("calls onSave with a numeric cashCap when provided", async () => {
       const { onSave } = renderDialog({
         initialName: "Groceries",
         initialCashCap: undefined,
       });
-      openDialog();
+      openDialog("Groceries");
       fireEvent.change(
         screen.getByLabelText(EDIT_LEDGER_DIALOG_COPY.cashCapLabel),
         { target: { value: "750" } },
@@ -113,9 +121,11 @@ describe("EditLedgerDialog", () => {
           name: EDIT_LEDGER_DIALOG_COPY.saveButton,
         }),
       );
-      expect(onSave).toHaveBeenCalledWith("ledger-1", {
-        name: "Groceries",
-        cashCap: 750,
+      await waitFor(() => {
+        expect(onSave).toHaveBeenCalledWith("ledger-1", {
+          name: "Groceries",
+          cashCap: 750,
+        });
       });
     });
 
@@ -153,6 +163,22 @@ describe("EditLedgerDialog", () => {
       expect(
         screen.getByText(EDIT_LEDGER_DIALOG_COPY.cashCapInvalid),
       ).toBeDefined();
+    });
+
+    it("displays a submit error when onSave rejects", async () => {
+      const { onSave } = renderDialog();
+      onSave.mockRejectedValue(new Error("Network error"));
+      openDialog();
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.saveButton,
+        }),
+      );
+      await waitFor(() => {
+        expect(
+          screen.getByText(EDIT_LEDGER_DIALOG_COPY.submitError),
+        ).toBeDefined();
+      });
     });
   });
 

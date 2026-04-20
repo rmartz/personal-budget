@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { LedgerList } from "./LedgerList";
 import { LEDGERS_PAGE_COPY } from "./copy";
-import type { Ledger } from "@/lib/types";
+import type { Ledger, UpdateLedgerInput } from "@/lib/types";
 
 afterEach(cleanup);
 
@@ -19,7 +19,8 @@ function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
 
 describe("LedgerList", () => {
   const onNewLedger = vi.fn();
-  const onEditLedger = vi.fn();
+  const onEditLedger: (id: string, data: UpdateLedgerInput) => Promise<void> =
+    vi.fn().mockResolvedValue(undefined);
 
   describe("empty state", () => {
     it("renders the empty state message when there are no ledgers", () => {

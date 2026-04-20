@@ -1,17 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog } from "@base-ui/react/dialog";
 import { Pencil } from "lucide-react";
 import type { UpdateLedgerInput } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { EDIT_LEDGER_DIALOG_COPY } from "./copy";
 
 export interface EditLedgerDialogProps {
   ledgerId: string;
   initialName: string;
   initialCashCap: number | undefined;
-  onSave: (id: string, data: UpdateLedgerInput) => void;
+  onSave: (id: string, data: UpdateLedgerInput) => Promise<void>;
 }
 
 export function EditLedgerDialog({
@@ -27,20 +34,35 @@ export function EditLedgerDialog({
   );
   const [nameError, setNameError] = useState<string | undefined>();
   const [cashCapError, setCashCapError] = useState<string | undefined>();
+  const [submitError, setSubmitError] = useState<string | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleOpen = () => {
+  const nameInputId = `edit-ledger-name-${ledgerId}`;
+  const nameErrorId = `edit-ledger-name-error-${ledgerId}`;
+  const cashCapInputId = `edit-ledger-cash-cap-${ledgerId}`;
+  const cashCapErrorId = `edit-ledger-cash-cap-error-${ledgerId}`;
+
+  const resetForm = () => {
     setName(initialName);
     setCashCapRaw(initialCashCap !== undefined ? String(initialCashCap) : "");
+    setIsSubmitting(false);
     setNameError(undefined);
     setCashCapError(undefined);
-    setOpen(true);
+    setSubmitError(undefined);
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      resetForm();
+    }
+    setOpen(nextOpen);
   };
 
   const handleCancel = () => {
     setOpen(false);
   };
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
 
     let valid = true;
@@ -70,89 +92,115 @@ export function EditLedgerDialog({
 
     if (!valid) return;
 
-    onSave(ledgerId, { name: trimmedName, cashCap });
-    setOpen(false);
+    setIsSubmitting(true);
+    setSubmitError(undefined);
+    try {
+      await onSave(ledgerId, { name: trimmedName, cashCap });
+      setOpen(false);
+    } catch {
+      setSubmitError(EDIT_LEDGER_DIALOG_COPY.submitError);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger
         render={
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label={EDIT_LEDGER_DIALOG_COPY.editButton}
-            onClick={handleOpen}
+            aria-label={`${EDIT_LEDGER_DIALOG_COPY.editButton} ${initialName}`}
           />
         }
       >
         <Pencil aria-hidden="true" />
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-black/40 dark:bg-black/60" />
-        <Dialog.Popup className="fixed left-1/2 top-1/2 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-background p-6 shadow-lg">
-          <Dialog.Title className="mb-4 text-lg font-semibold">
-            {EDIT_LEDGER_DIALOG_COPY.dialogTitle}
-          </Dialog.Title>
-          <form
-            onSubmit={handleSubmit}
-            noValidate
-            className="flex flex-col gap-4"
-          >
-            <div className="flex flex-col gap-1">
-              <label htmlFor="edit-ledger-name" className="text-sm font-medium">
-                {EDIT_LEDGER_DIALOG_COPY.nameLabel}
-              </label>
-              <input
-                id="edit-ledger-name"
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
-                placeholder={EDIT_LEDGER_DIALOG_COPY.namePlaceholder}
-                aria-invalid={nameError !== undefined}
-                className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
-              />
-              {nameError !== undefined && (
-                <p className="text-xs text-destructive">{nameError}</p>
-              )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <label
-                htmlFor="edit-ledger-cash-cap"
-                className="text-sm font-medium"
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{EDIT_LEDGER_DIALOG_COPY.dialogTitle}</DialogTitle>
+        </DialogHeader>
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(e);
+          }}
+          noValidate
+          className="flex flex-col gap-4"
+        >
+          <div className="flex flex-col gap-1">
+            <label htmlFor={nameInputId} className="text-sm font-medium">
+              {EDIT_LEDGER_DIALOG_COPY.nameLabel}
+            </label>
+            <input
+              id={nameInputId}
+              type="text"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+              placeholder={EDIT_LEDGER_DIALOG_COPY.namePlaceholder}
+              aria-invalid={nameError !== undefined}
+              aria-describedby={
+                nameError !== undefined ? nameErrorId : undefined
+              }
+              className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
+            />
+            {nameError !== undefined && (
+              <p
+                id={nameErrorId}
+                role="alert"
+                className="text-xs text-destructive"
               >
-                {EDIT_LEDGER_DIALOG_COPY.cashCapLabel}
-              </label>
-              <input
-                id="edit-ledger-cash-cap"
-                type="number"
-                min="0"
-                step="any"
-                value={cashCapRaw}
-                onChange={(e) => {
-                  setCashCapRaw(e.target.value);
-                }}
-                placeholder={EDIT_LEDGER_DIALOG_COPY.cashCapPlaceholder}
-                aria-invalid={cashCapError !== undefined}
-                className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
-              />
-              {cashCapError !== undefined && (
-                <p className="text-xs text-destructive">{cashCapError}</p>
-              )}
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                {EDIT_LEDGER_DIALOG_COPY.cancelButton}
-              </Button>
-              <Button type="submit">
-                {EDIT_LEDGER_DIALOG_COPY.saveButton}
-              </Button>
-            </div>
-          </form>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+                {nameError}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor={cashCapInputId} className="text-sm font-medium">
+              {EDIT_LEDGER_DIALOG_COPY.cashCapLabel}
+            </label>
+            <input
+              id={cashCapInputId}
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={cashCapRaw}
+              onChange={(e) => {
+                setCashCapRaw(e.target.value);
+              }}
+              placeholder={EDIT_LEDGER_DIALOG_COPY.cashCapPlaceholder}
+              aria-invalid={cashCapError !== undefined}
+              aria-describedby={
+                cashCapError !== undefined ? cashCapErrorId : undefined
+              }
+              className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
+            />
+            {cashCapError !== undefined && (
+              <p
+                id={cashCapErrorId}
+                role="alert"
+                className="text-xs text-destructive"
+              >
+                {cashCapError}
+              </p>
+            )}
+          </div>
+          {submitError !== undefined && (
+            <p role="alert" className="text-sm text-destructive">
+              {submitError}
+            </p>
+          )}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              {EDIT_LEDGER_DIALOG_COPY.cancelButton}
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {EDIT_LEDGER_DIALOG_COPY.saveButton}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
