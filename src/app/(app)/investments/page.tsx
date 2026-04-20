@@ -7,9 +7,11 @@ import {
   useInvestmentLedgers,
   useUpdateInvestmentLedger,
 } from "@/hooks/use-investment-ledgers";
-import { InvestmentLedgerList } from "@/components/investments";
-import { InvestmentLedgerFormDialog } from "@/components/investments/InvestmentLedgerFormDialog";
-import { InvestmentLedgerDeleteDialog } from "@/components/investments/InvestmentLedgerDeleteDialog";
+import {
+  InvestmentLedgerList,
+  InvestmentLedgerFormDialog,
+  InvestmentLedgerDeleteDialog,
+} from "@/components/investments";
 import type { InvestmentLedger } from "@/lib/types";
 
 export default function InvestmentsPage() {
@@ -71,6 +73,10 @@ export default function InvestmentsPage() {
     });
   };
 
+  const handleDeleteDialogOpenChange = (open: boolean) => {
+    if (!open) setDeletingLedger(undefined);
+  };
+
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-8">
       <InvestmentLedgerList
@@ -87,17 +93,13 @@ export default function InvestmentsPage() {
         onSubmit={handleFormSubmit}
         isPending={createMutation.isPending || updateMutation.isPending}
       />
-      {deletingLedger && (
-        <InvestmentLedgerDeleteDialog
-          open={!!deletingLedger}
-          onOpenChange={(open) => {
-            if (!open) setDeletingLedger(undefined);
-          }}
-          ledger={deletingLedger}
-          onConfirm={handleDeleteConfirm}
-          isPending={deleteMutation.isPending}
-        />
-      )}
+      <InvestmentLedgerDeleteDialog
+        open={!!deletingLedger}
+        onOpenChange={handleDeleteDialogOpenChange}
+        ledger={deletingLedger}
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteMutation.isPending}
+      />
     </main>
   );
 }

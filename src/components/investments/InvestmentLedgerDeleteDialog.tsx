@@ -7,7 +7,7 @@ import { INVESTMENT_LEDGER_DELETE_DIALOG_COPY } from "./copy";
 export interface InvestmentLedgerDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  ledger: InvestmentLedger;
+  ledger: InvestmentLedger | undefined;
   onConfirm: () => void;
   isPending?: boolean;
 }
@@ -28,7 +28,8 @@ export function InvestmentLedgerDeleteDialog({
             {INVESTMENT_LEDGER_DELETE_DIALOG_COPY.title}
           </Dialog.Title>
           <Dialog.Description className="text-sm text-zinc-600 dark:text-zinc-400">
-            {INVESTMENT_LEDGER_DELETE_DIALOG_COPY.description(ledger.name)}
+            {ledger &&
+              INVESTMENT_LEDGER_DELETE_DIALOG_COPY.description(ledger.name)}
           </Dialog.Description>
           <div className="mt-6 flex justify-end gap-3">
             <Dialog.Close

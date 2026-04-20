@@ -40,8 +40,10 @@ export function useInvestmentLedgers(uid: string): UseInvestmentLedgersResult {
 export function useCreateInvestmentLedger(uid: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateInvestmentLedgerInput) =>
-      createInvestmentLedger(uid, data),
+    mutationFn: (data: CreateInvestmentLedgerInput) => {
+      if (!uid) return Promise.reject(new Error("uid required"));
+      return createInvestmentLedger(uid, data);
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: ["investmentLedgers", uid],
@@ -59,7 +61,10 @@ export function useUpdateInvestmentLedger(uid: string) {
     }: {
       id: string;
       data: UpdateInvestmentLedgerInput;
-    }) => updateInvestmentLedger(uid, id, data),
+    }) => {
+      if (!uid) return Promise.reject(new Error("uid required"));
+      return updateInvestmentLedger(uid, id, data);
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: ["investmentLedgers", uid],
@@ -71,7 +76,10 @@ export function useUpdateInvestmentLedger(uid: string) {
 export function useDeleteInvestmentLedger(uid: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => deleteInvestmentLedger(uid, id),
+    mutationFn: (id: string) => {
+      if (!uid) return Promise.reject(new Error("uid required"));
+      return deleteInvestmentLedger(uid, id);
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: ["investmentLedgers", uid],
