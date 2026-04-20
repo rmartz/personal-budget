@@ -7,6 +7,8 @@ const meta: Meta<typeof LedgerList> = {
   args: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onNewLedger: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDeleteLedger: () => {},
   },
 };
 
