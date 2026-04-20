@@ -28,15 +28,23 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
-interface LedgerListItemProps {
+export interface LedgerListItemViewProps {
   ledger: Ledger;
-  onDelete?: (id: string) => void;
+  dialogOpen: boolean;
+  onDialogOpenChange: (open: boolean) => void;
+  onDeleteMenuClick: () => void;
+  onDeleteConfirm: () => void;
 }
 
-export function LedgerListItem({ ledger, onDelete }: LedgerListItemProps) {
+export function LedgerListItemView({
+  ledger,
+  dialogOpen,
+  onDialogOpenChange,
+  onDeleteMenuClick,
+  onDeleteConfirm,
+}: LedgerListItemViewProps) {
   const totalBalance = ledger.cashBalance + ledger.investmentBalance;
   const formattedBalance = currencyFormatter.format(totalBalance);
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
     <li className="flex items-center justify-between rounded-lg border px-4 py-3">
@@ -57,9 +65,7 @@ export function LedgerListItem({ ledger, onDelete }: LedgerListItemProps) {
               <DropdownMenuPopup>
                 <DropdownMenuItem
                   className="text-destructive hover:bg-destructive/10 data-[highlighted]:bg-destructive/10"
-                  onClick={() => {
-                    setDialogOpen(true);
-                  }}
+                  onClick={onDeleteMenuClick}
                 >
                   {LEDGER_LIST_ITEM_COPY.deleteMenuLabel}
                 </DropdownMenuItem>
@@ -67,7 +73,7 @@ export function LedgerListItem({ ledger, onDelete }: LedgerListItemProps) {
             </DropdownMenuPositioner>
           </DropdownMenuPortal>
         </DropdownMenuRoot>
-        <AlertDialogRoot open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogRoot open={dialogOpen} onOpenChange={onDialogOpenChange}>
           <AlertDialogPortal>
             <AlertDialogBackdrop />
             <AlertDialogPopup>
@@ -81,13 +87,7 @@ export function LedgerListItem({ ledger, onDelete }: LedgerListItemProps) {
                 <AlertDialogClose>
                   {LEDGER_LIST_ITEM_COPY.deleteCancelButton}
                 </AlertDialogClose>
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    setDialogOpen(false);
-                    onDelete?.(ledger.id);
-                  }}
-                >
+                <Button variant="destructive" onClick={onDeleteConfirm}>
                   {LEDGER_LIST_ITEM_COPY.deleteConfirmButton}
                 </Button>
               </div>
@@ -96,5 +96,33 @@ export function LedgerListItem({ ledger, onDelete }: LedgerListItemProps) {
         </AlertDialogRoot>
       </div>
     </li>
+  );
+}
+
+interface LedgerListItemProps {
+  ledger: Ledger;
+  onDelete: (id: string) => void;
+}
+
+export function LedgerListItem({ ledger, onDelete }: LedgerListItemProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  function handleDeleteMenuClick() {
+    setDialogOpen(true);
+  }
+
+  function handleDeleteConfirm() {
+    setDialogOpen(false);
+    onDelete(ledger.id);
+  }
+
+  return (
+    <LedgerListItemView
+      ledger={ledger}
+      dialogOpen={dialogOpen}
+      onDialogOpenChange={setDialogOpen}
+      onDeleteMenuClick={handleDeleteMenuClick}
+      onDeleteConfirm={handleDeleteConfirm}
+    />
   );
 }

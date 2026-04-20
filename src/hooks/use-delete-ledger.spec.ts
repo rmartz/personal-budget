@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { renderHook, waitFor, cleanup } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createElement } from "react";
+import type { ReactNode } from "react";
 import { useDeleteLedger } from "./use-delete-ledger";
 import * as ledgersService from "@/services/ledgers";
 
@@ -14,7 +15,7 @@ function makeWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  return ({ children }: { children: React.ReactNode }) =>
+  return ({ children }: { children: ReactNode }) =>
     createElement(QueryClientProvider, { client: queryClient }, children);
 }
 
@@ -47,5 +48,20 @@ describe("useDeleteLedger", () => {
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
+  });
+
+  it("rejects with an error when uid is empty", async () => {
+    const spy = vi.spyOn(ledgersService, "deleteLedger");
+
+    const { result } = renderHook(() => useDeleteLedger(""), {
+      wrapper: makeWrapper(),
+    });
+
+    result.current.mutate("ledger-abc");
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+    expect(spy).not.toHaveBeenCalled();
   });
 });

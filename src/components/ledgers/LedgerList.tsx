@@ -10,7 +10,7 @@ interface LedgerListProps {
   ledgers: Ledger[];
   isLoading: boolean;
   onNewLedger: () => void;
-  onDeleteLedger?: (id: string) => void;
+  onDeleteLedger: (id: string) => void;
 }
 
 export function LedgerList({

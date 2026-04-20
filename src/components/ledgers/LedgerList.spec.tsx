@@ -19,11 +19,17 @@ function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
 
 describe("LedgerList", () => {
   const onNewLedger = vi.fn();
+  const onDeleteLedger = vi.fn();
 
   describe("empty state", () => {
     it("renders the empty state message when there are no ledgers", () => {
       render(
-        <LedgerList ledgers={[]} isLoading={false} onNewLedger={onNewLedger} />,
+        <LedgerList
+          ledgers={[]}
+          isLoading={false}
+          onNewLedger={onNewLedger}
+          onDeleteLedger={onDeleteLedger}
+        />,
       );
       expect(
         screen.getByText(LEDGERS_PAGE_COPY.emptyStateMessage),
@@ -32,7 +38,12 @@ describe("LedgerList", () => {
 
     it("renders the New Ledger button in empty state", () => {
       render(
-        <LedgerList ledgers={[]} isLoading={false} onNewLedger={onNewLedger} />,
+        <LedgerList
+          ledgers={[]}
+          isLoading={false}
+          onNewLedger={onNewLedger}
+          onDeleteLedger={onDeleteLedger}
+        />,
       );
       expect(screen.getByText(LEDGERS_PAGE_COPY.newLedgerButton)).toBeDefined();
     });
@@ -41,7 +52,12 @@ describe("LedgerList", () => {
   describe("loading state", () => {
     it("does not render the empty state message while loading", () => {
       render(
-        <LedgerList ledgers={[]} isLoading={true} onNewLedger={onNewLedger} />,
+        <LedgerList
+          ledgers={[]}
+          isLoading={true}
+          onNewLedger={onNewLedger}
+          onDeleteLedger={onDeleteLedger}
+        />,
       );
       expect(
         screen.queryByText(LEDGERS_PAGE_COPY.emptyStateMessage),
@@ -60,6 +76,7 @@ describe("LedgerList", () => {
           ledgers={ledgers}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onDeleteLedger={onDeleteLedger}
         />,
       );
       expect(screen.getByText("Everyday Spending")).toBeDefined();
@@ -80,6 +97,7 @@ describe("LedgerList", () => {
           ledgers={ledgers}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onDeleteLedger={onDeleteLedger}
         />,
       );
       expect(screen.getByText("$1,500.00")).toBeDefined();
@@ -92,6 +110,7 @@ describe("LedgerList", () => {
           ledgers={ledgers}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onDeleteLedger={onDeleteLedger}
         />,
       );
       expect(
