@@ -1,3 +1,4 @@
 export { LedgerList } from "./LedgerList";
 export { LedgerListItem } from "./LedgerListItem";
-export { LEDGERS_PAGE_COPY } from "./copy";
+export { EditLedgerDialog } from "./EditLedgerDialog";
+export { LEDGERS_PAGE_COPY, EDIT_LEDGER_DIALOG_COPY } from "./copy";

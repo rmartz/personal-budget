@@ -1,4 +1,5 @@
-import type { Ledger } from "@/lib/types";
+import type { Ledger, UpdateLedgerInput } from "@/lib/types";
+import { EditLedgerDialog } from "./EditLedgerDialog";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -7,18 +8,27 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 
 interface LedgerListItemProps {
   ledger: Ledger;
+  onEdit: (id: string, data: UpdateLedgerInput) => void;
 }
 
-export function LedgerListItem({ ledger }: LedgerListItemProps) {
+export function LedgerListItem({ ledger, onEdit }: LedgerListItemProps) {
   const totalBalance = ledger.cashBalance + ledger.investmentBalance;
   const formattedBalance = currencyFormatter.format(totalBalance);
 
   return (
     <li className="flex items-center justify-between rounded-lg border px-4 py-3">
       <span className="font-medium">{ledger.name}</span>
-      <span className="text-sm text-zinc-600 dark:text-zinc-400">
-        {formattedBalance}
-      </span>
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-zinc-600 dark:text-zinc-400">
+          {formattedBalance}
+        </span>
+        <EditLedgerDialog
+          ledgerId={ledger.id}
+          initialName={ledger.name}
+          initialCashCap={ledger.cashCap}
+          onSave={onEdit}
+        />
+      </div>
     </li>
   );
 }

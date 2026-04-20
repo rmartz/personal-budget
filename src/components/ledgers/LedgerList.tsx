@@ -1,6 +1,6 @@
 "use client";
 
-import type { Ledger } from "@/lib/types";
+import type { Ledger, UpdateLedgerInput } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LedgerListItem } from "./LedgerListItem";
@@ -10,12 +10,14 @@ interface LedgerListProps {
   ledgers: Ledger[];
   isLoading: boolean;
   onNewLedger: () => void;
+  onEditLedger: (id: string, data: UpdateLedgerInput) => void;
 }
 
 export function LedgerList({
   ledgers,
   isLoading,
   onNewLedger,
+  onEditLedger,
 }: LedgerListProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -49,7 +51,11 @@ export function LedgerList({
       ) : (
         <ul className="flex flex-col gap-2">
           {ledgers.map((ledger) => (
-            <LedgerListItem key={ledger.id} ledger={ledger} />
+            <LedgerListItem
+              key={ledger.id}
+              ledger={ledger}
+              onEdit={onEditLedger}
+            />
           ))}
         </ul>
       )}
