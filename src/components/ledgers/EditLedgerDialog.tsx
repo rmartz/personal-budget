@@ -59,6 +59,7 @@ export function EditLedgerDialog({
   };
 
   const handleCancel = () => {
+    resetForm();
     setOpen(false);
   };
 

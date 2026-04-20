@@ -193,5 +193,24 @@ describe("EditLedgerDialog", () => {
       );
       expect(onSave).not.toHaveBeenCalled();
     });
+
+    it("resets form state when reopened after cancel", () => {
+      renderDialog({ initialName: "Original Name" });
+      openDialog("Original Name");
+      fireEvent.change(
+        screen.getByLabelText(EDIT_LEDGER_DIALOG_COPY.nameLabel),
+        { target: { value: "Edited Name" } },
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.cancelButton,
+        }),
+      );
+      openDialog("Original Name");
+      const nameInput = screen.getByLabelText(
+        EDIT_LEDGER_DIALOG_COPY.nameLabel,
+      );
+      expect((nameInput as HTMLInputElement).value).toBe("Original Name");
+    });
   });
 });
