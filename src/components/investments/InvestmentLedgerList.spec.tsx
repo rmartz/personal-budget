@@ -17,6 +17,12 @@ function makeInvestmentLedger(
   };
 }
 
+const defaultProps = {
+  onNewLedger: vi.fn(),
+  onEditLedger: vi.fn(),
+  onDeleteLedger: vi.fn(),
+};
+
 describe("InvestmentLedgerList", () => {
   describe("loading state", () => {
     it("does not render the empty state heading", () => {
@@ -24,7 +30,7 @@ describe("InvestmentLedgerList", () => {
         <InvestmentLedgerList
           ledgers={[]}
           isLoading={true}
-          onNewLedger={vi.fn()}
+          {...defaultProps}
         />,
       );
       expect(
@@ -37,7 +43,7 @@ describe("InvestmentLedgerList", () => {
         <InvestmentLedgerList
           ledgers={[]}
           isLoading={true}
-          onNewLedger={vi.fn()}
+          {...defaultProps}
         />,
       );
       expect(
@@ -54,7 +60,7 @@ describe("InvestmentLedgerList", () => {
         <InvestmentLedgerList
           ledgers={[]}
           isLoading={false}
-          onNewLedger={vi.fn()}
+          {...defaultProps}
         />,
       );
       expect(
@@ -67,7 +73,7 @@ describe("InvestmentLedgerList", () => {
         <InvestmentLedgerList
           ledgers={[]}
           isLoading={false}
-          onNewLedger={vi.fn()}
+          {...defaultProps}
         />,
       );
       expect(
@@ -80,7 +86,7 @@ describe("InvestmentLedgerList", () => {
         <InvestmentLedgerList
           ledgers={[]}
           isLoading={false}
-          onNewLedger={vi.fn()}
+          {...defaultProps}
         />,
       );
       expect(
@@ -99,7 +105,7 @@ describe("InvestmentLedgerList", () => {
         <InvestmentLedgerList
           ledgers={ledgers}
           isLoading={false}
-          onNewLedger={vi.fn()}
+          {...defaultProps}
         />,
       );
       expect(getByText("Stocks")).toBeDefined();
@@ -119,7 +125,7 @@ describe("InvestmentLedgerList", () => {
         <InvestmentLedgerList
           ledgers={ledgers}
           isLoading={false}
-          onNewLedger={vi.fn()}
+          {...defaultProps}
         />,
       );
       expect(getByText("$45,000.00")).toBeDefined();

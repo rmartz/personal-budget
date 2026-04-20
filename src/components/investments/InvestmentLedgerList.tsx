@@ -8,12 +8,16 @@ export interface InvestmentLedgerListProps {
   ledgers: InvestmentLedger[];
   isLoading: boolean;
   onNewLedger: () => void;
+  onEditLedger: (ledger: InvestmentLedger) => void;
+  onDeleteLedger: (ledger: InvestmentLedger) => void;
 }
 
 export function InvestmentLedgerList({
   ledgers,
   isLoading,
   onNewLedger,
+  onEditLedger,
+  onDeleteLedger,
 }: InvestmentLedgerListProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -64,7 +68,12 @@ export function InvestmentLedgerList({
       ) : (
         <div className="flex flex-col gap-2">
           {ledgers.map((ledger) => (
-            <InvestmentLedgerListItem key={ledger.id} ledger={ledger} />
+            <InvestmentLedgerListItem
+              key={ledger.id}
+              ledger={ledger}
+              onEdit={onEditLedger}
+              onDelete={onDeleteLedger}
+            />
           ))}
         </div>
       )}

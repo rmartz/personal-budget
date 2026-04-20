@@ -1,8 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import type { InvestmentLedger } from "@/lib/types";
-import { getInvestmentLedgers } from "@/services/investment-ledgers";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {
+  CreateInvestmentLedgerInput,
+  InvestmentLedger,
+  UpdateInvestmentLedgerInput,
+} from "@/lib/types";
+import {
+  createInvestmentLedger,
+  deleteInvestmentLedger,
+  getInvestmentLedgers,
+  updateInvestmentLedger,
+} from "@/services/investment-ledgers";
 
 interface UseInvestmentLedgersResult {
   ledgers: InvestmentLedger[] | undefined;
@@ -26,4 +35,47 @@ export function useInvestmentLedgers(uid: string): UseInvestmentLedgersResult {
     isLoading,
     error: error instanceof Error ? error : null,
   };
+}
+
+export function useCreateInvestmentLedger(uid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateInvestmentLedgerInput) =>
+      createInvestmentLedger(uid, data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["investmentLedgers", uid],
+      });
+    },
+  });
+}
+
+export function useUpdateInvestmentLedger(uid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateInvestmentLedgerInput;
+    }) => updateInvestmentLedger(uid, id, data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["investmentLedgers", uid],
+      });
+    },
+  });
+}
+
+export function useDeleteInvestmentLedger(uid: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteInvestmentLedger(uid, id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["investmentLedgers", uid],
+      });
+    },
+  });
 }

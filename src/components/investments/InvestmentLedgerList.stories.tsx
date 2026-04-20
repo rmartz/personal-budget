@@ -28,6 +28,8 @@ const meta: Meta<typeof InvestmentLedgerList> = {
   title: "Investments/InvestmentLedgerList",
   args: {
     onNewLedger: (() => undefined) as () => void,
+    onEditLedger: (() => undefined) as (ledger: InvestmentLedger) => void,
+    onDeleteLedger: (() => undefined) as (ledger: InvestmentLedger) => void,
   },
 };
 
