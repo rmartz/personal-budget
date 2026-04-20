@@ -3,23 +3,9 @@
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog";
 import { cn } from "@/lib/utils";
 
-function AlertDialogRoot({
-  ...props
-}: AlertDialogPrimitive.Root.Props) {
-  return <AlertDialogPrimitive.Root {...props} />;
-}
-
-function AlertDialogTrigger({
-  ...props
-}: AlertDialogPrimitive.Trigger.Props) {
-  return <AlertDialogPrimitive.Trigger {...props} />;
-}
-
-function AlertDialogPortal({
-  ...props
-}: AlertDialogPrimitive.Portal.Props) {
-  return <AlertDialogPrimitive.Portal {...props} />;
-}
+export const AlertDialogRoot = AlertDialogPrimitive.Root;
+export const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
+export const AlertDialogPortal = AlertDialogPrimitive.Portal;
 
 function AlertDialogBackdrop({
   className,
@@ -91,9 +77,6 @@ function AlertDialogClose({
 }
 
 export {
-  AlertDialogRoot,
-  AlertDialogTrigger,
-  AlertDialogPortal,
   AlertDialogBackdrop,
   AlertDialogPopup,
   AlertDialogTitle,

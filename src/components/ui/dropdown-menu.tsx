@@ -3,21 +3,10 @@
 import { Menu } from "@base-ui/react/menu";
 import { cn } from "@/lib/utils";
 
-function DropdownMenuRoot({ ...props }: Menu.Root.Props) {
-  return <Menu.Root {...props} />;
-}
-
-function DropdownMenuTrigger({ ...props }: Menu.Trigger.Props) {
-  return <Menu.Trigger {...props} />;
-}
-
-function DropdownMenuPortal({ ...props }: Menu.Portal.Props) {
-  return <Menu.Portal {...props} />;
-}
-
-function DropdownMenuPositioner({ ...props }: Menu.Positioner.Props) {
-  return <Menu.Positioner {...props} />;
-}
+export const DropdownMenuRoot = Menu.Root;
+export const DropdownMenuTrigger = Menu.Trigger;
+export const DropdownMenuPortal = Menu.Portal;
+export const DropdownMenuPositioner = Menu.Positioner;
 
 function DropdownMenuPopup({
   className,
@@ -49,11 +38,4 @@ function DropdownMenuItem({
   );
 }
 
-export {
-  DropdownMenuRoot,
-  DropdownMenuTrigger,
-  DropdownMenuPortal,
-  DropdownMenuPositioner,
-  DropdownMenuPopup,
-  DropdownMenuItem,
-};
+export { DropdownMenuPopup, DropdownMenuItem };
