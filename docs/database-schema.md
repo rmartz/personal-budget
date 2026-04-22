@@ -31,19 +31,6 @@ Timestamps are stored as ISO 8601 strings (e.g. `"2024-01-15T00:00:00.000Z"`). T
         fundedAmount    number        Amount currently funded
         priority        number        Integer; lower value = higher priority
 
-  investmentLedgers/
-    {ledgerId}/
-      name              string        Required. Display name (e.g. "Stocks")
-      targetAllocationPct number      Target allocation as a percentage (0–100)
-
-  investmentLots/
-    {ledgerId}/
-      {lotId}/
-        type            string        "purchase" | "sale"
-        date            string        ISO 8601 timestamp
-        units           number        Number of units transacted
-        pricePerUnit    number        Price per unit at time of transaction
-
   annuities/
     {annuityId}/
       name              string        Display name (e.g. "Netflix")
@@ -71,6 +58,5 @@ All paths under `/users/{uid}/` are readable and writable only by the authentica
 ## Design Notes
 
 - `budgetLedgerTransactions` and `budgetLedgerSavingsGoals` are nested under the ledger ID to keep related data co-located and to enable efficient Firebase queries scoped to a single ledger.
-- `investmentLots` follow the same pattern, nested under the parent `investmentLedger` ID.
 - `annuities`, `reconciliationAccounts`, and `reconciliationExpenses` are flat (not nested under another entity) because they are independent domain objects.
 - Optional fields that Firebase cannot store as `undefined` are written as `null` in the Firebase layer and converted back to `undefined` in the domain layer by the serialization helpers.
