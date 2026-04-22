@@ -108,6 +108,13 @@ pnpm build-storybook  # Build static Storybook
 - **Keep tests simple.** A failing test should make it immediately obvious whether the failure is a bug or an intentional change in behavior. If understanding a failure requires reading more than one layer of test setup or multiple assertions, split the test.
 - **Granularity scales with level of abstraction.** Low-level functions (pure utilities, serializers) warrant thorough edge-case coverage. High-level functions (service orchestration) should have smoke tests that verify they correctly apply the lower-level logic — not re-test every edge case that belongs in the lower-level tests.
 
+## Firebase Schema Migrations
+
+- **Never make a breaking schema change without a migration.** A breaking change is any modification to the Firebase Realtime DB path structure or field format that would cause existing stored data to be misread, ignored, or crash the application — for example: renaming a path segment, changing a field's type, removing a required field, or altering an enum's serialized value.
+- Before merging a breaking schema change, provide a migration script in `scripts/migrations/` that reads the old data shape and writes it in the new shape. The script must be idempotent (safe to run multiple times) and must not delete old data until the migration is verified complete.
+- Additive changes (new optional fields with safe defaults in `firebaseTo*()` helpers, new path segments that existing code ignores) are not breaking and do not require a migration.
+- Document the migration in `docs/database-schema.md` alongside the schema change.
+
 ## GitHub Issues
 
 - When picking the next task from a milestone, use `gh issue list --milestone "<milestone title>" --state open`.

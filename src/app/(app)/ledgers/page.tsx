@@ -3,23 +3,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LedgerList } from "@/components/ledgers";
 import { useLedgers } from "@/hooks/use-ledgers";
+import { useDeleteLedger } from "@/hooks/use-delete-ledger";
+import { useAuth } from "@/hooks/use-auth";
 import { updateLedger } from "@/services/ledgers";
 import type { UpdateLedgerInput } from "@/lib/types";
 
-// TODO: replace with real uid from auth context once auth is implemented
-const PLACEHOLDER_UID = "";
-
 export default function LedgersPage() {
+  const { user, loading: authLoading } = useAuth();
+  const uid = user?.uid ?? "";
+  const { ledgers, isLoading } = useLedgers(uid);
   const queryClient = useQueryClient();
-  const { ledgers, isLoading } = useLedgers(PLACEHOLDER_UID);
+  const { mutate: deleteLedger } = useDeleteLedger(uid);
 
   const editMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLedgerInput }) =>
-      updateLedger(PLACEHOLDER_UID, id, data),
+      updateLedger(uid, id, data),
     onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["ledgers", PLACEHOLDER_UID],
-      });
+      void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
     },
   });
 
@@ -32,6 +32,10 @@ export default function LedgersPage() {
     data: UpdateLedgerInput,
   ): Promise<void> => editMutation.mutateAsync({ id, data });
 
+  if (authLoading || !user) {
+    return null;
+  }
+
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8">
       <LedgerList
@@ -39,6 +43,7 @@ export default function LedgersPage() {
         isLoading={isLoading}
         onNewLedger={handleNewLedger}
         onEditLedger={handleEditLedger}
+        onDeleteLedger={deleteLedger}
       />
     </div>
   );

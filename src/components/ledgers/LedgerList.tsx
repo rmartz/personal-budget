@@ -11,6 +11,7 @@ interface LedgerListProps {
   isLoading: boolean;
   onNewLedger: () => void;
   onEditLedger: (id: string, data: UpdateLedgerInput) => Promise<void>;
+  onDeleteLedger: (id: string) => void;
 }
 
 export function LedgerList({
@@ -18,6 +19,7 @@ export function LedgerList({
   isLoading,
   onNewLedger,
   onEditLedger,
+  onDeleteLedger,
 }: LedgerListProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -55,6 +57,7 @@ export function LedgerList({
               key={ledger.id}
               ledger={ledger}
               onEdit={onEditLedger}
+              onDelete={onDeleteLedger}
             />
           ))}
         </ul>
