@@ -21,9 +21,11 @@ const meta: Meta<typeof LedgerListItemView> = {
   ],
   args: {
     ledger: sampleLedger,
-    dialogOpen: false,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onDialogOpenChange: () => {},
+    onEdit: async () => {},
+    deleteDialogOpen: false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDeleteDialogOpenChange: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onDeleteMenuClick: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -47,6 +49,6 @@ export const WithNoCashCap: Story = {
 
 export const DeleteDialogOpen: Story = {
   args: {
-    dialogOpen: true,
+    deleteDialogOpen: true,
   },
 };
