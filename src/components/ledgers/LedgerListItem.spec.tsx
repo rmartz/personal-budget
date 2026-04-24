@@ -19,22 +19,23 @@ function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
 
 describe("LedgerListItem", () => {
   const onDelete = vi.fn();
+  const onEdit = vi.fn().mockResolvedValue(undefined);
 
   it("renders the ledger name", () => {
     const ledger = makeLedger({ name: "Everyday Spending" });
-    render(<LedgerListItem ledger={ledger} onDelete={onDelete} />);
+    render(<LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />);
     expect(screen.getByText("Everyday Spending")).toBeDefined();
   });
 
   it("renders the formatted total balance", () => {
     const ledger = makeLedger({ cashBalance: 1000, investmentBalance: 500 });
-    render(<LedgerListItem ledger={ledger} onDelete={onDelete} />);
+    render(<LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />);
     expect(screen.getByText("$1,500.00")).toBeDefined();
   });
 
   it("renders the overflow menu button", () => {
     const ledger = makeLedger();
-    render(<LedgerListItem ledger={ledger} onDelete={onDelete} />);
+    render(<LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />);
     expect(
       screen.getByRole("button", {
         name: LEDGER_LIST_ITEM_COPY.overflowMenuLabel,
@@ -45,7 +46,7 @@ describe("LedgerListItem", () => {
   describe("delete flow", () => {
     it("shows the confirmation dialog when Delete is selected from the overflow menu", async () => {
       const ledger = makeLedger({ name: "Test Ledger" });
-      render(<LedgerListItem ledger={ledger} onDelete={onDelete} />);
+      render(<LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />);
 
       fireEvent.click(
         screen.getByRole("button", {
@@ -69,7 +70,7 @@ describe("LedgerListItem", () => {
     it("calls onDelete with the ledger id when the confirm button is clicked", async () => {
       const onDelete = vi.fn();
       const ledger = makeLedger({ id: "ledger-xyz" });
-      render(<LedgerListItem ledger={ledger} onDelete={onDelete} />);
+      render(<LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />);
 
       fireEvent.click(
         screen.getByRole("button", {
@@ -92,7 +93,7 @@ describe("LedgerListItem", () => {
     it("does not call onDelete when Cancel is clicked", async () => {
       const onDelete = vi.fn();
       const ledger = makeLedger();
-      render(<LedgerListItem ledger={ledger} onDelete={onDelete} />);
+      render(<LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />);
 
       fireEvent.click(
         screen.getByRole("button", {

@@ -76,7 +76,7 @@ export function EditLedgerDialog({
       setNameError(undefined);
     }
 
-    let cashCap: number | undefined;
+    let cashCap: number | null = null;
     if (cashCapRaw.trim() !== "") {
       const parsed = Number(cashCapRaw);
       if (isNaN(parsed) || parsed <= 0) {
@@ -88,7 +88,6 @@ export function EditLedgerDialog({
       }
     } else {
       setCashCapError(undefined);
-      cashCap = undefined;
     }
 
     if (!valid) return;

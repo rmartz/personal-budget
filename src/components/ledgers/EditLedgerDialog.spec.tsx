@@ -101,7 +101,7 @@ describe("EditLedgerDialog", () => {
       await waitFor(() => {
         expect(onSave).toHaveBeenCalledWith("ledger-1", {
           name: "New Name",
-          cashCap: undefined,
+          cashCap: null,
         });
       });
     });
