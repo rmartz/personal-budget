@@ -14,7 +14,7 @@
 #   Sentry:    sentry-cli login  (or SENTRY_AUTH_TOKEN in shell)
 #   Vercel:    vercel login
 #
-# Requires: gcloud, sentry-cli, vercel, jq
+# Requires: gcloud, sentry-cli, vercel, jq, curl
 
 set -euo pipefail
 
@@ -69,14 +69,15 @@ done
 
 echo "Checking prerequisites..."
 
-for tool in gcloud sentry-cli vercel jq; do
+for tool in curl gcloud jq sentry-cli vercel; do
   if ! command -v "$tool" &>/dev/null; then
     echo "ERROR: $tool not found."
     case "$tool" in
+      curl)       echo "  Install: brew install curl" ;;
       gcloud)     echo "  Install: https://cloud.google.com/sdk/docs/install" ;;
+      jq)         echo "  Install: brew install jq" ;;
       sentry-cli) echo "  Install: curl -sL https://sentry.io/get-cli/ | bash" ;;
       vercel)     echo "  Install: pnpm add -g vercel" ;;
-      jq)         echo "  Install: brew install jq" ;;
     esac
     exit 1
   fi
@@ -174,13 +175,15 @@ rotate_environment() {
   echo "3. Creating new Sentry auth token..."
   local new_sentry_token
   if [[ -n "$sentry_org" && -n "$sentry_project" ]]; then
-    new_sentry_token=$(curl -sf \
-      -H "Authorization: Bearer $SENTRY_TOKEN" \
-      -H "Content-Type: application/json" \
-      -d "{\"scopes\":[\"project:releases\",\"project:read\",\"org:read\"]}" \
-      "https://sentry.io/api/0/api-tokens/" | jq -r '.token')
+    new_sentry_token=$(
+      curl -sf \
+        -H "Authorization: Bearer $SENTRY_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"scopes\":[\"project:releases\",\"project:read\",\"org:read\"]}" \
+        "https://sentry.io/api/0/api-tokens/" | jq -r '.token' || true
+    )
     if [[ -z "$new_sentry_token" || "$new_sentry_token" == "null" ]]; then
-      echo "WARNING: Could not create Sentry token (check token scopes). Skipping Sentry rotation."
+      echo "WARNING: Could not create Sentry token (HTTP/network/API/parsing failure, or insufficient token scopes). Skipping Sentry rotation."
       new_sentry_token=""
     fi
   else

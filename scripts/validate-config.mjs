@@ -91,41 +91,9 @@ function loadEnvironments() {
   return { environments: envs, singleEnvironment: singleEnv };
 }
 
-function validateConfig(envName, schema) {
-  const configPath = join(deploymentDir, `${envName}.yml`);
-  if (!existsSync(configPath)) {
-    return [`deployment/${envName}.yml not found`];
-  }
-
-  const content = readFileSync(configPath, "utf8");
-  const inVariablesSection = [];
-  let inVars = false;
-  for (const rawLine of content.split("\n")) {
-    const line = rawLine.replace(/#.*$/, "");
-    const trimmed = line.trim();
-    if (trimmed === "variables:") {
-      inVars = true;
-      continue;
-    }
-    if (inVars && trimmed && !trimmed.startsWith("#")) {
-      // A non-indented line signals a new top-level section — stop collecting
-      if (!line.startsWith(" ")) {
-        inVars = false;
-        continue;
-      }
-      const colonIndex = trimmed.indexOf(":");
-      if (colonIndex !== -1) {
-        const key = trimmed.slice(0, colonIndex).trim();
-        // Skip commented-out example lines (original line starts with whitespace + #)
-        if (!rawLine.trim().startsWith("#") && key) {
-          inVariablesSection.push(key);
-        }
-      }
-    }
-  }
-
+function checkKeys(keys, schema) {
   const errors = [];
-  for (const key of inVariablesSection) {
+  for (const key of keys) {
     const isDenied = schema.deniedPatterns.some((p) => globMatch(p, key));
     if (isDenied) {
       errors.push(
@@ -145,11 +113,83 @@ function validateConfig(envName, schema) {
   return errors;
 }
 
+function validateConfig(envName, schema) {
+  const configPath = join(deploymentDir, `${envName}.yml`);
+  if (!existsSync(configPath)) {
+    return [`deployment/${envName}.yml not found`];
+  }
+
+  const content = readFileSync(configPath, "utf8");
+  const inVariablesSection = [];
+  let inVars = false;
+  let foundVariablesBlock = false;
+  for (const rawLine of content.split("\n")) {
+    const line = rawLine.replace(/#.*$/, "");
+    const trimmed = line.trim();
+    if (trimmed === "variables:") {
+      inVars = true;
+      foundVariablesBlock = true;
+      continue;
+    }
+    if (inVars && trimmed && !trimmed.startsWith("#")) {
+      // A non-indented line signals a new top-level section — stop collecting
+      if (!line.startsWith(" ")) {
+        inVars = false;
+        continue;
+      }
+      const colonIndex = trimmed.indexOf(":");
+      if (colonIndex !== -1) {
+        const key = trimmed.slice(0, colonIndex).trim();
+        // Skip commented-out example lines (original line starts with whitespace + #)
+        if (!rawLine.trim().startsWith("#") && key) {
+          inVariablesSection.push(key);
+        }
+      }
+    }
+  }
+
+  if (!foundVariablesBlock) {
+    return [
+      `deployment/${envName}.yml is missing a variables: block — config is malformed`,
+    ];
+  }
+
+  if (inVariablesSection.length === 0) {
+    return [
+      `deployment/${envName}.yml has an empty variables: block — add at least one key or remove the file`,
+    ];
+  }
+
+  return checkKeys(inVariablesSection, schema);
+}
+
 const args = process.argv.slice(2);
 const envArg = args.find((a) => a.startsWith("--env="))?.slice(6);
+const checkKeysIdx = args.indexOf("--check-keys");
+const keysToCheck = checkKeysIdx !== -1 ? args.slice(checkKeysIdx + 1) : null;
+
+const schema = loadSchema();
+
+// --check-keys mode: validate a list of key names without reading a config file.
+// Used by update-config.sh to pre-validate keys before writing them to disk.
+if (keysToCheck !== null) {
+  if (keysToCheck.length === 0) {
+    console.error("ERROR: --check-keys requires at least one key name.");
+    process.exit(1);
+  }
+  const errors = checkKeys(keysToCheck, schema);
+  if (errors.length > 0) {
+    console.error(`\n${errors.length} key(s) rejected by schema:`);
+    for (const e of errors) console.error(e);
+    console.error(
+      "\nFix the violations above or update deployment/schema.yml to allow these keys.",
+    );
+    process.exit(1);
+  }
+  process.exit(0);
+}
 
 const { environments, singleEnvironment } = loadEnvironments();
-const schema = loadSchema();
 
 const toValidate = envArg ? [envArg] : environments;
 

@@ -91,8 +91,18 @@ if [[ ${#KEY_VALUE_PAIRS[@]} -eq 0 ]]; then
   exit 1
 fi
 
+# ── Validate key names before writing ─────────────────────────────────────────
+
+echo "Validating keys against schema..."
+KEYS_TO_CHECK=()
+for pair in "${KEY_VALUE_PAIRS[@]}"; do
+  KEYS_TO_CHECK+=("${pair%%=*}")
+done
+node "$SCRIPT_DIR/validate-config.mjs" --check-keys "${KEYS_TO_CHECK[@]}"
+
 # ── Update YAML in place ──────────────────────────────────────────────────────
 
+echo ""
 echo "Updating $CONFIG_FILE..."
 
 for pair in "${KEY_VALUE_PAIRS[@]}"; do
@@ -136,10 +146,10 @@ NODE
   echo "  $action $KEY"
 done
 
-# ── Validate ──────────────────────────────────────────────────────────────────
+# ── Re-validate full config after writing ──────────────────────────────────────
 
 echo ""
-echo "Validating against schema..."
+echo "Validating full config against schema..."
 node "$SCRIPT_DIR/validate-config.mjs" --env="$ENV_NAME"
 
 # ── Sync to Vercel ────────────────────────────────────────────────────────────
