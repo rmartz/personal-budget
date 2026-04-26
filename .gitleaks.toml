@@ -22,6 +22,9 @@ regexes = [
 ]
 paths = [
   ".env.example",
+  # deployment/ contains only public Firebase Client SDK config (safe to commit;
+  # access control is enforced by Firebase security rules, not by keeping these secret)
+  "deployment/",
 ]
 
 # Project-specific rules for secrets not covered by the default ruleset
