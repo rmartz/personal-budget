@@ -1,13 +1,22 @@
 # Public environment variables for the staging environment.
 #
+# ── DISABLED ──────────────────────────────────────────────────────────────────
+# Staging is not listed in deployment/environments.yml and is not part of the
+# active rotation or validation cycle. The dedicated staging Firebase project
+# (personal-budget-staging-a99af) cannot have a Realtime Database created due
+# to a Firebase console bug. Preview deployments currently use the production
+# Firebase project.
+#
+# To re-enable staging:
+#   1. Create the RTDB in the staging Firebase project
+#   2. Populate NEXT_PUBLIC_FIREBASE_DATABASE_URL and FIREBASE_DATABASE_URL below
+#   3. Re-add staging to deployment/environments.yml and set single_environment: false
+#   4. Run: scripts/deploy-config.sh --env=staging
+# ──────────────────────────────────────────────────────────────────────────────
+#
 # Only non-sensitive variables belong here. All keys are validated against
 # deployment/schema.yml — sensitive variables (private keys, auth tokens, DSNs)
 # will be rejected by the pre-commit hook and CI.
-#
-# Sensitive variables are managed directly in Vercel and are never committed.
-# Run `pnpm env:pull` to generate a local .env.local from Vercel's stored values.
-#
-# To update these values and sync them to Vercel: scripts/update-config.sh --env=staging
 
 environment: staging
 
