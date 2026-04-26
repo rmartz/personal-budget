@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
-# Updates a public environment config file and syncs all its variables to Vercel.
+# Updates a public environment config file.
 #
 # Usage:
 #   scripts/update-config.sh --env=staging KEY=value [KEY=value ...]
 #   scripts/update-config.sh --env=production --firebase-config=/path/to/config.json
+#   scripts/update-config.sh --env=staging --firebase-config=... --sync
 #
 # The --firebase-config flag accepts the path to a JSON file containing the
 # firebaseConfig object exported from the Firebase console. It extracts and maps
-# the relevant NEXT_PUBLIC_FIREBASE_* keys automatically.
+# the relevant NEXT_PUBLIC_FIREBASE_* keys automatically. Both strict JSON and
+# the JavaScript object literal format produced by the Firebase console are accepted.
+#
+# Pass --sync to also push the updated values to Vercel immediately after writing
+# the YAML (calls deploy-config.sh). Without --sync, only the local YAML is updated.
+#
+# To deploy without modifying the YAML, run deploy-config.sh directly:
+#   scripts/deploy-config.sh --env=staging
 #
 # Sensitive values must NEVER be passed as KEY=value arguments — they will appear
-# in shell history and ps output. Use `vercel env add` directly for secrets.
+# in shell history and ps output. Use `pnpm exec vercel env add` directly for secrets.
 #
-# Requires: node, vercel CLI authenticated via `vercel login`
+# Requires: node
 
 set -euo pipefail
 
@@ -24,12 +32,14 @@ DEPLOYMENT_DIR="$PROJECT_ROOT/deployment"
 
 ENV_NAME=""
 FIREBASE_CONFIG_FILE=""
+SYNC=false
 declare -a KEY_VALUE_PAIRS=()
 
 for arg in "$@"; do
   case "$arg" in
     --env=*) ENV_NAME="${arg#--env=}" ;;
     --firebase-config=*) FIREBASE_CONFIG_FILE="${arg#--firebase-config=}" ;;
+    --sync) SYNC=true ;;
     *=*) KEY_VALUE_PAIRS+=("$arg") ;;
     *) echo "ERROR: Unknown argument: $arg"; exit 1 ;;
   esac
@@ -46,18 +56,6 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
   exit 1
 fi
 
-# ── Prerequisites ─────────────────────────────────────────────────────────────
-
-if ! command -v vercel &>/dev/null; then
-  echo "ERROR: vercel CLI not found. Install with: pnpm add -g vercel"
-  exit 1
-fi
-
-if ! vercel whoami &>/dev/null 2>&1; then
-  echo "ERROR: Not authenticated with Vercel. Run: vercel login"
-  exit 1
-fi
-
 # ── Firebase config extraction ────────────────────────────────────────────────
 
 if [[ -n "$FIREBASE_CONFIG_FILE" ]]; then
@@ -69,7 +67,9 @@ if [[ -n "$FIREBASE_CONFIG_FILE" ]]; then
   while IFS="=" read -r key value; do
     KEY_VALUE_PAIRS+=("$key=$value")
   done < <(FIREBASE_CONFIG_PATH="$FIREBASE_CONFIG_FILE" node -e "
-    const cfg = JSON.parse(require('fs').readFileSync(process.env.FIREBASE_CONFIG_PATH, 'utf8'));
+    const raw = require('fs').readFileSync(process.env.FIREBASE_CONFIG_PATH, 'utf8').trim().replace(/;\s*\$/, '');
+    let cfg;
+    try { cfg = JSON.parse(raw); } catch { cfg = new Function('return (' + raw + ')')(); }
     const map = {
       apiKey: 'NEXT_PUBLIC_FIREBASE_API_KEY',
       authDomain: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
@@ -91,18 +91,62 @@ if [[ ${#KEY_VALUE_PAIRS[@]} -eq 0 ]]; then
   exit 1
 fi
 
-# ── Validate key names before writing ─────────────────────────────────────────
+# ── Pre-validate proposed keys against schema ─────────────────────────────────
+# Validate before writing anything — prevents a dirty working tree when a
+# denied or unknown key is passed.
 
-echo "Validating keys against schema..."
+SCHEMA_FILE="$DEPLOYMENT_DIR/schema.yml"
 KEYS_TO_CHECK=()
 for pair in "${KEY_VALUE_PAIRS[@]}"; do
   KEYS_TO_CHECK+=("${pair%%=*}")
 done
-node "$SCRIPT_DIR/validate-config.mjs" --check-keys "${KEYS_TO_CHECK[@]}"
+
+node - "$SCHEMA_FILE" "${KEYS_TO_CHECK[@]}" <<'NODE'
+const fs = require('fs');
+const [, , schemaFile, ...keys] = process.argv;
+
+function parseYamlList(content, listKey) {
+  const lines = content.split('\n');
+  const items = [];
+  let inList = false;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith(listKey + ':')) { inList = true; continue; }
+    if (inList) {
+      if (trimmed.startsWith('- ')) {
+        items.push(trimmed.slice(2).replace(/#.*$/, '').replace(/^["']|["']$/g, '').trim());
+      } else if (trimmed && !trimmed.startsWith('#')) {
+        inList = false;
+      }
+    }
+  }
+  return items;
+}
+
+function globMatch(pattern, key) {
+  return new RegExp('^' + pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$').test(key);
+}
+
+const content = fs.readFileSync(schemaFile, 'utf8');
+const allowedPatterns = parseYamlList(content, 'allowed_patterns');
+const allowedKeys = parseYamlList(content, 'allowed_keys');
+const deniedPatterns = parseYamlList(content, 'denied_patterns');
+
+let failed = false;
+for (const key of keys) {
+  if (deniedPatterns.some(p => globMatch(p, key))) {
+    process.stderr.write(`ERROR: Key ${key} matches a denied_pattern in schema.yml\n`);
+    failed = true;
+  } else if (!allowedPatterns.some(p => globMatch(p, key)) && !allowedKeys.includes(key)) {
+    process.stderr.write(`ERROR: Key ${key} is not in allowed_patterns or allowed_keys in schema.yml\n`);
+    failed = true;
+  }
+}
+if (failed) process.exit(1);
+NODE
 
 # ── Update YAML in place ──────────────────────────────────────────────────────
 
-echo ""
 echo "Updating $CONFIG_FILE..."
 
 for pair in "${KEY_VALUE_PAIRS[@]}"; do
@@ -146,32 +190,18 @@ NODE
   echo "  $action $KEY"
 done
 
-# ── Re-validate full config after writing ──────────────────────────────────────
+# ── Validate ──────────────────────────────────────────────────────────────────
 
 echo ""
-echo "Validating full config against schema..."
+echo "Validating against schema..."
 node "$SCRIPT_DIR/validate-config.mjs" --env="$ENV_NAME"
 
-# ── Sync to Vercel ────────────────────────────────────────────────────────────
+# ── Sync to Vercel (optional) ─────────────────────────────────────────────────
 
-# Map environment name to Vercel environment target
-case "$ENV_NAME" in
-  staging)    VERCEL_ENV="preview" ;;
-  production) VERCEL_ENV="production" ;;
-  *) echo "ERROR: Unknown environment: $ENV_NAME"; exit 1 ;;
-esac
+if [[ "$SYNC" == "true" ]]; then
+  echo ""
+  exec "$SCRIPT_DIR/deploy-config.sh" --env="$ENV_NAME"
+fi
 
 echo ""
-echo "Syncing to Vercel ($VERCEL_ENV)..."
-
-for pair in "${KEY_VALUE_PAIRS[@]}"; do
-  KEY="${pair%%=*}"
-  VALUE="${pair#*=}"
-  # Remove existing value then add new one (vercel env add errors if key exists)
-  vercel env rm "$KEY" "$VERCEL_ENV" --yes 2>/dev/null || true
-  echo "$VALUE" | vercel env add "$KEY" "$VERCEL_ENV"
-  echo "  Synced $KEY"
-done
-
-echo ""
-echo "Done. Run 'pnpm env:pull' to refresh your local .env.local."
+echo "YAML updated. Run 'scripts/deploy-config.sh --env=$ENV_NAME' to push to Vercel."
