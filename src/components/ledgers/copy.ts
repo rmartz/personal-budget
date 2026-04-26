@@ -1,3 +1,17 @@
+export const CREATE_LEDGER_DIALOG_COPY = {
+  cancelButton: "Cancel",
+  cashCapInvalidError: "Cash cap must be a positive number.",
+  cashCapLabel: "Cash Cap (optional)",
+  cashCapPlaceholder: "e.g. 1000",
+  createButton: "Creating…",
+  errorPrefix: "Failed to create: ",
+  nameLabel: "Name",
+  namePlaceholder: "e.g. Everyday Spending",
+  nameRequiredError: "Name is required.",
+  submitButton: "Create Ledger",
+  title: "New Ledger",
+} as const;
+
 export const LEDGERS_PAGE_COPY = {
   emptyStateMessage: "You don't have any ledgers yet.",
   loadingMessage: "Loading ledgers…",
