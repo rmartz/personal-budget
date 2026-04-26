@@ -11,6 +11,12 @@ useDefault = true
 
 [allowlist]
 description = "Known safe patterns — placeholder values in documentation and config examples"
+commits = [
+  # Populates deployment/production.yml and deployment/staging.yml with Firebase
+  # Client SDK config. These values are public (access control is enforced by
+  # Firebase security rules, not by keeping them secret).
+  "728aab94d46cf24352c806fb8b1b2534949e98eb",
+]
 regexes = [
   # Placeholder values used in .env.example and documentation
   '''your-project-id''',
@@ -22,9 +28,6 @@ regexes = [
 ]
 paths = [
   ".env.example",
-  # deployment/ contains only public Firebase Client SDK config (safe to commit;
-  # access control is enforced by Firebase security rules, not by keeping these secret)
-  "deployment/",
 ]
 
 # Project-specific rules for secrets not covered by the default ruleset
