@@ -15,7 +15,18 @@ pnpm test             # Run tests with Vitest
 pnpm tsc              # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
+pnpm run env:pull     # Pull .env.local from Vercel
+pnpm run env:validate # Validate deployment config files against schema
+pnpm run secrets-check # Config validation + gitleaks scan (also runs pre-commit)
 ```
+
+## Deployment Config
+
+Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
+
+- To update a public config value: `scripts/update-config.sh --env=<staging|production> KEY=value`
+- To rotate all secrets (Firebase + Sentry + Vercel): `scripts/rotate-keys.sh --env=<staging|production>`
+- Secrets checks run automatically on every commit via `.husky/pre-commit`; also enforced in CI via `.github/workflows/secret-scan.yml`
 
 ## TypeScript
 
@@ -30,8 +41,12 @@ pnpm build-storybook  # Build static Storybook
 - **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files.
 - **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file — e.g., a context wrapper, structural template, or props alias. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests (e.g., list items, row components, panels, form sections). All component props must be defined as an explicitly named interface (e.g., `interface UserListProps`), never inline in the function signature.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain.
-- Barrel `index.ts` exports for all component/module directories.
-- Use named exports, not default exports (except for Next.js pages and Redux slices).
+- Add a barrel `index.ts` when a component or module directory exposes a public API or already
+  follows a barrel pattern; do not require one for every directory (e.g. ShadCN-generated
+  `src/components/ui/` has no barrel by convention).
+- Use named exports, not default exports (except for Next.js pages, Redux slices, and
+  Storybook story files, where the only allowed default export is the required
+  `export default meta`; stories and components must remain named exports).
 
 ## Code Conventions
 
@@ -41,7 +56,7 @@ pnpm build-storybook  # Build static Storybook
 - **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
 - **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
 - **Enums and constant objects** should be kept in alphabetical order to minimize merge conflicts.
-- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum Status { Active = "active", Inactive = "inactive" }` rather than `"active" | "inactive"`). String enum values must match the current serialized schema. Export new enums from the module barrel.
+- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum Status { Active = "active", Inactive = "inactive" }` rather than `"active" | "inactive"`). String enum values must match the current serialized schema. Export new enums from the module barrel (the directory-level `index.ts` when one exists or is required by the barrel rule above).
 
 ## Naming Conventions
 
@@ -51,7 +66,13 @@ pnpm build-storybook  # Build static Storybook
 
 ## User-Facing Text
 
-- All user-facing strings must be stored in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness.
+- For any new or modified UI component, store user-facing strings in a co-located copy file
+  (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness.
+  Do not introduce new hardcoded display strings inline in components you are actively changing.
+
+  Existing hardcoded strings elsewhere in the codebase are technical debt to be migrated over
+  time; this rule does not require unrelated cleanup.
+
 - Copy files export a single `as const` object named `{SCOPE}_COPY` (e.g., `HOME_PAGE_COPY`, `USER_PROFILE_COPY`).
 
 ## Documentation
@@ -73,7 +94,7 @@ pnpm build-storybook  # Build static Storybook
 
 ### JSX
 
-- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings.
+- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings. Multi-statement callback functions passed as JSX props (e.g. `onChange={(e) => { setValue(e.target.value); setError(undefined); }}`) are permitted — the prohibition targets imperative logic in JSX structure, not callback bodies.
 
 ### Component Structure
 
@@ -108,6 +129,13 @@ pnpm build-storybook  # Build static Storybook
 - **Keep tests simple.** A failing test should make it immediately obvious whether the failure is a bug or an intentional change in behavior. If understanding a failure requires reading more than one layer of test setup or multiple assertions, split the test.
 - **Granularity scales with level of abstraction.** Low-level functions (pure utilities, serializers) warrant thorough edge-case coverage. High-level functions (service orchestration) should have smoke tests that verify they correctly apply the lower-level logic — not re-test every edge case that belongs in the lower-level tests.
 
+## Firebase Schema Migrations
+
+- **Never make a breaking schema change without a migration.** A breaking change is any modification to the Firebase Realtime DB path structure or field format that would cause existing stored data to be misread, ignored, or crash the application — for example: renaming a path segment, changing a field's type, removing a required field, or altering an enum's serialized value.
+- Before merging a breaking schema change, provide a migration script in `scripts/migrations/` that reads the old data shape and writes it in the new shape. The script must be idempotent (safe to run multiple times) and must not delete old data until the migration is verified complete.
+- Additive changes (new optional fields with safe defaults in `firebaseTo*()` helpers, new path segments that existing code ignores) are not breaking and do not require a migration.
+- Document the migration in `docs/database-schema.md` alongside the schema change.
+
 ## GitHub Issues
 
 - When picking the next task from a milestone, use `gh issue list --milestone "<milestone title>" --state open`.
@@ -118,3 +146,4 @@ pnpm build-storybook  # Build static Storybook
 - Commit messages: imperative verbs (Add, Implement, Fix, Update, Extract, Remove). No `feat:`/`fix:` prefixes.
 - PR titles must follow Conventional Commits format: `<type>: description` or `<type>(<scope>): description`. Valid types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `perf`, `ci`, `build`, `revert`. A `!` suffix is allowed before the colon to denote breaking changes (e.g., `feat!: remove legacy auth`). This is enforced by CI.
 - PR descriptions must use `Closes #123`, `Fixes #123`, or `Resolves #123` to trigger GitHub's automatic issue close on merge. Phrases like "Addresses #123" or "Related to #123" do NOT trigger auto-close.
+- PR descriptions must be descriptive prose, not a task checklist. A good description covers: (1) what the PR does and why, (2) key technical decisions or non-obvious implementation choices, and (3) for PRs with user-facing changes, manual testing steps. Task checklists, placeholder text, and generated implementation logs are not acceptable substitutes.
