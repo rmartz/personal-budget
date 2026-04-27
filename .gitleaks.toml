@@ -4,7 +4,7 @@
 # Extends the default ruleset with project-specific patterns and allowlists
 # known false positives (e.g. example/placeholder values in documentation).
 
-title = "firebase-nextjs-template"
+title = "personal-budget"
 
 [extend]
 useDefault = true
@@ -24,10 +24,13 @@ regexes = [
   '''firebase-adminsdk-xxx''',
   # Example/truncated keys in ARCHITECTURE.md and README
   '''xxx@o\w+\.ingest\.sentry\.io''',
-  # The .env.example file itself — it contains only placeholder values
 ]
 paths = [
+  # Contains only placeholder values
   ".env.example",
+  # Contains only NEXT_PUBLIC_* Firebase client keys (intentionally public).
+  # Schema enforcement (deployment/schema.yml) hard-denies all secret patterns.
+  '''deployment/.*\.yml''',
 ]
 
 # Project-specific rules for secrets not covered by the default ruleset
