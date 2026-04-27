@@ -96,7 +96,7 @@ export function EditLedgerDialog({
     setSubmitError(undefined);
     try {
       await onSave(ledgerId, { name: trimmedName, cashCap });
-      setOpen(false);
+      handleOpenChange(false);
     } catch {
       setSubmitError(EDIT_LEDGER_DIALOG_COPY.submitError);
     } finally {

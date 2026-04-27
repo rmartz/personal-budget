@@ -95,7 +95,7 @@ export function CreateLedgerDialog({
         if (!isOpen) handleClose();
       }}
     >
-      <DialogContent showCloseButton={false}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{CREATE_LEDGER_DIALOG_COPY.title}</DialogTitle>
         </DialogHeader>
@@ -143,7 +143,7 @@ export function CreateLedgerDialog({
               <input
                 id="ledger-cash-cap"
                 type="number"
-                min="0"
+                min="0.01"
                 step="0.01"
                 value={cashCap}
                 onChange={handleCashCapChange}
