@@ -80,6 +80,11 @@ case "$ENV_NAME" in
   *) echo "ERROR: Unknown environment: $ENV_NAME"; exit 1 ;;
 esac
 
+# ── Pre-validate against schema ──────────────────────────────────────────────
+
+echo "Validating $CONFIG_FILE against schema..."
+node "$SCRIPT_DIR/validate-config.mjs" --env="$ENV_NAME"
+
 # ── Sync YAML variables to Vercel ────────────────────────────────────────────
 
 echo "Syncing $CONFIG_FILE to Vercel ($VERCEL_ENV)..."

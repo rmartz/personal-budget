@@ -143,22 +143,34 @@ echo ""
 # (it appears "old" relative to that run's OLD_KEY_IDS snapshot).
 # Require separate --env= invocations when a project ID is shared.
 
-declare -A SEEN_PROJECT_IDS=()
+SEEN_PROJECT_IDS=()
+SEEN_PROJECT_ENVS=()
 for env in "${ENVS_TO_ROTATE[@]}"; do
   config_file="$DEPLOYMENT_DIR/$env.yml"
   project_id=$(grep "^  FIREBASE_PROJECT_ID:" "$config_file" | sed 's/.*: *//' | tr -d "\"' ")
   if [[ -z "$project_id" ]]; then
     continue  # Missing project ID is caught with a clearer error inside rotate_environment()
   fi
-  if [[ -n "${SEEN_PROJECT_IDS[$project_id]+x}" ]]; then
-    echo "ERROR: FIREBASE_PROJECT_ID \"$project_id\" is shared between environments: ${SEEN_PROJECT_IDS[$project_id]} and $env."
+
+  seen_index=""
+  for i in "${!SEEN_PROJECT_IDS[@]}"; do
+    if [[ "${SEEN_PROJECT_IDS[$i]}" == "$project_id" ]]; then
+      seen_index="$i"
+      break
+    fi
+  done
+
+  if [[ -n "$seen_index" ]]; then
+    echo "ERROR: FIREBASE_PROJECT_ID \"$project_id\" is shared between environments: ${SEEN_PROJECT_ENVS[$seen_index]} and $env."
     echo "Rotating both in one run would delete the first environment's new key during"
     echo "the second rotation. Rotate each environment separately instead:"
-    echo "  scripts/rotate-keys.sh --env=${SEEN_PROJECT_IDS[$project_id]}"
+    echo "  scripts/rotate-keys.sh --env=${SEEN_PROJECT_ENVS[$seen_index]}"
     echo "  scripts/rotate-keys.sh --env=$env"
     exit 1
   fi
-  SEEN_PROJECT_IDS[$project_id]="$env"
+
+  SEEN_PROJECT_IDS+=("$project_id")
+  SEEN_PROJECT_ENVS+=("$env")
 done
 
 # ── Per-environment rotation ──────────────────────────────────────────────────

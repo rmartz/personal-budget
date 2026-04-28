@@ -28,9 +28,6 @@ regexes = [
 paths = [
   # Contains only placeholder values
   ".env.example",
-  # Contains only NEXT_PUBLIC_* Firebase client keys (intentionally public).
-  # Schema enforcement (deployment/schema.yml) hard-denies all secret patterns.
-  '''deployment/.*\.yml''',
 ]
 
 # Project-specific rules for secrets not covered by the default ruleset

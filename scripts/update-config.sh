@@ -67,9 +67,12 @@ if [[ -n "$FIREBASE_CONFIG_FILE" ]]; then
   while IFS="=" read -r key value; do
     KEY_VALUE_PAIRS+=("$key=$value")
   done < <(FIREBASE_CONFIG_PATH="$FIREBASE_CONFIG_FILE" node -e "
-    const raw = require('fs').readFileSync(process.env.FIREBASE_CONFIG_PATH, 'utf8').trim().replace(/;\s*\$/, '');
-    let cfg;
-    try { cfg = JSON.parse(raw); } catch { cfg = new Function('return (' + raw + ')')(); }
+    const raw = require('fs')
+      .readFileSync(process.env.FIREBASE_CONFIG_PATH, 'utf8')
+      .trim()
+      .replace(/^\s*(?:const|let|var)\s+firebaseConfig\s*=\s*/, '')
+      .replace(/;\s*$/, '');
+    const cfg = JSON.parse(raw);
     const map = {
       apiKey: 'NEXT_PUBLIC_FIREBASE_API_KEY',
       authDomain: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
@@ -95,55 +98,12 @@ fi
 # Validate before writing anything — prevents a dirty working tree when a
 # denied or unknown key is passed.
 
-SCHEMA_FILE="$DEPLOYMENT_DIR/schema.yml"
 KEYS_TO_CHECK=()
 for pair in "${KEY_VALUE_PAIRS[@]}"; do
   KEYS_TO_CHECK+=("${pair%%=*}")
 done
 
-node - "$SCHEMA_FILE" "${KEYS_TO_CHECK[@]}" <<'NODE'
-const fs = require('fs');
-const [, , schemaFile, ...keys] = process.argv;
-
-function parseYamlList(content, listKey) {
-  const lines = content.split('\n');
-  const items = [];
-  let inList = false;
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith(listKey + ':')) { inList = true; continue; }
-    if (inList) {
-      if (trimmed.startsWith('- ')) {
-        items.push(trimmed.slice(2).replace(/#.*$/, '').replace(/^["']|["']$/g, '').trim());
-      } else if (trimmed && !trimmed.startsWith('#')) {
-        inList = false;
-      }
-    }
-  }
-  return items;
-}
-
-function globMatch(pattern, key) {
-  return new RegExp('^' + pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$').test(key);
-}
-
-const content = fs.readFileSync(schemaFile, 'utf8');
-const allowedPatterns = parseYamlList(content, 'allowed_patterns');
-const allowedKeys = parseYamlList(content, 'allowed_keys');
-const deniedPatterns = parseYamlList(content, 'denied_patterns');
-
-let failed = false;
-for (const key of keys) {
-  if (deniedPatterns.some(p => globMatch(p, key))) {
-    process.stderr.write(`ERROR: Key ${key} matches a denied_pattern in schema.yml\n`);
-    failed = true;
-  } else if (!allowedPatterns.some(p => globMatch(p, key)) && !allowedKeys.includes(key)) {
-    process.stderr.write(`ERROR: Key ${key} is not in allowed_patterns or allowed_keys in schema.yml\n`);
-    failed = true;
-  }
-}
-if (failed) process.exit(1);
-NODE
+node "$SCRIPT_DIR/validate-config.mjs" --check-keys "${KEYS_TO_CHECK[@]}"
 
 # ── Update YAML in place ──────────────────────────────────────────────────────
 
