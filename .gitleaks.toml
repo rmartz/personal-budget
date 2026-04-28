@@ -15,7 +15,7 @@ commits = [
   # Populates deployment/production.yml and deployment/staging.yml with Firebase
   # Client SDK config. These values are public (access control is enforced by
   # Firebase security rules, not by keeping them secret).
-  "728aab94d46cf24352c806fb8b1b2534949e98eb",
+  "f9eb2cacefa2d69ad4fb8c260779df298781ec9a",
 ]
 regexes = [
   # Placeholder values used in .env.example and documentation

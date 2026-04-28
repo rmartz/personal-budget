@@ -1,0 +1,5 @@
+# Firebase Client SDK API keys in deployment YAMLs are public config values.
+# Access control is enforced by Firebase security rules, not by secrecy.
+# These fingerprints correspond to the commit that first populated the deployment files.
+8213ef4ccca9c4f457f04c85d80b78c9e49c80e2:deployment/production.yml:gcp-api-key:16
+8213ef4ccca9c4f457f04c85d80b78c9e49c80e2:deployment/staging.yml:gcp-api-key:16
