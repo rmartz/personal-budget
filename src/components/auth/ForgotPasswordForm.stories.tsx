@@ -5,7 +5,7 @@ const meta: Meta<typeof ForgotPasswordFormView> = {
   component: ForgotPasswordFormView,
   title: "Auth/ForgotPasswordForm",
   args: {
-    onSubmit: (() => undefined) as (email: string) => void,
+    onSubmit: () => undefined,
   },
 };
 

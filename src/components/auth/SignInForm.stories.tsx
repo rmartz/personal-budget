@@ -5,7 +5,7 @@ const meta: Meta<typeof SignInFormView> = {
   component: SignInFormView,
   title: "Auth/SignInForm",
   args: {
-    onSubmit: (() => undefined) as (email: string, password: string) => void,
+    onSubmit: () => undefined,
   },
 };
 
