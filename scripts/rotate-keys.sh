@@ -74,11 +74,14 @@ echo "Checking prerequisites..."
 
 VERCEL="pnpm exec vercel"
 
-# Determine whether any target environment has Sentry configured
+# Determine whether any target environment has Sentry configured.
+# Mirror the condition used in rotate_environment(): both SENTRY_ORG and
+# SENTRY_PROJECT must be set for rotation to actually occur.
 SENTRY_NEEDED=false
 for env in "${ENVS_TO_ROTATE[@]}"; do
   sentry_org=$(grep "^  SENTRY_ORG:" "$DEPLOYMENT_DIR/$env.yml" | sed 's/.*: *//' | tr -d "\"' ")
-  if [[ -n "$sentry_org" ]]; then
+  sentry_project=$(grep "^  SENTRY_PROJECT:" "$DEPLOYMENT_DIR/$env.yml" | sed 's/.*: *//' | tr -d "\"' ")
+  if [[ -n "$sentry_org" && -n "$sentry_project" ]]; then
     SENTRY_NEEDED=true
     break
   fi

@@ -67,12 +67,21 @@ if [[ -n "$FIREBASE_CONFIG_FILE" ]]; then
   while IFS="=" read -r key value; do
     KEY_VALUE_PAIRS+=("$key=$value")
   done < <(FIREBASE_CONFIG_PATH="$FIREBASE_CONFIG_FILE" node -e "
-    const raw = require('fs')
+    const fs = require('fs');
+    const vm = require('vm');
+    const raw = fs
       .readFileSync(process.env.FIREBASE_CONFIG_PATH, 'utf8')
       .trim()
       .replace(/^\s*(?:const|let|var)\s+firebaseConfig\s*=\s*/, '')
       .replace(/;\s*$/, '');
-    const cfg = JSON.parse(raw);
+    let cfg;
+    try {
+      cfg = JSON.parse(raw);
+    } catch {
+      // Firebase console exports JS object literals with unquoted keys — not valid JSON.
+      // vm.runInNewContext evaluates the object literal in an isolated context without eval.
+      cfg = vm.runInNewContext('(' + raw + ')', Object.create(null), { timeout: 1000 });
+    }
     const map = {
       apiKey: 'NEXT_PUBLIC_FIREBASE_API_KEY',
       authDomain: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
