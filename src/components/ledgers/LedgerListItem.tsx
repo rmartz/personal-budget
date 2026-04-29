@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
-import type { Ledger } from "@/lib/types";
+import type { Ledger, UpdateLedgerInput } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialogBackdrop,
@@ -21,6 +21,7 @@ import {
   DropdownMenuPopup,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { EditLedgerDialog } from "./EditLedgerDialog";
 import { LEDGER_LIST_ITEM_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -30,16 +31,18 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 
 export interface LedgerListItemViewProps {
   ledger: Ledger;
-  dialogOpen: boolean;
-  onDialogOpenChange: (open: boolean) => void;
+  onEdit: (id: string, data: UpdateLedgerInput) => Promise<void>;
+  deleteDialogOpen: boolean;
+  onDeleteDialogOpenChange: (open: boolean) => void;
   onDeleteMenuClick: () => void;
   onDeleteConfirm: () => void;
 }
 
 export function LedgerListItemView({
   ledger,
-  dialogOpen,
-  onDialogOpenChange,
+  onEdit,
+  deleteDialogOpen,
+  onDeleteDialogOpenChange,
   onDeleteMenuClick,
   onDeleteConfirm,
 }: LedgerListItemViewProps) {
@@ -53,6 +56,12 @@ export function LedgerListItemView({
         <span className="text-sm text-zinc-600 dark:text-zinc-400">
           {formattedBalance}
         </span>
+        <EditLedgerDialog
+          ledgerId={ledger.id}
+          initialName={ledger.name}
+          initialCashCap={ledger.cashCap}
+          onSave={onEdit}
+        />
         <DropdownMenuRoot>
           <DropdownMenuTrigger
             aria-label={LEDGER_LIST_ITEM_COPY.overflowMenuLabel}
@@ -73,7 +82,10 @@ export function LedgerListItemView({
             </DropdownMenuPositioner>
           </DropdownMenuPortal>
         </DropdownMenuRoot>
-        <AlertDialogRoot open={dialogOpen} onOpenChange={onDialogOpenChange}>
+        <AlertDialogRoot
+          open={deleteDialogOpen}
+          onOpenChange={onDeleteDialogOpenChange}
+        >
           <AlertDialogPortal>
             <AlertDialogBackdrop />
             <AlertDialogPopup>
@@ -101,26 +113,32 @@ export function LedgerListItemView({
 
 interface LedgerListItemProps {
   ledger: Ledger;
+  onEdit: (id: string, data: UpdateLedgerInput) => Promise<void>;
   onDelete: (id: string) => void;
 }
 
-export function LedgerListItem({ ledger, onDelete }: LedgerListItemProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+export function LedgerListItem({
+  ledger,
+  onEdit,
+  onDelete,
+}: LedgerListItemProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   function handleDeleteMenuClick() {
-    setDialogOpen(true);
+    setDeleteDialogOpen(true);
   }
 
   function handleDeleteConfirm() {
-    setDialogOpen(false);
+    setDeleteDialogOpen(false);
     onDelete(ledger.id);
   }
 
   return (
     <LedgerListItemView
       ledger={ledger}
-      dialogOpen={dialogOpen}
-      onDialogOpenChange={setDialogOpen}
+      onEdit={onEdit}
+      deleteDialogOpen={deleteDialogOpen}
+      onDeleteDialogOpenChange={setDeleteDialogOpen}
       onDeleteMenuClick={handleDeleteMenuClick}
       onDeleteConfirm={handleDeleteConfirm}
     />
