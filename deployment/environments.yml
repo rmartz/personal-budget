@@ -10,7 +10,10 @@
 # distinction). The default is false — both environments must be present.
 
 environments:
-  - staging
   - production
 
-single_environment: false
+# Staging is temporarily disabled — the dedicated staging Firebase project
+# (personal-budget-staging-a99af) cannot have a Realtime Database created due
+# to a Firebase console bug. Re-add staging here and set single_environment: false
+# once the staging RTDB is available.
+single_environment: true
