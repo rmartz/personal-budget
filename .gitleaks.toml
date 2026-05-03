@@ -13,9 +13,11 @@ useDefault = true
 
 [allowlist]
 description = "Known safe patterns — placeholder values in documentation and config examples"
-paths = [
-  # Contains only placeholder values
-  ".env.example",
+commits = [
+  # Populates deployment/production.yml and deployment/staging.yml with Firebase
+  # Client SDK config. These values are public (access control is enforced by
+  # Firebase security rules, not by keeping them secret).
+  "f9eb2cacefa2d69ad4fb8c260779df298781ec9a",
 ]
 regexes = [
   # Placeholder values used in .env.example and documentation
@@ -30,6 +32,14 @@ regexes = [
   '''<[^>]+>''',
   '''(?i)^example$''',
   '''(?i)^changeme$''',
+]
+paths = [
+  # Contains only placeholder values
+  ".env.example",
+  # Contains intentionally public Firebase Client SDK config (NEXT_PUBLIC_* keys).
+  # Access control is enforced by Firebase security rules, not by keeping these values secret.
+  "deployment/production.yml",
+  "deployment/staging.yml",
 ]
 
 # Rules inlined from vercel-deploy-scripts shared ruleset
