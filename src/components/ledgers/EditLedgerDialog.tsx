@@ -75,6 +75,7 @@ export function EditLedgerDialog({
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    setSubmitError(undefined);
 
     let valid = true;
 
@@ -103,7 +104,6 @@ export function EditLedgerDialog({
     if (!valid) return;
 
     setIsSubmitting(true);
-    setSubmitError(undefined);
     try {
       await onSave(ledgerId, { name: trimmedName, cashCap });
       // Close directly rather than via handleOpenChange(false) because the

@@ -229,5 +229,35 @@ describe("CreateLedgerDialog", () => {
         expect(screen.getByText(/Firebase error/)).toBeDefined();
       });
     });
+
+    it("clears the submit error when re-submitting with a validation failure", async () => {
+      const mockSubmit = vi.fn().mockRejectedValue(new Error("Firebase error"));
+      render(
+        <CreateLedgerDialog
+          open={true}
+          onSubmit={mockSubmit}
+          onClose={onClose}
+          isSubmitting={false}
+        />,
+      );
+      fireEvent.change(
+        screen.getByLabelText(CREATE_LEDGER_DIALOG_COPY.nameLabel),
+        { target: { value: "My Ledger" } },
+      );
+      fireEvent.click(screen.getByText(CREATE_LEDGER_DIALOG_COPY.submitButton));
+      await waitFor(() => {
+        expect(screen.getByText(/Firebase error/)).toBeDefined();
+      });
+      // Clear the name to trigger a validation failure on re-submit
+      fireEvent.change(
+        screen.getByLabelText(CREATE_LEDGER_DIALOG_COPY.nameLabel),
+        { target: { value: "" } },
+      );
+      fireEvent.click(screen.getByText(CREATE_LEDGER_DIALOG_COPY.submitButton));
+      expect(screen.queryByText(/Firebase error/)).toBeNull();
+      expect(
+        screen.getByText(CREATE_LEDGER_DIALOG_COPY.nameRequiredError),
+      ).toBeDefined();
+    });
   });
 });

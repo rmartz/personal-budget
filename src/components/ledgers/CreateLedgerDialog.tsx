@@ -54,6 +54,7 @@ export function CreateLedgerDialog({
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitError(undefined);
 
     let valid = true;
 
@@ -76,8 +77,6 @@ export function CreateLedgerDialog({
     if (!valid) {
       return;
     }
-
-    setSubmitError(undefined);
 
     try {
       await onSubmit({ name: name.trim(), cashCap: parsedCashCap });

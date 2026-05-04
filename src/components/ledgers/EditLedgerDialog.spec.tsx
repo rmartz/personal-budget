@@ -180,6 +180,38 @@ describe("EditLedgerDialog", () => {
         ).toBeDefined();
       });
     });
+
+    it("clears the submit error when re-submitting with a validation failure", async () => {
+      const { onSave } = renderDialog();
+      onSave.mockRejectedValue(new Error("Network error"));
+      openDialog();
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.saveButton,
+        }),
+      );
+      await waitFor(() => {
+        expect(
+          screen.getByText(EDIT_LEDGER_DIALOG_COPY.submitError),
+        ).toBeDefined();
+      });
+      // Clear the name to trigger a validation failure on re-submit
+      fireEvent.change(
+        screen.getByLabelText(EDIT_LEDGER_DIALOG_COPY.nameLabel),
+        { target: { value: "" } },
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.saveButton,
+        }),
+      );
+      expect(
+        screen.queryByText(EDIT_LEDGER_DIALOG_COPY.submitError),
+      ).toBeNull();
+      expect(
+        screen.getByText(EDIT_LEDGER_DIALOG_COPY.nameRequired),
+      ).toBeDefined();
+    });
   });
 
   describe("cancel", () => {
