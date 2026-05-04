@@ -72,8 +72,9 @@ describe("middleware", () => {
       );
       const response = await middleware(request);
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain("next=");
-      expect(response.headers.get("location")).toContain("%2Fdashboard");
+      expect(response.headers.get("location")).toContain(
+        "next=%2Fdashboard%3Ftab%3Dsummary%26view%3Dmonthly",
+      );
     });
 
     it("allows unauthenticated access to /sign-in", async () => {
@@ -127,29 +128,20 @@ describe("middleware", () => {
     });
 
     it("allows authenticated access to protected routes", async () => {
-      const request = makeRequest(
-        "http://localhost/dashboard",
-        makeValidJwt(),
-      );
+      const request = makeRequest("http://localhost/dashboard", makeValidJwt());
       const response = await middleware(request);
       expect(response.status).toBe(200);
     });
 
     it("redirects to / when authenticated user visits /sign-in", async () => {
-      const request = makeRequest(
-        "http://localhost/sign-in",
-        makeValidJwt(),
-      );
+      const request = makeRequest("http://localhost/sign-in", makeValidJwt());
       const response = await middleware(request);
       expect(response.status).toBe(307);
       expect(response.headers.get("location")).toBe("http://localhost/");
     });
 
     it("redirects to / when authenticated user visits /sign-up", async () => {
-      const request = makeRequest(
-        "http://localhost/sign-up",
-        makeValidJwt(),
-      );
+      const request = makeRequest("http://localhost/sign-up", makeValidJwt());
       const response = await middleware(request);
       expect(response.status).toBe(307);
       expect(response.headers.get("location")).toBe("http://localhost/");
