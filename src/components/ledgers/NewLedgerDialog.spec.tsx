@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { NewLedgerDialogView } from "./NewLedgerDialog";
+import {
+  render,
+  screen,
+  cleanup,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
+import { NewLedgerDialog, NewLedgerDialogView } from "./NewLedgerDialog";
 import { NEW_LEDGER_DIALOG_COPY } from "./copy";
 
 afterEach(cleanup);
@@ -17,6 +23,7 @@ function renderView(
     onCashCapChange: vi.fn(),
     nameError: undefined,
     cashCapError: undefined,
+    submitError: undefined,
     onSubmit: vi.fn(),
     isSubmitting: false,
     ...overrides,
@@ -69,6 +76,11 @@ describe("NewLedgerDialogView", () => {
         screen.queryByText(NEW_LEDGER_DIALOG_COPY.cashCapError),
       ).toBeNull();
     });
+
+    it("does not render submit error when submitError is undefined", () => {
+      renderView({ submitError: undefined });
+      expect(screen.queryByText(NEW_LEDGER_DIALOG_COPY.submitError)).toBeNull();
+    });
   });
 
   describe("validation error state", () => {
@@ -83,13 +95,34 @@ describe("NewLedgerDialogView", () => {
         screen.getByText(NEW_LEDGER_DIALOG_COPY.cashCapError),
       ).toBeDefined();
     });
+
+    it("renders the submit error message", () => {
+      renderView({ submitError: NEW_LEDGER_DIALOG_COPY.submitError });
+      expect(
+        screen.getByText(NEW_LEDGER_DIALOG_COPY.submitError),
+      ).toBeDefined();
+    });
   });
 
   describe("interactions", () => {
-    it("calls onSubmit when the submit button is clicked", () => {
+    it("calls onSubmit when the form is submitted", () => {
       const onSubmit = vi.fn();
-      renderView({ onSubmit });
-      fireEvent.click(screen.getByText(NEW_LEDGER_DIALOG_COPY.submitButton));
+      render(
+        <NewLedgerDialogView
+          open={true}
+          onOpenChange={vi.fn()}
+          name="Test"
+          onNameChange={vi.fn()}
+          cashCap=""
+          onCashCapChange={vi.fn()}
+          nameError={undefined}
+          cashCapError={undefined}
+          submitError={undefined}
+          onSubmit={onSubmit}
+          isSubmitting={false}
+        />,
+      );
+      fireEvent.submit(document.querySelector("form")!);
       expect(onSubmit).toHaveBeenCalledOnce();
     });
 
@@ -132,5 +165,169 @@ describe("NewLedgerDialogView", () => {
           .hasAttribute("disabled"),
       ).toBe(true);
     });
+  });
+});
+
+describe("NewLedgerDialog", () => {
+  it("shows a name error and does not call onSubmit when name is empty", async () => {
+    const onSubmit = vi.fn();
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.submit(document.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(screen.getByText(NEW_LEDGER_DIALOG_COPY.nameError)).toBeDefined();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("calls onSubmit with trimmed name and parsed cashCap on valid submission", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "  My Ledger  " },
+    });
+    fireEvent.change(
+      screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.cashCapLabel),
+      { target: { value: "250.50" } },
+    );
+    fireEvent.submit(document.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith("My Ledger", 250.5);
+    });
+  });
+
+  it("calls onOpenChange with false after successful submission", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const onOpenChange = vi.fn();
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "My Ledger" },
+    });
+    fireEvent.submit(document.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  it("shows a submit error message when onSubmit rejects", async () => {
+    const onSubmit = vi.fn().mockRejectedValue(new Error("Network error"));
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "My Ledger" },
+    });
+    fireEvent.submit(document.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(NEW_LEDGER_DIALOG_COPY.submitError),
+      ).toBeDefined();
+    });
+  });
+
+  it("does not call onOpenChange with false when onSubmit rejects", async () => {
+    const onSubmit = vi.fn().mockRejectedValue(new Error("Network error"));
+    const onOpenChange = vi.fn();
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "My Ledger" },
+    });
+    fireEvent.submit(document.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(NEW_LEDGER_DIALOG_COPY.submitError),
+      ).toBeDefined();
+    });
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  });
+
+  it("does not call onOpenChange with false while a submission is in flight", async () => {
+    let resolveSubmit: () => void = vi.fn();
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSubmit = resolve;
+        }),
+    );
+    const onOpenChange = vi.fn();
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "My Ledger" },
+    });
+    fireEvent.submit(document.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalled();
+    });
+
+    onOpenChange.mockClear();
+    fireEvent.keyDown(document, { key: "Escape", keyCode: 27 });
+
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+
+    resolveSubmit();
+  });
+
+  it("resets form fields when the dialog closes", () => {
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "My Ledger" },
+    });
+    expect(screen.queryByDisplayValue("My Ledger")).not.toBeNull();
+
+    fireEvent.click(screen.getByText(NEW_LEDGER_DIALOG_COPY.cancelButton));
+
+    expect(screen.queryByDisplayValue("My Ledger")).toBeNull();
   });
 });

@@ -16,6 +16,7 @@ const meta: Meta<typeof NewLedgerDialogView> = {
     onCashCapChange: () => {},
     nameError: undefined,
     cashCapError: undefined,
+    submitError: undefined,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onSubmit: () => {},
     isSubmitting: false,
@@ -32,6 +33,13 @@ export const ValidationErrors: Story = {
     nameError: "Name is required.",
     cashCapError: "Cash cap must be a positive number.",
     cashCap: "-5",
+  },
+};
+
+export const SubmitError: Story = {
+  args: {
+    name: "Everyday Spending",
+    submitError: "Something went wrong. Please try again.",
   },
 };
 

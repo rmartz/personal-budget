@@ -14,6 +14,7 @@ export const NEW_LEDGER_DIALOG_COPY = {
   namePlaceholder: "e.g. Everyday Spending",
   nameError: "Name is required.",
   submitButton: "Create Ledger",
+  submitError: "Something went wrong. Please try again.",
   title: "New Ledger",
 } as const;
 
