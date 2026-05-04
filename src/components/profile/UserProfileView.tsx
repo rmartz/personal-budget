@@ -31,23 +31,62 @@ export function UserProfileView({
   const [emailValue, setEmailValue] = useState(email);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [displayNameError, setDisplayNameError] = useState<string | undefined>(
+    undefined,
+  );
+  const [emailError, setEmailError] = useState<string | undefined>(undefined);
+  const [passwordError, setPasswordError] = useState<string | undefined>(
+    undefined,
+  );
+
+  async function submitDisplayName() {
+    try {
+      await onUpdateDisplayName(displayNameValue);
+      setDisplayNameError(undefined);
+    } catch (err) {
+      setDisplayNameError(
+        err instanceof Error ? err.message : USER_PROFILE_COPY.genericError,
+      );
+    }
+  }
+
+  async function submitEmail() {
+    try {
+      await onUpdateEmail(emailValue);
+      setEmailError(undefined);
+    } catch (err) {
+      setEmailError(
+        err instanceof Error ? err.message : USER_PROFILE_COPY.genericError,
+      );
+    }
+  }
+
+  async function submitPassword() {
+    try {
+      await onUpdatePassword(currentPassword, newPassword);
+      setPasswordError(undefined);
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err) {
+      setPasswordError(
+        err instanceof Error ? err.message : USER_PROFILE_COPY.genericError,
+      );
+    }
+  }
 
   function handleDisplayNameSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
-    void onUpdateDisplayName(displayNameValue);
+    void submitDisplayName();
   }
 
   function handleEmailSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
-    void onUpdateEmail(emailValue);
+    void submitEmail();
   }
 
   function handlePasswordSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
-    void onUpdatePassword(currentPassword, newPassword).then(() => {
-      setCurrentPassword("");
-      setNewPassword("");
-    });
+    void submitPassword();
   }
 
   return (
@@ -81,6 +120,11 @@ export function UserProfileView({
               className={INPUT_CLASSES}
             />
           </div>
+          {displayNameError !== undefined && (
+            <p role="alert" className="text-sm text-destructive">
+              {displayNameError}
+            </p>
+          )}
           <Button type="submit" className="self-end">
             {USER_PROFILE_COPY.displayNameButton}
           </Button>
@@ -109,6 +153,11 @@ export function UserProfileView({
               className={INPUT_CLASSES}
             />
           </div>
+          {emailError !== undefined && (
+            <p role="alert" className="text-sm text-destructive">
+              {emailError}
+            </p>
+          )}
           <Button type="submit" className="self-end">
             {USER_PROFILE_COPY.changeEmailButton}
           </Button>
@@ -154,6 +203,11 @@ export function UserProfileView({
               className={INPUT_CLASSES}
             />
           </div>
+          {passwordError !== undefined && (
+            <p role="alert" className="text-sm text-destructive">
+              {passwordError}
+            </p>
+          )}
           <Button type="submit" className="self-end">
             {USER_PROFILE_COPY.changePasswordButton}
           </Button>

@@ -7,6 +7,7 @@ export const USER_PROFILE_COPY = {
   displayNameButton: "Update Name",
   displayNameLabel: "Display Name",
   emailSectionTitle: "Email Address",
+  genericError: "An unexpected error occurred. Please try again.",
   passwordSectionTitle: "Change Password",
   profileSectionTitle: "Profile",
   signOutButton: "Sign Out",

@@ -1,5 +1,11 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  cleanup,
+  waitFor,
+} from "@testing-library/react";
 import { UserProfileView } from "./UserProfileView";
 import { USER_PROFILE_COPY } from "./copy";
 
@@ -86,5 +92,94 @@ describe("UserProfileView", () => {
     expect(
       screen.getByText(USER_PROFILE_COPY.passwordSectionTitle),
     ).toBeDefined();
+  });
+
+  describe("error handling", () => {
+    it("shows display name error when onUpdateDisplayName rejects", async () => {
+      const onUpdateDisplayName = vi
+        .fn()
+        .mockRejectedValue(new Error("Name update failed"));
+      render(<UserProfileView {...makeProps({ onUpdateDisplayName })} />);
+      const input = screen.getByLabelText(USER_PROFILE_COPY.displayNameLabel);
+      fireEvent.submit(input.closest("form")!);
+      await waitFor(() => {
+        expect(screen.getByText("Name update failed")).toBeDefined();
+      });
+    });
+
+    it("shows email error when onUpdateEmail rejects", async () => {
+      const onUpdateEmail = vi
+        .fn()
+        .mockRejectedValue(new Error("Email update failed"));
+      render(<UserProfileView {...makeProps({ onUpdateEmail })} />);
+      const input = screen.getByLabelText(USER_PROFILE_COPY.changeEmailLabel);
+      fireEvent.submit(input.closest("form")!);
+      await waitFor(() => {
+        expect(screen.getByText("Email update failed")).toBeDefined();
+      });
+    });
+
+    it("shows password error when onUpdatePassword rejects", async () => {
+      const onUpdatePassword = vi
+        .fn()
+        .mockRejectedValue(new Error("Wrong password"));
+      render(<UserProfileView {...makeProps({ onUpdatePassword })} />);
+      const currentInput = screen.getByLabelText(
+        USER_PROFILE_COPY.changePasswordCurrentLabel,
+      );
+      fireEvent.submit(currentInput.closest("form")!);
+      await waitFor(() => {
+        expect(screen.getByText("Wrong password")).toBeDefined();
+      });
+    });
+
+    it("clears password fields on successful password update", async () => {
+      const onUpdatePassword = vi.fn().mockResolvedValue(undefined);
+      render(<UserProfileView {...makeProps({ onUpdatePassword })} />);
+      const currentInput = screen.getByLabelText(
+        USER_PROFILE_COPY.changePasswordCurrentLabel,
+      );
+      const newInput = screen.getByLabelText(
+        USER_PROFILE_COPY.changePasswordNewLabel,
+      );
+      fireEvent.change(currentInput, { target: { value: "oldPass" } });
+      fireEvent.change(newInput, { target: { value: "newPass" } });
+      fireEvent.submit(currentInput.closest("form")!);
+      await waitFor(() => {
+        expect((currentInput as HTMLInputElement).value).toBe("");
+        expect((newInput as HTMLInputElement).value).toBe("");
+      });
+    });
+
+    it("does not clear password fields on failed password update", async () => {
+      const onUpdatePassword = vi
+        .fn()
+        .mockRejectedValue(new Error("Wrong password"));
+      render(<UserProfileView {...makeProps({ onUpdatePassword })} />);
+      const currentInput = screen.getByLabelText(
+        USER_PROFILE_COPY.changePasswordCurrentLabel,
+      );
+      const newInput = screen.getByLabelText(
+        USER_PROFILE_COPY.changePasswordNewLabel,
+      );
+      fireEvent.change(currentInput, { target: { value: "oldPass" } });
+      fireEvent.change(newInput, { target: { value: "newPass" } });
+      fireEvent.submit(currentInput.closest("form")!);
+      await waitFor(() => {
+        expect(screen.getByText("Wrong password")).toBeDefined();
+      });
+      expect((currentInput as HTMLInputElement).value).toBe("oldPass");
+      expect((newInput as HTMLInputElement).value).toBe("newPass");
+    });
+
+    it("uses the generic error message for non-Error rejections", async () => {
+      const onUpdateEmail = vi.fn().mockRejectedValue("raw string error");
+      render(<UserProfileView {...makeProps({ onUpdateEmail })} />);
+      const input = screen.getByLabelText(USER_PROFILE_COPY.changeEmailLabel);
+      fireEvent.submit(input.closest("form")!);
+      await waitFor(() => {
+        expect(screen.getByText(USER_PROFILE_COPY.genericError)).toBeDefined();
+      });
+    });
   });
 });
