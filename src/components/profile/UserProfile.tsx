@@ -33,6 +33,7 @@ export function UserProfile({ user }: UserProfileProps) {
   }
 
   async function handleSignOut() {
+    await fetch("/api/auth/session", { method: "DELETE" });
     await signOut();
     router.push("/sign-in");
   }
