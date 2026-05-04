@@ -31,11 +31,19 @@ interface JwtPayload {
 }
 
 function isAuthRoute(pathname: string): boolean {
-  return pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+  return (
+    pathname.startsWith("/sign-in") ||
+    pathname.startsWith("/sign-up") ||
+    pathname.startsWith("/forgot-password")
+  );
 }
 
 function isExcludedPath(pathname: string): boolean {
-  return pathname.startsWith("/_next/") || pathname === "/favicon.ico";
+  return (
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/api/auth/") ||
+    pathname === "/favicon.ico"
+  );
 }
 
 export async function middleware(request: NextRequest) {
@@ -150,5 +158,5 @@ async function verifySessionCookie(
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth/session).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth/).*)"],
 };
