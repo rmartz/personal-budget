@@ -5,14 +5,10 @@ const meta: Meta<typeof UserProfileView> = {
   component: UserProfileView,
   title: "Profile/UserProfileView",
   args: {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onUpdateDisplayName: async () => {},
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onUpdateEmail: async () => {},
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onUpdatePassword: async () => {},
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onSignOut: async () => {},
+    onUpdateDisplayName: () => Promise.resolve(),
+    onUpdateEmail: () => Promise.resolve(),
+    onUpdatePassword: () => Promise.resolve(),
+    onSignOut: () => Promise.resolve(),
   },
 };
 

@@ -41,10 +41,12 @@ export async function updatePassword(
   currentPassword: string,
   newPassword: string,
 ) {
-  const credential = EmailAuthProvider.credential(
-    user.email ?? "",
-    currentPassword,
-  );
+  if (!user.email) {
+    throw new Error(
+      "User does not have an email address for re-authentication.",
+    );
+  }
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
   await reauthenticateWithCredential(user, credential);
   return firebaseUpdatePassword(user, newPassword);
 }

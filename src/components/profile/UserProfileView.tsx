@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { USER_PROFILE_COPY } from "./copy";
 
+const INPUT_CLASSES =
+  "rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+
 export interface UserProfileViewProps {
   displayName: string;
   email: string;
@@ -75,7 +78,7 @@ export function UserProfileView({
               onChange={(e) => {
                 setDisplayNameValue(e.target.value);
               }}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className={INPUT_CLASSES}
             />
           </div>
           <Button type="submit" className="self-end">
@@ -103,7 +106,7 @@ export function UserProfileView({
               onChange={(e) => {
                 setEmailValue(e.target.value);
               }}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className={INPUT_CLASSES}
             />
           </div>
           <Button type="submit" className="self-end">
@@ -131,7 +134,7 @@ export function UserProfileView({
               onChange={(e) => {
                 setCurrentPassword(e.target.value);
               }}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className={INPUT_CLASSES}
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -148,7 +151,7 @@ export function UserProfileView({
               onChange={(e) => {
                 setNewPassword(e.target.value);
               }}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className={INPUT_CLASSES}
             />
           </div>
           <Button type="submit" className="self-end">
