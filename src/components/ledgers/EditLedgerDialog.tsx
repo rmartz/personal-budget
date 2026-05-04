@@ -106,6 +106,9 @@ export function EditLedgerDialog({
     setSubmitError(undefined);
     try {
       await onSave(ledgerId, { name: trimmedName, cashCap });
+      // Close directly rather than via handleOpenChange(false) because the
+      // guard there blocks close while isSubmitting is true, and isSubmitting
+      // is still true here (the finally block resets it afterward).
       resetForm();
       setOpen(false);
     } catch {
