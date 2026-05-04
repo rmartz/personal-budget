@@ -57,10 +57,19 @@ export function NewLedgerDialogView({
                 }}
                 placeholder={NEW_LEDGER_DIALOG_COPY.namePlaceholder}
                 aria-invalid={nameError !== undefined}
+                aria-describedby={
+                  nameError !== undefined ? "new-ledger-name-error" : undefined
+                }
                 className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
               />
               {nameError !== undefined && (
-                <p className="text-sm text-destructive">{nameError}</p>
+                <p
+                  id="new-ledger-name-error"
+                  role="alert"
+                  className="text-sm text-destructive"
+                >
+                  {nameError}
+                </p>
               )}
             </div>
             <div className="flex flex-col gap-1.5">
@@ -81,10 +90,21 @@ export function NewLedgerDialogView({
                 }}
                 placeholder={NEW_LEDGER_DIALOG_COPY.cashCapPlaceholder}
                 aria-invalid={cashCapError !== undefined}
+                aria-describedby={
+                  cashCapError !== undefined
+                    ? "new-ledger-cash-cap-error"
+                    : undefined
+                }
                 className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
               />
               {cashCapError !== undefined && (
-                <p className="text-sm text-destructive">{cashCapError}</p>
+                <p
+                  id="new-ledger-cash-cap-error"
+                  role="alert"
+                  className="text-sm text-destructive"
+                >
+                  {cashCapError}
+                </p>
               )}
             </div>
           </div>
