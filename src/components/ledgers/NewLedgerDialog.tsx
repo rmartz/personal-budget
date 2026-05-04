@@ -46,6 +46,7 @@ export function NewLedgerDialogView({
         <DialogPopup>
           <DialogTitle>{NEW_LEDGER_DIALOG_COPY.title}</DialogTitle>
           <form
+            noValidate
             onSubmit={(e) => {
               e.preventDefault();
               onSubmit();
@@ -95,7 +96,7 @@ export function NewLedgerDialogView({
                 <input
                   id="new-ledger-cash-cap"
                   type="number"
-                  min="0"
+                  min="0.01"
                   step="0.01"
                   value={cashCap}
                   onChange={(e) => {
