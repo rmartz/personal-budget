@@ -212,5 +212,63 @@ describe("EditLedgerDialog", () => {
       );
       expect((nameInput as HTMLInputElement).value).toBe("Original Name");
     });
+
+    it("disables the Cancel button while submitting", async () => {
+      let resolveOnSave!: () => void;
+      const slowSave = vi
+        .fn()
+        .mockImplementation(
+          () => new Promise<void>((resolve) => (resolveOnSave = resolve)),
+        );
+      renderDialog({ onSave: slowSave });
+      openDialog();
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.saveButton,
+        }),
+      );
+      await waitFor(() => {
+        const cancelButton = screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.cancelButton,
+        });
+        expect((cancelButton as HTMLButtonElement).disabled).toBe(true);
+      });
+      resolveOnSave();
+    });
+  });
+
+  describe("prop sync", () => {
+    it("shows updated prop values when the dialog is opened after props change while closed", () => {
+      const onSave = vi.fn().mockResolvedValue(undefined);
+      const { rerender } = render(
+        <EditLedgerDialog
+          ledgerId="ledger-1"
+          initialName="Old Name"
+          initialCashCap={100}
+          onSave={onSave}
+        />,
+      );
+      rerender(
+        <EditLedgerDialog
+          ledgerId="ledger-1"
+          initialName="New Name"
+          initialCashCap={200}
+          onSave={onSave}
+        />,
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: `${EDIT_LEDGER_DIALOG_COPY.editButton} New Name`,
+        }),
+      );
+      const nameInput = screen.getByLabelText(
+        EDIT_LEDGER_DIALOG_COPY.nameLabel,
+      );
+      expect((nameInput as HTMLInputElement).value).toBe("New Name");
+      const cashCapInput = screen.getByLabelText(
+        EDIT_LEDGER_DIALOG_COPY.cashCapLabel,
+      );
+      expect((cashCapInput as HTMLInputElement).value).toBe("200");
+    });
   });
 });

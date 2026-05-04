@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil } from "lucide-react";
 import type { UpdateLedgerInput } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,16 @@ export function EditLedgerDialog({
   const [submitError, setSubmitError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Sync form field values from props whenever the dialog is closed so the next
+  // open always shows the current ledger values (e.g. after a successful save
+  // causes React Query to update the parent's data).
+  useEffect(() => {
+    if (!open) {
+      setName(initialName);
+      setCashCapRaw(initialCashCap !== undefined ? String(initialCashCap) : "");
+    }
+  }, [initialName, initialCashCap, open]);
+
   const nameInputId = `edit-ledger-name-${ledgerId}`;
   const nameErrorId = `edit-ledger-name-error-${ledgerId}`;
   const cashCapInputId = `edit-ledger-cash-cap-${ledgerId}`;
@@ -52,6 +62,7 @@ export function EditLedgerDialog({
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen && isSubmitting) return;
     if (!nextOpen) {
       resetForm();
     }
@@ -59,8 +70,7 @@ export function EditLedgerDialog({
   };
 
   const handleCancel = () => {
-    resetForm();
-    setOpen(false);
+    handleOpenChange(false);
   };
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
@@ -96,7 +106,8 @@ export function EditLedgerDialog({
     setSubmitError(undefined);
     try {
       await onSave(ledgerId, { name: trimmedName, cashCap });
-      handleOpenChange(false);
+      resetForm();
+      setOpen(false);
     } catch {
       setSubmitError(EDIT_LEDGER_DIALOG_COPY.submitError);
     } finally {
@@ -192,7 +203,12 @@ export function EditLedgerDialog({
             </p>
           )}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleCancel}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+            >
               {EDIT_LEDGER_DIALOG_COPY.cancelButton}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
