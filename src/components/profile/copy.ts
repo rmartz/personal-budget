@@ -8,6 +8,8 @@ export const USER_PROFILE_COPY = {
   displayNameLabel: "Display Name",
   emailSectionTitle: "Email Address",
   genericError: "An unexpected error occurred. Please try again.",
+  passwordNoEmailError:
+    "Password change is unavailable because this account has no email address.",
   passwordSectionTitle: "Change Password",
   profileSectionTitle: "Profile",
   signOutButton: "Sign Out",

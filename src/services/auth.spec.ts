@@ -137,7 +137,9 @@ describe("auth service", () => {
 
       await expect(
         serviceUpdatePassword(userWithoutEmail, "current", "new"),
-      ).rejects.toThrow("User does not have an email address");
+      ).rejects.toThrow(
+        "Password change is unavailable because this account has no email address.",
+      );
     });
 
     it("re-authenticates then updates the password", async () => {

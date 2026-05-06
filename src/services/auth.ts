@@ -43,7 +43,7 @@ export async function updatePassword(
 ) {
   if (!user.email) {
     throw new Error(
-      "User does not have an email address for re-authentication.",
+      "Password change is unavailable because this account has no email address.",
     );
   }
   const credential = EmailAuthProvider.credential(user.email, currentPassword);
