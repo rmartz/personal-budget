@@ -4,11 +4,11 @@ export const CREATE_LEDGER_DIALOG_COPY = {
   cashCapLabel: "Cash Cap (optional)",
   cashCapPlaceholder: "e.g. 1000",
   createButton: "Creating…",
-  errorPrefix: "Failed to create: ",
   nameLabel: "Name",
   namePlaceholder: "e.g. Everyday Spending",
   nameRequiredError: "Name is required.",
   submitButton: "Create Ledger",
+  submitError: "Failed to create ledger. Please try again.",
   title: "New Ledger",
 } as const;
 

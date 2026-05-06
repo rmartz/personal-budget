@@ -81,9 +81,8 @@ export function CreateLedgerDialog({
     try {
       await onSubmit({ name: name.trim(), cashCap: parsedCashCap });
       handleClose();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setSubmitError(message);
+    } catch {
+      setSubmitError(CREATE_LEDGER_DIALOG_COPY.submitError);
     }
   };
 
@@ -91,6 +90,7 @@ export function CreateLedgerDialog({
     <Dialog
       open={open}
       onOpenChange={(isOpen: boolean) => {
+        if (!isOpen && isSubmitting) return;
         if (!isOpen) handleClose();
       }}
     >
@@ -165,7 +165,6 @@ export function CreateLedgerDialog({
             </div>
             {submitError !== undefined && (
               <p role="alert" className="text-xs text-destructive">
-                {CREATE_LEDGER_DIALOG_COPY.errorPrefix}
                 {submitError}
               </p>
             )}

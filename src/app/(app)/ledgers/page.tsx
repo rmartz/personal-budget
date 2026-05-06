@@ -1,12 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { LedgerList } from "@/components/ledgers";
+import { LedgerList, CreateLedgerDialog } from "@/components/ledgers";
 import { useLedgers } from "@/hooks/use-ledgers";
 import { useDeleteLedger } from "@/hooks/use-delete-ledger";
 import { useAuth } from "@/hooks/use-auth";
-import { updateLedger } from "@/services/ledgers";
-import type { UpdateLedgerInput } from "@/lib/types";
+import { createLedger, updateLedger } from "@/services/ledgers";
+import type { CreateLedgerInput, UpdateLedgerInput } from "@/lib/types";
 
 export default function LedgersPage() {
   const { user, loading: authLoading } = useAuth();
@@ -14,6 +15,7 @@ export default function LedgersPage() {
   const { ledgers, isLoading } = useLedgers(uid);
   const queryClient = useQueryClient();
   const { mutate: deleteLedger } = useDeleteLedger(uid);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const editMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLedgerInput }) =>
@@ -23,8 +25,19 @@ export default function LedgersPage() {
     },
   });
 
+  const createMutation = useMutation({
+    mutationFn: (data: CreateLedgerInput) => createLedger(uid, data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
+    },
+  });
+
   const handleNewLedger = () => {
-    // TODO: open new ledger dialog/modal
+    setCreateDialogOpen(true);
+  };
+
+  const handleCreateLedger = async (data: CreateLedgerInput): Promise<void> => {
+    await createMutation.mutateAsync(data);
   };
 
   const handleEditLedger = (
@@ -44,6 +57,14 @@ export default function LedgersPage() {
         onNewLedger={handleNewLedger}
         onEditLedger={handleEditLedger}
         onDeleteLedger={deleteLedger}
+      />
+      <CreateLedgerDialog
+        open={createDialogOpen}
+        onSubmit={handleCreateLedger}
+        onClose={() => {
+          setCreateDialogOpen(false);
+        }}
+        isSubmitting={createMutation.isPending}
       />
     </div>
   );

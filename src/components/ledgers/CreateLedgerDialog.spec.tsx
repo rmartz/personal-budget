@@ -226,7 +226,9 @@ describe("CreateLedgerDialog", () => {
       );
       fireEvent.click(screen.getByText(CREATE_LEDGER_DIALOG_COPY.submitButton));
       await waitFor(() => {
-        expect(screen.getByText(/Firebase error/)).toBeDefined();
+        expect(
+          screen.getByText(CREATE_LEDGER_DIALOG_COPY.submitError),
+        ).toBeDefined();
       });
     });
 
@@ -246,7 +248,9 @@ describe("CreateLedgerDialog", () => {
       );
       fireEvent.click(screen.getByText(CREATE_LEDGER_DIALOG_COPY.submitButton));
       await waitFor(() => {
-        expect(screen.getByText(/Firebase error/)).toBeDefined();
+        expect(
+          screen.getByText(CREATE_LEDGER_DIALOG_COPY.submitError),
+        ).toBeDefined();
       });
       // Clear the name to trigger a validation failure on re-submit
       fireEvent.change(
@@ -254,10 +258,42 @@ describe("CreateLedgerDialog", () => {
         { target: { value: "" } },
       );
       fireEvent.click(screen.getByText(CREATE_LEDGER_DIALOG_COPY.submitButton));
-      expect(screen.queryByText(/Firebase error/)).toBeNull();
+      expect(
+        screen.queryByText(CREATE_LEDGER_DIALOG_COPY.submitError),
+      ).toBeNull();
       expect(
         screen.getByText(CREATE_LEDGER_DIALOG_COPY.nameRequiredError),
       ).toBeDefined();
+    });
+
+    it("disables the Submit button while isSubmitting is true", () => {
+      render(
+        <CreateLedgerDialog
+          open={true}
+          onSubmit={onSubmit}
+          onClose={onClose}
+          isSubmitting={true}
+        />,
+      );
+      const submitBtn = screen
+        .getByText(CREATE_LEDGER_DIALOG_COPY.createButton)
+        .closest("button");
+      expect(submitBtn?.disabled).toBe(true);
+    });
+
+    it("disables the Cancel button while isSubmitting is true", () => {
+      render(
+        <CreateLedgerDialog
+          open={true}
+          onSubmit={onSubmit}
+          onClose={onClose}
+          isSubmitting={true}
+        />,
+      );
+      const cancelBtn = screen
+        .getByText(CREATE_LEDGER_DIALOG_COPY.cancelButton)
+        .closest("button");
+      expect(cancelBtn?.disabled).toBe(true);
     });
   });
 });
