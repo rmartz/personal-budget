@@ -54,6 +54,12 @@ describe("middleware", () => {
       const response = await middleware(request);
       expect(response.status).toBe(200);
     });
+
+    it("passes through bare /api/auth path without checking authentication", async () => {
+      const request = makeRequest("http://localhost/api/auth");
+      const response = await middleware(request);
+      expect(response.status).toBe(200);
+    });
   });
 
   describe("unauthenticated user", () => {

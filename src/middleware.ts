@@ -41,7 +41,7 @@ function isAuthRoute(pathname: string): boolean {
 function isExcludedPath(pathname: string): boolean {
   return (
     pathname.startsWith("/_next/") ||
-    pathname.startsWith("/api/auth/") ||
+    pathname.startsWith("/api/auth") ||
     pathname === "/favicon.ico"
   );
 }
@@ -158,5 +158,5 @@ async function verifySessionCookie(
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth).*)"],
 };
