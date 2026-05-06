@@ -295,5 +295,19 @@ describe("CreateLedgerDialog", () => {
         .closest("button");
       expect(cancelBtn?.disabled).toBe(true);
     });
+
+    it("does not call onClose when dismiss is attempted while isSubmitting is true", () => {
+      const onCloseMock = vi.fn();
+      render(
+        <CreateLedgerDialog
+          open={true}
+          onSubmit={vi.fn()}
+          onClose={onCloseMock}
+          isSubmitting={true}
+        />,
+      );
+      fireEvent.keyDown(document, { key: "Escape", bubbles: true });
+      expect(onCloseMock).not.toHaveBeenCalled();
+    });
   });
 });

@@ -75,6 +75,7 @@ export function EditLedgerDialog({
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setSubmitError(undefined);
 
     let valid = true;

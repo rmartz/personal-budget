@@ -267,6 +267,35 @@ describe("EditLedgerDialog", () => {
       });
       resolveOnSave();
     });
+
+    it("does not close when dismiss is attempted while a save is in flight", async () => {
+      let resolveOnSave!: () => void;
+      const slowSave = vi
+        .fn()
+        .mockImplementation(
+          () => new Promise<void>((resolve) => (resolveOnSave = resolve)),
+        );
+      renderDialog({ onSave: slowSave });
+      openDialog();
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.saveButton,
+        }),
+      );
+      await waitFor(() => {
+        const cancelButton = screen.getByRole("button", {
+          name: EDIT_LEDGER_DIALOG_COPY.cancelButton,
+        });
+        expect((cancelButton as HTMLButtonElement).disabled).toBe(true);
+      });
+      // Attempt to dismiss while save is in flight
+      fireEvent.keyDown(document, { key: "Escape", bubbles: true });
+      // Dialog should still be open
+      expect(
+        screen.getByText(EDIT_LEDGER_DIALOG_COPY.dialogTitle),
+      ).toBeDefined();
+      resolveOnSave();
+    });
   });
 
   describe("prop sync", () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useId } from "react";
 import type { CreateLedgerInput } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +33,12 @@ export function CreateLedgerDialog({
   );
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
+  const baseId = useId();
+  const nameInputId = `${baseId}-name`;
+  const nameErrorId = `${baseId}-name-error`;
+  const cashCapInputId = `${baseId}-cash-cap`;
+  const cashCapErrorId = `${baseId}-cash-cap-error`;
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
     setNameError(undefined);
@@ -54,6 +60,7 @@ export function CreateLedgerDialog({
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setSubmitError(undefined);
 
     let valid = true;
@@ -107,24 +114,24 @@ export function CreateLedgerDialog({
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
               <label
-                htmlFor="ledger-name"
+                htmlFor={nameInputId}
                 className="text-sm font-medium leading-none"
               >
                 {CREATE_LEDGER_DIALOG_COPY.nameLabel}
               </label>
               <input
-                id="ledger-name"
+                id={nameInputId}
                 type="text"
                 value={name}
                 onChange={handleNameChange}
                 placeholder={CREATE_LEDGER_DIALOG_COPY.namePlaceholder}
                 aria-invalid={nameError !== undefined}
-                aria-describedby={nameError ? "ledger-name-error" : undefined}
+                aria-describedby={nameError ? nameErrorId : undefined}
                 className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {nameError !== undefined && (
                 <p
-                  id="ledger-name-error"
+                  id={nameErrorId}
                   role="alert"
                   className="text-xs text-destructive"
                 >
@@ -134,13 +141,13 @@ export function CreateLedgerDialog({
             </div>
             <div className="flex flex-col gap-1.5">
               <label
-                htmlFor="ledger-cash-cap"
+                htmlFor={cashCapInputId}
                 className="text-sm font-medium leading-none"
               >
                 {CREATE_LEDGER_DIALOG_COPY.cashCapLabel}
               </label>
               <input
-                id="ledger-cash-cap"
+                id={cashCapInputId}
                 type="number"
                 min="0.01"
                 step="0.01"
@@ -148,14 +155,12 @@ export function CreateLedgerDialog({
                 onChange={handleCashCapChange}
                 placeholder={CREATE_LEDGER_DIALOG_COPY.cashCapPlaceholder}
                 aria-invalid={cashCapError !== undefined}
-                aria-describedby={
-                  cashCapError ? "ledger-cash-cap-error" : undefined
-                }
+                aria-describedby={cashCapError ? cashCapErrorId : undefined}
                 className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {cashCapError !== undefined && (
                 <p
-                  id="ledger-cash-cap-error"
+                  id={cashCapErrorId}
                   role="alert"
                   className="text-xs text-destructive"
                 >
