@@ -234,12 +234,7 @@ export function UserProfileView({
         </form>
       </section>
 
-      <Button
-        variant="outline"
-        onClick={() => {
-          void onSignOut();
-        }}
-      >
+      <Button variant="outline" onClick={() => void onSignOut()}>
         {USER_PROFILE_COPY.signOutButton}
       </Button>
     </div>
