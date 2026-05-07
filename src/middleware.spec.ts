@@ -60,6 +60,13 @@ describe("middleware", () => {
       const response = await middleware(request);
       expect(response.status).toBe(200);
     });
+
+    it("does not exclude /api/authentication — similar prefix but different segment", async () => {
+      const request = makeRequest("http://localhost/api/authentication");
+      const response = await middleware(request);
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toContain("/sign-in");
+    });
   });
 
   describe("unauthenticated user", () => {
