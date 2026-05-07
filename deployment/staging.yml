@@ -11,7 +11,7 @@
 #   1. Create the RTDB in the staging Firebase project
 #   2. Populate NEXT_PUBLIC_FIREBASE_DATABASE_URL and FIREBASE_DATABASE_URL below
 #   3. Re-add staging to deployment/environments.yml and set single_environment: false
-#   4. Run: scripts/deploy-config.sh --env=staging
+#   4. Run: pnpm exec sync-env --env=staging
 # ──────────────────────────────────────────────────────────────────────────────
 #
 # Only non-sensitive variables belong here. All keys are validated against

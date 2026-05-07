@@ -24,8 +24,9 @@ pnpm run secrets-check # Config validation + gitleaks scan (also runs pre-commit
 
 Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
 
-- To update a public config value: `scripts/update-config.sh --env=<staging|production> KEY=value`
-- To rotate all secrets (Firebase + Sentry + Vercel): `scripts/rotate-keys.sh --env=<staging|production>`
+- To sync public config values to Vercel: `pnpm exec sync-env` (all environments) or `pnpm exec sync-env --env=<staging|production>`
+- To rotate all secrets (Firebase + Sentry): `pnpm exec sync-env --rotate-keys --env=<staging|production>`
+- To validate config files against schema locally: `pnpm run env:validate`
 - Secrets checks run automatically on every commit via `.husky/pre-commit`; also enforced in CI via `.github/workflows/secret-scan.yml`
 
 ## TypeScript
