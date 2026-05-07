@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
 
   if (isAuthRoute(pathname)) {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("/ledgers", request.url));
     }
     return NextResponse.next();
   }
