@@ -179,6 +179,7 @@ export function NewLedgerDialog({
   }
 
   async function handleSubmit() {
+    if (isSubmitting) return;
     setSubmitError(undefined);
     let valid = true;
 
