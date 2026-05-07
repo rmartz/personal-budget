@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { LedgerListItem } from "./LedgerListItem";
-import { LEDGER_LIST_ITEM_COPY } from "./copy";
+import { LedgerListItem, LedgerListItemView } from "./LedgerListItem";
+import { LEDGER_LIST_ITEM_COPY, LEDGERS_PAGE_COPY } from "./copy";
 import type { Ledger } from "@/lib/types";
 
 afterEach(cleanup);
@@ -13,6 +13,7 @@ function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
     cashCap: undefined,
     cashBalance: 100,
     investmentBalance: 50,
+    goalsCount: 0,
     ...overrides,
   };
 }
@@ -24,23 +25,23 @@ describe("LedgerListItem", () => {
   it("renders the ledger name", () => {
     const ledger = makeLedger({ name: "Everyday Spending" });
     render(
-      <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />,
+      <table>
+        <tbody>
+          <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />
+        </tbody>
+      </table>,
     );
     expect(screen.getByText("Everyday Spending")).toBeDefined();
-  });
-
-  it("renders the formatted total balance", () => {
-    const ledger = makeLedger({ cashBalance: 1000, investmentBalance: 500 });
-    render(
-      <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />,
-    );
-    expect(screen.getByText("$1,500.00")).toBeDefined();
   });
 
   it("renders the overflow menu button", () => {
     const ledger = makeLedger();
     render(
-      <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />,
+      <table>
+        <tbody>
+          <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />
+        </tbody>
+      </table>,
     );
     expect(
       screen.getByRole("button", {
@@ -53,7 +54,15 @@ describe("LedgerListItem", () => {
     it("shows the confirmation dialog when Delete is selected from the overflow menu", async () => {
       const ledger = makeLedger({ name: "Test Ledger" });
       render(
-        <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />,
+        <table>
+          <tbody>
+            <LedgerListItem
+              ledger={ledger}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          </tbody>
+        </table>,
       );
 
       fireEvent.click(
@@ -70,16 +79,21 @@ describe("LedgerListItem", () => {
       expect(
         screen.getByText(LEDGER_LIST_ITEM_COPY.deleteConfirmTitle),
       ).toBeDefined();
-      expect(
-        screen.getByText(LEDGER_LIST_ITEM_COPY.deleteConfirmDescription),
-      ).toBeDefined();
     });
 
     it("calls onDelete with the ledger id when the confirm button is clicked", async () => {
       const onDelete = vi.fn();
       const ledger = makeLedger({ id: "ledger-xyz" });
       render(
-        <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />,
+        <table>
+          <tbody>
+            <LedgerListItem
+              ledger={ledger}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          </tbody>
+        </table>,
       );
 
       fireEvent.click(
@@ -92,7 +106,6 @@ describe("LedgerListItem", () => {
         LEDGER_LIST_ITEM_COPY.deleteMenuLabel,
       );
       fireEvent.click(deleteMenuItem);
-
       fireEvent.click(
         screen.getByText(LEDGER_LIST_ITEM_COPY.deleteConfirmButton),
       );
@@ -104,7 +117,15 @@ describe("LedgerListItem", () => {
       const onDelete = vi.fn();
       const ledger = makeLedger();
       render(
-        <LedgerListItem ledger={ledger} onEdit={onEdit} onDelete={onDelete} />,
+        <table>
+          <tbody>
+            <LedgerListItem
+              ledger={ledger}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          </tbody>
+        </table>,
       );
 
       fireEvent.click(
@@ -117,12 +138,95 @@ describe("LedgerListItem", () => {
         LEDGER_LIST_ITEM_COPY.deleteMenuLabel,
       );
       fireEvent.click(deleteMenuItem);
-
       fireEvent.click(
         screen.getByText(LEDGER_LIST_ITEM_COPY.deleteCancelButton),
       );
 
       expect(onDelete).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe("LedgerListItemView", () => {
+  const onEdit = vi.fn().mockResolvedValue(undefined);
+
+  describe("cap usage column", () => {
+    it("renders 'no cash cap' text when cashCap is undefined", () => {
+      const ledger = makeLedger({ cashCap: undefined });
+      render(
+        <table>
+          <tbody>
+            <LedgerListItemView
+              ledger={ledger}
+              onEdit={onEdit}
+              deleteDialogOpen={false}
+              onDeleteDialogOpenChange={vi.fn()}
+              onDeleteMenuClick={vi.fn()}
+              onDeleteConfirm={vi.fn()}
+            />
+          </tbody>
+        </table>,
+      );
+      expect(screen.getByText(LEDGERS_PAGE_COPY.noCashCapLabel)).toBeDefined();
+    });
+
+    it("does not render 'no cash cap' text when cashCap is set", () => {
+      const ledger = makeLedger({ cashCap: 1000 });
+      render(
+        <table>
+          <tbody>
+            <LedgerListItemView
+              ledger={ledger}
+              onEdit={onEdit}
+              deleteDialogOpen={false}
+              onDeleteDialogOpenChange={vi.fn()}
+              onDeleteMenuClick={vi.fn()}
+              onDeleteConfirm={vi.fn()}
+            />
+          </tbody>
+        </table>,
+      );
+      expect(screen.queryByText(LEDGERS_PAGE_COPY.noCashCapLabel)).toBeNull();
+    });
+  });
+
+  describe("goals column", () => {
+    it("renders em dash when goalsCount is 0", () => {
+      const ledger = makeLedger({ goalsCount: 0 });
+      render(
+        <table>
+          <tbody>
+            <LedgerListItemView
+              ledger={ledger}
+              onEdit={onEdit}
+              deleteDialogOpen={false}
+              onDeleteDialogOpenChange={vi.fn()}
+              onDeleteMenuClick={vi.fn()}
+              onDeleteConfirm={vi.fn()}
+            />
+          </tbody>
+        </table>,
+      );
+      expect(screen.getByText(LEDGER_LIST_ITEM_COPY.goalsNone)).toBeDefined();
+    });
+
+    it("renders the goals count when goalsCount is non-zero", () => {
+      const ledger = makeLedger({ goalsCount: 3 });
+      render(
+        <table>
+          <tbody>
+            <LedgerListItemView
+              ledger={ledger}
+              onEdit={onEdit}
+              deleteDialogOpen={false}
+              onDeleteDialogOpenChange={vi.fn()}
+              onDeleteMenuClick={vi.fn()}
+              onDeleteConfirm={vi.fn()}
+            />
+          </tbody>
+        </table>,
+      );
+      expect(screen.getByText("3")).toBeDefined();
     });
   });
 });

@@ -33,13 +33,25 @@ export const LEDGER_LIST_ITEM_COPY = {
     "This will permanently delete this ledger and all its associated transactions and goals. This action cannot be undone.",
   deleteConfirmTitle: "Delete ledger?",
   deleteMenuLabel: "Delete",
+  goalsNone: "—",
   overflowMenuLabel: "More options",
 } as const;
 
 export const LEDGERS_PAGE_COPY = {
+  columnCapUsage: "Cap usage",
+  columnCash: "Cash",
+  columnGoals: "Goals",
+  columnInvestment: "Investment",
+  columnLedger: "Ledger",
+  columnTotal: "Total",
   emptyStateMessage: "You don't have any ledgers yet.",
+  headerSummary: (count: number, cash: string, invested: string) =>
+    `${String(count)} ${count === 1 ? "ledger" : "ledgers"} · ${cash} cash · ${invested} invested`,
+  importButton: "Import",
   loadingMessage: "Loading ledgers…",
+  mobileTotalLabel: "Total",
   newLedgerButton: "New Ledger",
+  noCashCapLabel: "no cash cap",
   title: "Budget Ledgers",
 } as const;
 

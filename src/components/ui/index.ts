@@ -23,3 +23,6 @@ export type {
   CardHeaderProps,
   CardTitleProps,
 } from "./card";
+
+export { Bar } from "./bar";
+export type { BarProps } from "./bar";
