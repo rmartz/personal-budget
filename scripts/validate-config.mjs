@@ -172,6 +172,11 @@ const { environments, singleEnvironment } = loadEnvironments();
 
 const toValidate = envArg ? [envArg] : environments;
 
+if (environments.length === 0 && !envArg) {
+  console.error("ERROR: environments.yml has no active environments listed.");
+  process.exit(1);
+}
+
 if (!singleEnvironment && environments.length < 2 && !envArg) {
   console.error(
     "ERROR: environments.yml lists fewer than 2 environments but single_environment is not true.\n" +
