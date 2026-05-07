@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
 
     steps:
       - uses: actions/checkout@v6
@@ -46,8 +48,8 @@ jobs:
         run: |
           pnpm exec sentry-cli sourcemaps inject .next
           pnpm exec sentry-cli sourcemaps upload \
-            --org reedmartz \
-            --project personal-budget \
+            --org "$SENTRY_ORG" \
+            --project "$SENTRY_PROJECT" \
             --release "${{ github.sha }}" \
             .next
         env:
