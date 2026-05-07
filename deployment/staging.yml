@@ -36,7 +36,7 @@ variables:
   FIREBASE_DATABASE_URL: ""
 
   # Sentry — slugs only, not credentials
-  SENTRY_ORG: ""
-  SENTRY_PROJECT: ""
+  SENTRY_ORG: "reedmartz"
+  SENTRY_PROJECT: "personal-budget"
   # Sentry public DSN — safe to expose; matched by the NEXT_PUBLIC_* allowed_pattern in schema.yml.
   NEXT_PUBLIC_SENTRY_DSN: "https://39ad6a2f62056621e3452bee009c1afc@o4511071618072576.ingest.us.sentry.io/4511351011737600"
