@@ -7,6 +7,7 @@ const sampleLedger = {
   cashCap: 2000,
   cashBalance: 1250.0,
   investmentBalance: 500.0,
+  goalsCount: 2,
 };
 
 const meta: Meta<typeof LedgerListItemView> = {
@@ -14,9 +15,11 @@ const meta: Meta<typeof LedgerListItemView> = {
   title: "Ledgers/LedgerListItem",
   decorators: [
     (Story) => (
-      <ul>
-        <Story />
-      </ul>
+      <table>
+        <tbody>
+          <Story />
+        </tbody>
+      </table>
     ),
   ],
   args: {
@@ -43,6 +46,15 @@ export const WithNoCashCap: Story = {
     ledger: {
       ...sampleLedger,
       cashCap: undefined,
+    },
+  },
+};
+
+export const WithNoGoals: Story = {
+  args: {
+    ledger: {
+      ...sampleLedger,
+      goalsCount: 0,
     },
   },
 };

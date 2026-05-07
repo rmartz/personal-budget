@@ -13,6 +13,7 @@ function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
     cashCap: undefined,
     cashBalance: 100,
     investmentBalance: 50,
+    goalsCount: 0,
     ...overrides,
   };
 }
@@ -84,29 +85,10 @@ describe("LedgerList", () => {
           onDeleteLedger={onDeleteLedger}
         />,
       );
-      expect(screen.getByText("Everyday Spending")).toBeDefined();
-      expect(screen.getByText("Emergency Fund")).toBeDefined();
-    });
-
-    it("renders the formatted total balance for each ledger", () => {
-      const ledgers = [
-        makeLedger({
-          id: "1",
-          name: "Savings",
-          cashBalance: 1000,
-          investmentBalance: 500,
-        }),
-      ];
-      render(
-        <LedgerList
-          ledgers={ledgers}
-          isLoading={false}
-          onNewLedger={onNewLedger}
-          onEditLedger={onEditLedger}
-          onDeleteLedger={onDeleteLedger}
-        />,
+      expect(screen.getAllByText("Everyday Spending").length).toBeGreaterThan(
+        0,
       );
-      expect(screen.getByText("$1,500.00")).toBeDefined();
+      expect(screen.getAllByText("Emergency Fund").length).toBeGreaterThan(0);
     });
 
     it("does not render the empty state message when ledgers exist", () => {
@@ -123,6 +105,69 @@ describe("LedgerList", () => {
       expect(
         screen.queryByText(LEDGERS_PAGE_COPY.emptyStateMessage),
       ).toBeNull();
+    });
+  });
+
+  describe("header summary sub line", () => {
+    it("shows the correct ledger count in the summary", () => {
+      const ledgers = [makeLedger({ id: "1" }), makeLedger({ id: "2" })];
+      render(
+        <LedgerList
+          ledgers={ledgers}
+          isLoading={false}
+          onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
+          onDeleteLedger={onDeleteLedger}
+        />,
+      );
+      expect(screen.getByText(/2 ledgers ·/)).toBeDefined();
+    });
+
+    it("uses singular 'ledger' when there is exactly one", () => {
+      render(
+        <LedgerList
+          ledgers={[makeLedger({ id: "1" })]}
+          isLoading={false}
+          onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
+          onDeleteLedger={onDeleteLedger}
+        />,
+      );
+      expect(screen.getByText(/1 ledger ·/)).toBeDefined();
+    });
+
+    it("shows the total cash balance in the summary", () => {
+      const ledgers = [
+        makeLedger({ id: "1", cashBalance: 1000, investmentBalance: 0 }),
+        makeLedger({ id: "2", cashBalance: 500, investmentBalance: 0 }),
+      ];
+      render(
+        <LedgerList
+          ledgers={ledgers}
+          isLoading={false}
+          onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
+          onDeleteLedger={onDeleteLedger}
+        />,
+      );
+      expect(screen.getByText(/\$1,500\.00 cash/)).toBeDefined();
+    });
+
+    it("shows the total invested balance in the summary", () => {
+      const ledgers = [
+        makeLedger({ id: "1", cashBalance: 0, investmentBalance: 750 }),
+        makeLedger({ id: "2", cashBalance: 0, investmentBalance: 250 }),
+      ];
+      render(
+        <LedgerList
+          ledgers={ledgers}
+          isLoading={false}
+          onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
+          onDeleteLedger={onDeleteLedger}
+        />,
+      );
+      expect(screen.getByText(/\$1,000\.00 invested/)).toBeDefined();
     });
   });
 });
