@@ -1,8 +1,10 @@
 "use client";
 
-import { LedgerList } from "@/components/ledgers";
+import { useState } from "react";
+import { LedgerList, NewLedgerDialog } from "@/components/ledgers";
 import { useLedgers } from "@/hooks/use-ledgers";
 import { useDeleteLedger } from "@/hooks/use-delete-ledger";
+import { useCreateLedger } from "@/hooks/use-create-ledger";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function LedgersPage() {
@@ -10,10 +12,8 @@ export default function LedgersPage() {
   const uid = user?.uid ?? "";
   const { ledgers, isLoading } = useLedgers(uid);
   const { mutate: deleteLedger } = useDeleteLedger(uid);
-
-  const handleNewLedger = () => {
-    // TODO: open new ledger dialog/modal
-  };
+  const { mutateAsync: createLedger } = useCreateLedger(uid);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   if (authLoading || !user) {
     return null;
@@ -24,8 +24,15 @@ export default function LedgersPage() {
       <LedgerList
         ledgers={ledgers}
         isLoading={isLoading}
-        onNewLedger={handleNewLedger}
+        onNewLedger={() => {
+          setDialogOpen(true);
+        }}
         onDeleteLedger={deleteLedger}
+      />
+      <NewLedgerDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={(name, cashCap) => createLedger({ name, cashCap })}
       />
     </div>
   );

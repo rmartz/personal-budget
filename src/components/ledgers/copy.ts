@@ -5,6 +5,19 @@ export const LEDGERS_PAGE_COPY = {
   title: "Budget Ledgers",
 } as const;
 
+export const NEW_LEDGER_DIALOG_COPY = {
+  cancelButton: "Cancel",
+  cashCapLabel: "Cash Cap (optional)",
+  cashCapPlaceholder: "0.00",
+  cashCapError: "Cash cap must be a positive number.",
+  nameLabel: "Name",
+  namePlaceholder: "e.g. Everyday Spending",
+  nameError: "Name is required.",
+  submitButton: "Create Ledger",
+  submitError: "Something went wrong. Please try again.",
+  title: "New Ledger",
+} as const;
+
 export const LEDGER_LIST_ITEM_COPY = {
   deleteCancelButton: "Cancel",
   deleteConfirmButton: "Delete",
