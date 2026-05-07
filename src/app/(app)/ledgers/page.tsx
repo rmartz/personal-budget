@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { LedgerList, CreateLedgerDialog } from "@/components/ledgers";
+import { LedgerList, NewLedgerDialog } from "@/components/ledgers";
 import { useLedgers } from "@/hooks/use-ledgers";
 import { useDeleteLedger } from "@/hooks/use-delete-ledger";
+import { useCreateLedger } from "@/hooks/use-create-ledger";
 import { useAuth } from "@/hooks/use-auth";
-import { createLedger, updateLedger } from "@/services/ledgers";
-import type { CreateLedgerInput, UpdateLedgerInput } from "@/lib/types";
+import { updateLedger } from "@/services/ledgers";
+import type { UpdateLedgerInput } from "@/lib/types";
 
 export default function LedgersPage() {
   const { user, loading: authLoading } = useAuth();
@@ -15,7 +16,8 @@ export default function LedgersPage() {
   const { ledgers, isLoading } = useLedgers(uid);
   const queryClient = useQueryClient();
   const { mutate: deleteLedger } = useDeleteLedger(uid);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const { mutateAsync: createLedger } = useCreateLedger(uid);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const editMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLedgerInput }) =>
@@ -24,21 +26,6 @@ export default function LedgersPage() {
       void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
     },
   });
-
-  const createMutation = useMutation({
-    mutationFn: (data: CreateLedgerInput) => createLedger(uid, data),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
-    },
-  });
-
-  const handleNewLedger = () => {
-    setCreateDialogOpen(true);
-  };
-
-  const handleCreateLedger = async (data: CreateLedgerInput): Promise<void> => {
-    await createMutation.mutateAsync(data);
-  };
 
   const handleEditLedger = (
     id: string,
@@ -54,17 +41,16 @@ export default function LedgersPage() {
       <LedgerList
         ledgers={ledgers}
         isLoading={isLoading}
-        onNewLedger={handleNewLedger}
+        onNewLedger={() => {
+          setDialogOpen(true);
+        }}
         onEditLedger={handleEditLedger}
         onDeleteLedger={deleteLedger}
       />
-      <CreateLedgerDialog
-        open={createDialogOpen}
-        onSubmit={handleCreateLedger}
-        onClose={() => {
-          setCreateDialogOpen(false);
-        }}
-        isSubmitting={createMutation.isPending}
+      <NewLedgerDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={(name, cashCap) => createLedger({ name, cashCap })}
       />
     </div>
   );

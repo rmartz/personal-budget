@@ -12,13 +12,6 @@ export const CREATE_LEDGER_DIALOG_COPY = {
   title: "New Ledger",
 } as const;
 
-export const LEDGERS_PAGE_COPY = {
-  emptyStateMessage: "You don't have any ledgers yet.",
-  loadingMessage: "Loading ledgers…",
-  newLedgerButton: "New Ledger",
-  title: "Budget Ledgers",
-} as const;
-
 export const EDIT_LEDGER_DIALOG_COPY = {
   cancelButton: "Cancel",
   cashCapInvalid: "Cash cap must be a positive number.",
@@ -41,4 +34,24 @@ export const LEDGER_LIST_ITEM_COPY = {
   deleteConfirmTitle: "Delete ledger?",
   deleteMenuLabel: "Delete",
   overflowMenuLabel: "More options",
+} as const;
+
+export const LEDGERS_PAGE_COPY = {
+  emptyStateMessage: "You don't have any ledgers yet.",
+  loadingMessage: "Loading ledgers…",
+  newLedgerButton: "New Ledger",
+  title: "Budget Ledgers",
+} as const;
+
+export const NEW_LEDGER_DIALOG_COPY = {
+  cancelButton: "Cancel",
+  cashCapError: "Cash cap must be a positive number.",
+  cashCapLabel: "Cash Cap (optional)",
+  cashCapPlaceholder: "0.00",
+  nameError: "Name is required.",
+  nameLabel: "Name",
+  namePlaceholder: "e.g. Everyday Spending",
+  submitButton: "Create Ledger",
+  submitError: "Something went wrong. Please try again.",
+  title: "New Ledger",
 } as const;
