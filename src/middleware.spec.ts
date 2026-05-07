@@ -1,52 +1,52 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
-import { middleware } from "./middleware";
+import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
+import { middleware } from "./middleware";
 
-afterEach(() => {
-  delete process.env["NEXT_PUBLIC_FIREBASE_PROJECT_ID"];
-  vi.restoreAllMocks();
-});
-
-function encodeBase64Url(value: object): string {
-  return Buffer.from(JSON.stringify(value)).toString("base64url");
-}
-
-function makeSessionCookie(projectId: string): string {
+function makeSessionCookie(): string {
   const now = Math.floor(Date.now() / 1000);
-  const header = encodeBase64Url({ alg: "RS256", kid: "test-kid" });
-  const payload = encodeBase64Url({
-    exp: now + 3600,
-    iat: now - 60,
-    aud: projectId,
-    iss: `https://securetoken.google.com/${projectId}`,
-    sub: "test-user-id",
-  });
+  const header = Buffer.from(
+    JSON.stringify({ alg: "RS256", kid: "kid-123" }),
+  ).toString("base64url");
+  const payload = Buffer.from(
+    JSON.stringify({
+      exp: now + 3600,
+      iat: now - 60,
+      aud: "test-project-id",
+      iss: "https://securetoken.google.com/test-project-id",
+      sub: "uid-123",
+    }),
+  ).toString("base64url");
 
   return `${header}.${payload}.c2ln`;
 }
 
-describe("middleware", () => {
-  it("allows unauthenticated requests to / through without redirecting", async () => {
-    const request = new NextRequest("https://example.com/", {});
+function makeRequest(pathname: string, sessionCookie?: string): NextRequest {
+  return {
+    url: `https://example.com${pathname}`,
+    nextUrl: new URL(`https://example.com${pathname}`),
+    cookies: {
+      get(name: string) {
+        if (name === SESSION_COOKIE_NAME && sessionCookie !== undefined) {
+          return { value: sessionCookie };
+        }
+        return undefined;
+      },
+    },
+  } as NextRequest;
+}
 
-    const response = await middleware(request);
-
-    expect(response.status).toBe(200);
-    expect(response.headers.get("location")).toBeNull();
-  });
-
-  it("redirects authenticated requests from / to /ledgers", async () => {
-    const projectId = "test-project-id";
-    process.env["NEXT_PUBLIC_FIREBASE_PROJECT_ID"] = projectId;
-
-    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+function mockAuthenticatedCrypto() {
+  vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "test-project-id");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
       json: () =>
         Promise.resolve({
           keys: [
             {
-              kid: "test-kid",
-              n: "test-modulus",
+              kid: "kid-123",
+              n: "test-n",
               e: "AQAB",
               kty: "RSA",
               alg: "RS256",
@@ -54,22 +54,71 @@ describe("middleware", () => {
             },
           ],
         }),
-    } as Response);
+    }),
+  );
+  vi.stubGlobal("crypto", {
+    subtle: {
+      importKey: vi.fn().mockResolvedValue({}),
+      verify: vi.fn().mockResolvedValue(true),
+    },
+  });
+}
 
-    vi.spyOn(globalThis.crypto.subtle, "importKey").mockResolvedValue(
-      {} as CryptoKey,
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
+
+describe("middleware", () => {
+  it("allows unauthenticated requests to / through without redirecting", async () => {
+    const response = await middleware(makeRequest("/"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("redirects authenticated requests from / to /ledgers", async () => {
+    mockAuthenticatedCrypto();
+
+    const response = await middleware(makeRequest("/", makeSessionCookie()));
+
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
     );
-    vi.spyOn(globalThis.crypto.subtle, "verify").mockResolvedValue(true);
+  });
 
-    const request = new NextRequest("https://example.com/", {
-      headers: {
-        cookie: `${SESSION_COOKIE_NAME}=${makeSessionCookie(projectId)}`,
-      },
-    });
+  it("redirects authenticated users from auth routes directly to /ledgers", async () => {
+    mockAuthenticatedCrypto();
 
-    const response = await middleware(request);
+    const response = await middleware(
+      makeRequest("/sign-in", makeSessionCookie()),
+    );
 
-    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
+    );
+  });
+
+  it("redirects authenticated users from /sign-up directly to /ledgers", async () => {
+    mockAuthenticatedCrypto();
+
+    const response = await middleware(
+      makeRequest("/sign-up", makeSessionCookie()),
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
+    );
+  });
+
+  it("redirects authenticated users from /forgot-password directly to /ledgers", async () => {
+    mockAuthenticatedCrypto();
+
+    const response = await middleware(
+      makeRequest("/forgot-password", makeSessionCookie()),
+    );
+
     expect(response.headers.get("location")).toBe(
       "https://example.com/ledgers",
     );
