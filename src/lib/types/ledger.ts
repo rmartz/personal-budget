@@ -13,5 +13,5 @@ export interface CreateLedgerInput {
 
 export interface UpdateLedgerInput {
   name?: string;
-  cashCap?: number;
+  cashCap?: number | null;
 }
