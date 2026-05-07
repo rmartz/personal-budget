@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { USER_PROFILE_COPY } from "./copy";
-
-const INPUT_CLASSES =
-  "rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 export interface UserProfileViewProps {
   displayName: string;
@@ -104,27 +103,31 @@ export function UserProfileView({
           className="flex flex-col gap-3"
         >
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor="display-name"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <Label htmlFor="profile-display-name">
               {USER_PROFILE_COPY.displayNameLabel}
-            </label>
-            <input
-              id="display-name"
+            </Label>
+            <Input
+              id="profile-display-name"
               type="text"
               value={displayNameValue}
               onChange={(e) => {
                 setDisplayNameValue(e.target.value);
               }}
-              className={INPUT_CLASSES}
+              aria-invalid={displayNameError !== undefined}
+              aria-describedby={
+                displayNameError ? "profile-display-name-error" : undefined
+              }
             />
+            {displayNameError !== undefined && (
+              <p
+                id="profile-display-name-error"
+                role="alert"
+                className="text-sm text-destructive"
+              >
+                {displayNameError}
+              </p>
+            )}
           </div>
-          {displayNameError !== undefined && (
-            <p role="alert" className="text-sm text-destructive">
-              {displayNameError}
-            </p>
-          )}
           <Button type="submit" className="self-end">
             {USER_PROFILE_COPY.displayNameButton}
           </Button>
@@ -137,27 +140,30 @@ export function UserProfileView({
         </h2>
         <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <Label htmlFor="profile-email">
               {USER_PROFILE_COPY.changeEmailLabel}
-            </label>
-            <input
-              id="email"
+            </Label>
+            <Input
+              id="profile-email"
               type="email"
+              autoComplete="email"
               value={emailValue}
               onChange={(e) => {
                 setEmailValue(e.target.value);
               }}
-              className={INPUT_CLASSES}
+              aria-invalid={emailError !== undefined}
+              aria-describedby={emailError ? "profile-email-error" : undefined}
             />
+            {emailError !== undefined && (
+              <p
+                id="profile-email-error"
+                role="alert"
+                className="text-sm text-destructive"
+              >
+                {emailError}
+              </p>
+            )}
           </div>
-          {emailError !== undefined && (
-            <p role="alert" className="text-sm text-destructive">
-              {emailError}
-            </p>
-          )}
           <Button type="submit" className="self-end">
             {USER_PROFILE_COPY.changeEmailButton}
           </Button>
@@ -170,41 +176,47 @@ export function UserProfileView({
         </h2>
         <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor="current-password"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <Label htmlFor="profile-current-password">
               {USER_PROFILE_COPY.changePasswordCurrentLabel}
-            </label>
-            <input
-              id="current-password"
+            </Label>
+            <Input
+              id="profile-current-password"
               type="password"
+              autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => {
                 setCurrentPassword(e.target.value);
               }}
-              className={INPUT_CLASSES}
+              aria-invalid={passwordError !== undefined}
+              aria-describedby={
+                passwordError ? "profile-password-error" : undefined
+              }
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor="new-password"
-              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <Label htmlFor="profile-new-password">
               {USER_PROFILE_COPY.changePasswordNewLabel}
-            </label>
-            <input
-              id="new-password"
+            </Label>
+            <Input
+              id="profile-new-password"
               type="password"
+              autoComplete="new-password"
               value={newPassword}
               onChange={(e) => {
                 setNewPassword(e.target.value);
               }}
-              className={INPUT_CLASSES}
+              aria-invalid={passwordError !== undefined}
+              aria-describedby={
+                passwordError ? "profile-password-error" : undefined
+              }
             />
           </div>
           {passwordError !== undefined && (
-            <p role="alert" className="text-sm text-destructive">
+            <p
+              id="profile-password-error"
+              role="alert"
+              className="text-sm text-destructive"
+            >
               {passwordError}
             </p>
           )}
