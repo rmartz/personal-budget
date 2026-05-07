@@ -38,3 +38,5 @@ variables:
   # Sentry — slugs only, not credentials
   SENTRY_ORG: ""
   SENTRY_PROJECT: ""
+  # Sentry public DSN — safe to expose; matched by the NEXT_PUBLIC_* allowed_pattern in schema.yml.
+  NEXT_PUBLIC_SENTRY_DSN: ""
