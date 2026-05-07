@@ -179,6 +179,7 @@ export function NewLedgerDialog({
   }
 
   async function handleSubmit() {
+    setSubmitError(undefined);
     let valid = true;
 
     if (name.trim() === "") {
@@ -205,7 +206,6 @@ export function NewLedgerDialog({
     if (!valid) return;
 
     setIsSubmitting(true);
-    setSubmitError(undefined);
     try {
       await onSubmit(name.trim(), parsedCashCap);
       handleOpenChange(false);

@@ -254,6 +254,36 @@ describe("NewLedgerDialog", () => {
     });
   });
 
+  it("clears the submit error when re-submitting with a validation failure", async () => {
+    const onSubmit = vi.fn().mockRejectedValue(new Error("Network error"));
+    render(
+      <NewLedgerDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "My Ledger" },
+    });
+    fireEvent.submit(document.querySelector("form")!);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(NEW_LEDGER_DIALOG_COPY.submitError),
+      ).toBeDefined();
+    });
+
+    fireEvent.change(screen.getByLabelText(NEW_LEDGER_DIALOG_COPY.nameLabel), {
+      target: { value: "" },
+    });
+    fireEvent.submit(document.querySelector("form")!);
+
+    expect(screen.queryByText(NEW_LEDGER_DIALOG_COPY.submitError)).toBeNull();
+    expect(screen.getByText(NEW_LEDGER_DIALOG_COPY.nameError)).toBeDefined();
+  });
+
   it("does not call onOpenChange with false when onSubmit rejects", async () => {
     const onSubmit = vi.fn().mockRejectedValue(new Error("Network error"));
     const onOpenChange = vi.fn();
