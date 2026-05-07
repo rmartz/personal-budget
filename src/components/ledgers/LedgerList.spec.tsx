@@ -19,6 +19,7 @@ function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
 
 describe("LedgerList", () => {
   const onNewLedger = vi.fn();
+  const onEditLedger = vi.fn().mockResolvedValue(undefined);
   const onDeleteLedger = vi.fn();
 
   describe("empty state", () => {
@@ -28,6 +29,7 @@ describe("LedgerList", () => {
           ledgers={[]}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
           onDeleteLedger={onDeleteLedger}
         />,
       );
@@ -42,6 +44,7 @@ describe("LedgerList", () => {
           ledgers={[]}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
           onDeleteLedger={onDeleteLedger}
         />,
       );
@@ -56,6 +59,7 @@ describe("LedgerList", () => {
           ledgers={[]}
           isLoading={true}
           onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
           onDeleteLedger={onDeleteLedger}
         />,
       );
@@ -76,6 +80,7 @@ describe("LedgerList", () => {
           ledgers={ledgers}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
           onDeleteLedger={onDeleteLedger}
         />,
       );
@@ -97,6 +102,7 @@ describe("LedgerList", () => {
           ledgers={ledgers}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
           onDeleteLedger={onDeleteLedger}
         />,
       );
@@ -110,6 +116,7 @@ describe("LedgerList", () => {
           ledgers={ledgers}
           isLoading={false}
           onNewLedger={onNewLedger}
+          onEditLedger={onEditLedger}
           onDeleteLedger={onDeleteLedger}
         />,
       );

@@ -7,7 +7,7 @@
 # Sensitive variables are managed directly in Vercel and are never committed.
 # Run `pnpm env:pull` to generate a local .env.local from Vercel's stored values.
 #
-# To update these values and sync them to Vercel: scripts/update-config.sh --env=production
+# To sync these values to Vercel: pnpm exec sync-env --env=production
 
 environment: production
 

@@ -85,7 +85,7 @@ function loadSchema() {
 
 function loadEnvironments() {
   const content = readFileSync(join(deploymentDir, "environments.yml"), "utf8");
-  const envs = parseYamlList(content, "environments");
+  const envs = parseYamlList(content, "active");
   const parsed = parseYamlSimple(content);
   const singleEnv = parsed["single_environment"] === "true";
   return { environments: envs, singleEnvironment: singleEnv };
@@ -165,29 +165,8 @@ function validateConfig(envName, schema) {
 
 const args = process.argv.slice(2);
 const envArg = args.find((a) => a.startsWith("--env="))?.slice(6);
-const checkKeysIdx = args.indexOf("--check-keys");
-const keysToCheck = checkKeysIdx !== -1 ? args.slice(checkKeysIdx + 1) : null;
 
 const schema = loadSchema();
-
-// --check-keys mode: validate a list of key names without reading a config file.
-// Used by update-config.sh to pre-validate keys before writing them to disk.
-if (keysToCheck !== null) {
-  if (keysToCheck.length === 0) {
-    console.error("ERROR: --check-keys requires at least one key name.");
-    process.exit(1);
-  }
-  const errors = checkKeys(keysToCheck, schema);
-  if (errors.length > 0) {
-    console.error(`\n${errors.length} key(s) rejected by schema:`);
-    for (const e of errors) console.error(e);
-    console.error(
-      "\nFix the violations above or update deployment/schema.yml to allow these keys.",
-    );
-    process.exit(1);
-  }
-  process.exit(0);
-}
 
 const { environments, singleEnvironment } = loadEnvironments();
 

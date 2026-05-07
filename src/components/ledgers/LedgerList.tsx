@@ -1,6 +1,6 @@
 "use client";
 
-import type { Ledger } from "@/lib/types";
+import type { Ledger, UpdateLedgerInput } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LedgerListItem } from "./LedgerListItem";
@@ -10,6 +10,7 @@ interface LedgerListProps {
   ledgers: Ledger[];
   isLoading: boolean;
   onNewLedger: () => void;
+  onEditLedger: (id: string, data: UpdateLedgerInput) => Promise<void>;
   onDeleteLedger: (id: string) => void;
 }
 
@@ -17,6 +18,7 @@ export function LedgerList({
   ledgers,
   isLoading,
   onNewLedger,
+  onEditLedger,
   onDeleteLedger,
 }: LedgerListProps) {
   return (
@@ -54,6 +56,7 @@ export function LedgerList({
             <LedgerListItem
               key={ledger.id}
               ledger={ledger}
+              onEdit={onEditLedger}
               onDelete={onDeleteLedger}
             />
           ))}
