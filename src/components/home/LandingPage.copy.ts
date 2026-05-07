@@ -1,7 +1,7 @@
 export const LANDING_PAGE_COPY = {
-  heading: "Take control of your finances",
+  createAccountButton: "Create account",
   description:
     "Track spending across ledgers, manage your cash and investment split, and work toward your financial goals — all in one place.",
+  heading: "Take control of your finances",
   signInButton: "Sign in",
-  createAccountButton: "Create account",
 } as const;
