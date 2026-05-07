@@ -12,6 +12,7 @@ import { describe, expect, it } from "vitest";
 
 const SCRIPT_PATH = join(process.cwd(), "scripts", "validate-config.mjs");
 const SCRIPT_SOURCE = readFileSync(SCRIPT_PATH, "utf8");
+const TEST_APP_NAME = "Personal Budget";
 const SCHEMA_SOURCE = `allowed_patterns:
   - NEXT_PUBLIC_*
 allowed_keys:
@@ -20,17 +21,17 @@ denied_patterns:
   - *SECRET*
 `;
 
-interface RunValidateConfigResult {
+interface ValidateConfigIntegrationTestResult {
   stderr: string;
   status: number | null;
   stdout: string;
 }
 
-function runValidateConfigInTempRepo(options: {
+function makeValidateConfigInTempRepo(options: {
   envArg?: string;
   environmentsYml: string;
   stagingYml: string;
-}): RunValidateConfigResult {
+}): ValidateConfigIntegrationTestResult {
   const tempRoot = mkdtempSync(join(tmpdir(), "validate-config-"));
   const scriptsDir = join(tempRoot, "scripts");
   const deploymentDir = join(tempRoot, "deployment");
@@ -67,9 +68,9 @@ function runValidateConfigInTempRepo(options: {
 
 describe("validate-config script", () => {
   it("fails fast when no active environments are listed and --env is not provided", () => {
-    const result = runValidateConfigInTempRepo({
+    const result = makeValidateConfigInTempRepo({
       environmentsYml: "single_environment: true\nactive:\n",
-      stagingYml: "variables:\n  NEXT_PUBLIC_APP_NAME: Personal Budget\n",
+      stagingYml: `variables:\n  NEXT_PUBLIC_APP_NAME: ${TEST_APP_NAME}\n`,
     });
 
     expect(result.status).toBe(1);
@@ -79,10 +80,20 @@ describe("validate-config script", () => {
   });
 
   it("allows explicit --env validation when active environments are empty", () => {
-    const result = runValidateConfigInTempRepo({
+    const result = makeValidateConfigInTempRepo({
       envArg: "staging",
       environmentsYml: "single_environment: true\nactive:\n",
-      stagingYml: "variables:\n  NEXT_PUBLIC_APP_NAME: Personal Budget\n",
+      stagingYml: `variables:\n  NEXT_PUBLIC_APP_NAME: ${TEST_APP_NAME}\n`,
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("deployment/staging.yml — OK");
+  });
+
+  it("validates listed active environments when --env is not provided", () => {
+    const result = makeValidateConfigInTempRepo({
+      environmentsYml: "single_environment: true\nactive:\n  - staging\n",
+      stagingYml: `variables:\n  NEXT_PUBLIC_APP_NAME: ${TEST_APP_NAME}\n`,
     });
 
     expect(result.status).toBe(0);
