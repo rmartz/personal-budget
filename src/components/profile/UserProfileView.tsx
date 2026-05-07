@@ -115,7 +115,9 @@ export function UserProfileView({
               }}
               aria-invalid={displayNameError !== undefined}
               aria-describedby={
-                displayNameError ? "profile-display-name-error" : undefined
+                displayNameError !== undefined
+                  ? "profile-display-name-error"
+                  : undefined
               }
             />
             {displayNameError !== undefined && (
@@ -152,7 +154,9 @@ export function UserProfileView({
                 setEmailValue(e.target.value);
               }}
               aria-invalid={emailError !== undefined}
-              aria-describedby={emailError ? "profile-email-error" : undefined}
+              aria-describedby={
+                emailError !== undefined ? "profile-email-error" : undefined
+              }
             />
             {emailError !== undefined && (
               <p
@@ -189,7 +193,9 @@ export function UserProfileView({
               }}
               aria-invalid={passwordError !== undefined}
               aria-describedby={
-                passwordError ? "profile-password-error" : undefined
+                passwordError !== undefined
+                  ? "profile-password-error"
+                  : undefined
               }
             />
           </div>
@@ -207,7 +213,9 @@ export function UserProfileView({
               }}
               aria-invalid={passwordError !== undefined}
               aria-describedby={
-                passwordError ? "profile-password-error" : undefined
+                passwordError !== undefined
+                  ? "profile-password-error"
+                  : undefined
               }
             />
           </div>
