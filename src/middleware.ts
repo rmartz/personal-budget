@@ -31,7 +31,11 @@ interface JwtPayload {
 }
 
 function isAuthRoute(pathname: string): boolean {
-  return pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+  return (
+    pathname.startsWith("/sign-in") ||
+    pathname.startsWith("/sign-up") ||
+    pathname.startsWith("/forgot-password")
+  );
 }
 
 function isExcludedPath(pathname: string): boolean {

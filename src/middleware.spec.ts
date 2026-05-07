@@ -114,4 +114,40 @@ describe("middleware", () => {
       "https://example.com/ledgers",
     );
   });
+
+  it("redirects authenticated users from /forgot-password directly to /ledgers", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "test-project-id");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        json: () =>
+          Promise.resolve({
+            keys: [
+              {
+                kid: "kid-123",
+                n: "test-n",
+                e: "AQAB",
+                kty: "RSA",
+                alg: "RS256",
+                use: "sig",
+              },
+            ],
+          }),
+      }),
+    );
+    vi.stubGlobal("crypto", {
+      subtle: {
+        importKey: vi.fn().mockResolvedValue({}),
+        verify: vi.fn().mockResolvedValue(true),
+      },
+    });
+
+    const response = await middleware(
+      makeRequest("/forgot-password", makeSessionCookie()),
+    );
+
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
+    );
+  });
 });
