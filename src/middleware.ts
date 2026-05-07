@@ -59,6 +59,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname === "/") {
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL("/ledgers", request.url));
+    }
+    return NextResponse.next();
+  }
+
   if (!isAuthenticated) {
     const signInUrl = new URL("/sign-in", request.url);
     signInUrl.searchParams.set(

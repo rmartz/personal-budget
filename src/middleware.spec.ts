@@ -21,19 +21,47 @@ function makeSessionCookie(): string {
   return `${header}.${payload}.c2ln`;
 }
 
-function makeRequest(pathname: string, sessionCookie: string): NextRequest {
+function makeRequest(pathname: string, sessionCookie?: string): NextRequest {
   return {
     url: `https://example.com${pathname}`,
     nextUrl: new URL(`https://example.com${pathname}`),
     cookies: {
       get(name: string) {
-        if (name === SESSION_COOKIE_NAME) {
+        if (name === SESSION_COOKIE_NAME && sessionCookie !== undefined) {
           return { value: sessionCookie };
         }
         return undefined;
       },
     },
   } as NextRequest;
+}
+
+function mockAuthenticatedCrypto() {
+  vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "test-project-id");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve({
+          keys: [
+            {
+              kid: "kid-123",
+              n: "test-n",
+              e: "AQAB",
+              kty: "RSA",
+              alg: "RS256",
+              use: "sig",
+            },
+          ],
+        }),
+    }),
+  );
+  vi.stubGlobal("crypto", {
+    subtle: {
+      importKey: vi.fn().mockResolvedValue({}),
+      verify: vi.fn().mockResolvedValue(true),
+    },
+  });
 }
 
 afterEach(() => {
@@ -43,32 +71,25 @@ afterEach(() => {
 });
 
 describe("middleware", () => {
-  it("redirects authenticated users from auth routes directly to /ledgers", async () => {
-    vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "test-project-id");
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        json: () =>
-          Promise.resolve({
-            keys: [
-              {
-                kid: "kid-123",
-                n: "test-n",
-                e: "AQAB",
-                kty: "RSA",
-                alg: "RS256",
-                use: "sig",
-              },
-            ],
-          }),
-      }),
+  it("allows unauthenticated requests to / through without redirecting", async () => {
+    const response = await middleware(makeRequest("/"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("redirects authenticated requests from / to /ledgers", async () => {
+    mockAuthenticatedCrypto();
+
+    const response = await middleware(makeRequest("/", makeSessionCookie()));
+
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
     );
-    vi.stubGlobal("crypto", {
-      subtle: {
-        importKey: vi.fn().mockResolvedValue({}),
-        verify: vi.fn().mockResolvedValue(true),
-      },
-    });
+  });
+
+  it("redirects authenticated users from auth routes directly to /ledgers", async () => {
+    mockAuthenticatedCrypto();
 
     const response = await middleware(
       makeRequest("/sign-in", makeSessionCookie()),
@@ -80,31 +101,7 @@ describe("middleware", () => {
   });
 
   it("redirects authenticated users from /sign-up directly to /ledgers", async () => {
-    vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "test-project-id");
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        json: () =>
-          Promise.resolve({
-            keys: [
-              {
-                kid: "kid-123",
-                n: "test-n",
-                e: "AQAB",
-                kty: "RSA",
-                alg: "RS256",
-                use: "sig",
-              },
-            ],
-          }),
-      }),
-    );
-    vi.stubGlobal("crypto", {
-      subtle: {
-        importKey: vi.fn().mockResolvedValue({}),
-        verify: vi.fn().mockResolvedValue(true),
-      },
-    });
+    mockAuthenticatedCrypto();
 
     const response = await middleware(
       makeRequest("/sign-up", makeSessionCookie()),
@@ -116,31 +113,7 @@ describe("middleware", () => {
   });
 
   it("redirects authenticated users from /forgot-password directly to /ledgers", async () => {
-    vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "test-project-id");
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        json: () =>
-          Promise.resolve({
-            keys: [
-              {
-                kid: "kid-123",
-                n: "test-n",
-                e: "AQAB",
-                kty: "RSA",
-                alg: "RS256",
-                use: "sig",
-              },
-            ],
-          }),
-      }),
-    );
-    vi.stubGlobal("crypto", {
-      subtle: {
-        importKey: vi.fn().mockResolvedValue({}),
-        verify: vi.fn().mockResolvedValue(true),
-      },
-    });
+    mockAuthenticatedCrypto();
 
     const response = await middleware(
       makeRequest("/forgot-password", makeSessionCookie()),
