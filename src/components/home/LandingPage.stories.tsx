@@ -2,10 +2,12 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { LandingPage } from "./LandingPage";
 
-export default {
+const meta: Meta<typeof LandingPage> = {
   title: "Home/LandingPage",
   component: LandingPage,
-} satisfies Meta<typeof LandingPage>;
+};
+
+export default meta;
 
 type Story = StoryObj<typeof LandingPage>;
 

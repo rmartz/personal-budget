@@ -55,8 +55,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isAuthenticated && pathname === "/") {
-    return NextResponse.redirect(new URL("/ledgers", request.url));
+  if (pathname === "/") {
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL("/ledgers", request.url));
+    }
+    return NextResponse.next();
   }
 
   if (!isAuthenticated) {

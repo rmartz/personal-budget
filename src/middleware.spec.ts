@@ -27,6 +27,15 @@ function makeSessionCookie(projectId: string): string {
 }
 
 describe("middleware", () => {
+  it("allows unauthenticated requests to / through without redirecting", async () => {
+    const request = new NextRequest("https://example.com/", {});
+
+    const response = await middleware(request);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
   it("redirects authenticated requests from / to /ledgers", async () => {
     const projectId = "test-project-id";
     process.env["NEXT_PUBLIC_FIREBASE_PROJECT_ID"] = projectId;
