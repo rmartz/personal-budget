@@ -1,11 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { signIn, signUp, sendPasswordReset, signOut } from "./auth";
+import {
+  signIn,
+  signUp,
+  sendPasswordReset,
+  signOut,
+  updateDisplayName,
+  updateEmail as serviceUpdateEmail,
+  updatePassword as serviceUpdatePassword,
+} from "./auth";
 
 vi.mock("firebase/auth", () => ({
   signInWithEmailAndPassword: vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
   sendPasswordResetEmail: vi.fn(),
   signOut: vi.fn(),
+  updateProfile: vi.fn(),
+  updateEmail: vi.fn(),
+  updatePassword: vi.fn(),
+  reauthenticateWithCredential: vi.fn(),
+  EmailAuthProvider: {
+    credential: vi.fn().mockReturnValue({ type: "mock-credential" }),
+  },
 }));
 
 vi.mock("@/lib/firebase/client", () => ({
@@ -17,6 +32,10 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut as firebaseSignOut,
+  updateProfile as firebaseUpdateProfile,
+  updateEmail as firebaseUpdateEmail,
+  updatePassword as firebaseUpdatePassword,
+  reauthenticateWithCredential,
 } from "firebase/auth";
 import { getClientAuth } from "@/lib/firebase/client";
 
@@ -24,6 +43,7 @@ describe("auth service", () => {
   const mockAuth = { type: "mock-auth" };
   const email = "test@example.com";
   const password = "password123";
+  const mockUser = { uid: "uid-1", email } as never;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -83,6 +103,61 @@ describe("auth service", () => {
       await signOut();
 
       expect(firebaseSignOut).toHaveBeenCalledWith(mockAuth);
+    });
+  });
+
+  describe("updateDisplayName", () => {
+    it("calls updateProfile with the user and display name", async () => {
+      vi.mocked(firebaseUpdateProfile).mockResolvedValue(undefined);
+
+      await updateDisplayName(mockUser, "New Name");
+
+      expect(firebaseUpdateProfile).toHaveBeenCalledWith(mockUser, {
+        displayName: "New Name",
+      });
+    });
+  });
+
+  describe("updateEmail", () => {
+    it("calls firebase updateEmail with the user and new email", async () => {
+      vi.mocked(firebaseUpdateEmail).mockResolvedValue(undefined);
+
+      await serviceUpdateEmail(mockUser, "new@example.com");
+
+      expect(firebaseUpdateEmail).toHaveBeenCalledWith(
+        mockUser,
+        "new@example.com",
+      );
+    });
+  });
+
+  describe("updatePassword", () => {
+    it("throws when user has no email address", async () => {
+      const userWithoutEmail = { uid: "uid-1", email: null } as never;
+
+      await expect(
+        serviceUpdatePassword(userWithoutEmail, "current", "new"),
+      ).rejects.toThrow(
+        "Password change is unavailable because this account has no email address.",
+      );
+    });
+
+    it("re-authenticates then updates the password", async () => {
+      vi.mocked(reauthenticateWithCredential).mockResolvedValue(
+        undefined as never,
+      );
+      vi.mocked(firebaseUpdatePassword).mockResolvedValue(undefined);
+
+      await serviceUpdatePassword(mockUser, password, "newPassword123");
+
+      expect(reauthenticateWithCredential).toHaveBeenCalledWith(
+        mockUser,
+        expect.anything(),
+      );
+      expect(firebaseUpdatePassword).toHaveBeenCalledWith(
+        mockUser,
+        "newPassword123",
+      );
     });
   });
 });
