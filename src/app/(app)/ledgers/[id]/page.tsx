@@ -8,11 +8,14 @@ import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 import { useCreateTransaction } from "@/hooks/use-create-transaction";
 import { useCreateDeposit } from "@/hooks/use-create-deposit";
 import { useDeleteTransaction } from "@/hooks/use-delete-transaction";
+import { useSavingsGoals } from "@/hooks/use-savings-goals";
+import { useUpdateSavingsGoal } from "@/hooks/use-update-savings-goal";
 import {
   LedgerTransactionListView,
   AddExpenseDialog,
 } from "@/components/ledger-transactions";
 import { AddDepositDialog } from "@/components/ledgers";
+import { SavingsGoalListView } from "@/components/savings-goals";
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 
 type DepositInput = Omit<BudgetLedgerTransaction, "id" | "ledgerId" | "type">;
@@ -29,6 +32,8 @@ export default function LedgerDetailPage() {
   const { mutateAsync: createDeposit, isPending: isDepositPending } =
     useCreateDeposit(uid, id);
   const { mutate: deleteTransaction } = useDeleteTransaction(uid, id);
+  const { savingsGoals } = useSavingsGoals(uid, id);
+  const { editGoal, reorderGoal } = useUpdateSavingsGoal(uid, id);
 
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
@@ -72,6 +77,11 @@ export default function LedgerDetailPage() {
           setExpenseDialogOpen(false);
         }}
         isSubmitting={isExpenseSubmitting}
+      />
+      <SavingsGoalListView
+        goals={savingsGoals}
+        onEdit={editGoal}
+        onReorder={reorderGoal}
       />
     </div>
   );
