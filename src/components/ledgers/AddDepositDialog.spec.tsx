@@ -70,8 +70,10 @@ describe("AddDepositDialogView", () => {
         />,
       );
       const today = new Date().toISOString().slice(0, 10);
-      const dateInput = screen.getByLabelText(ADD_DEPOSIT_DIALOG_COPY.dateLabel) as HTMLInputElement;
-      expect(dateInput.value).toBe(today);
+      const dateInput = screen.getByLabelText(
+        ADD_DEPOSIT_DIALOG_COPY.dateLabel,
+      );
+      expect((dateInput as HTMLInputElement).value).toBe(today);
     });
 
     it("renders the amount field", () => {
@@ -124,7 +126,9 @@ describe("AddDepositDialogView", () => {
         { target: { value: "Paycheck" } },
       );
       fireEvent.click(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       );
 
       await waitFor(() => {
@@ -138,9 +142,7 @@ describe("AddDepositDialogView", () => {
     });
 
     it("shows submit error when onSubmit rejects", async () => {
-      const mockSubmit = vi
-        .fn()
-        .mockRejectedValue(new Error("Firebase error"));
+      const mockSubmit = vi.fn().mockRejectedValue(new Error("Firebase error"));
       render(
         <AddDepositDialogView
           open={true}
@@ -159,7 +161,9 @@ describe("AddDepositDialogView", () => {
         { target: { value: "Deposit" } },
       );
       fireEvent.click(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       );
 
       await waitFor(() => {
@@ -185,7 +189,9 @@ describe("AddDepositDialogView", () => {
         { target: { value: "Test" } },
       );
       fireEvent.click(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       );
       await waitFor(() => {
         expect(
@@ -212,7 +218,9 @@ describe("AddDepositDialogView", () => {
         { target: { value: "Test" } },
       );
       fireEvent.click(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       );
       await waitFor(() => {
         expect(
@@ -239,7 +247,9 @@ describe("AddDepositDialogView", () => {
         { target: { value: "Test" } },
       );
       fireEvent.click(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       );
       await waitFor(() => {
         expect(
@@ -262,7 +272,9 @@ describe("AddDepositDialogView", () => {
         { target: { value: "100" } },
       );
       fireEvent.click(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       );
       await waitFor(() => {
         expect(
@@ -282,7 +294,9 @@ describe("AddDepositDialogView", () => {
         />,
       );
       fireEvent.click(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       );
       await waitFor(() => {
         expect(mockSubmit).not.toHaveBeenCalled();
@@ -301,7 +315,9 @@ describe("AddDepositDialogView", () => {
         />,
       );
       expect(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.submitButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+        }),
       ).toBeDefined();
     });
 
@@ -315,7 +331,9 @@ describe("AddDepositDialogView", () => {
         />,
       );
       expect(
-        screen.getByRole("button", { name: ADD_DEPOSIT_DIALOG_COPY.cancelButton }),
+        screen.getByRole("button", {
+          name: ADD_DEPOSIT_DIALOG_COPY.cancelButton,
+        }),
       ).toBeDefined();
     });
 
@@ -330,8 +348,8 @@ describe("AddDepositDialogView", () => {
       );
       const submitBtn = screen.getByRole("button", {
         name: ADD_DEPOSIT_DIALOG_COPY.submittingButton,
-      }) as HTMLButtonElement;
-      expect(submitBtn.disabled).toBe(true);
+      });
+      expect(submitBtn.getAttribute("disabled")).not.toBeNull();
     });
   });
 });
