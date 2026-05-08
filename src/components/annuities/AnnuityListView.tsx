@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { ANNUITY_LIST_COPY } from "./copy";
 
@@ -23,18 +24,23 @@ function remainingMonths(startDate: Date, durationMonths: number): number {
 interface AnnuityListViewProps {
   annuities: Annuity[];
   isLoading: boolean;
+  onNewAnnuity: () => void;
 }
 
 export function AnnuityListView({
   annuities,
   isLoading,
+  onNewAnnuity,
 }: AnnuityListViewProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div>
+      <div className="flex items-start justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
           {ANNUITY_LIST_COPY.title}
         </h1>
+        <Button onClick={onNewAnnuity}>
+          {ANNUITY_LIST_COPY.newAnnuityButton}
+        </Button>
       </div>
 
       {isLoading ? (

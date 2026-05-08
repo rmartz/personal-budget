@@ -6,6 +6,12 @@ export const LEDGER_TRANSACTION_LIST_COPY = {
   columnDate: "Date",
   columnDescription: "Description",
   columnType: "Type",
+  deleteCancelButton: "Cancel",
+  deleteConfirmButton: "Delete",
+  deleteConfirmDescription:
+    "This transaction will be permanently deleted. This action cannot be undone.",
+  deleteConfirmTitle: "Delete transaction?",
+  deleteButtonLabel: "Delete transaction",
   emptyStateMessage:
     "No transactions yet. Record your first transaction to get started.",
   title: "Transaction History",

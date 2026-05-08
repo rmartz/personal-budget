@@ -13,6 +13,8 @@ export const Empty: Story = {
   args: {
     annuities: [],
     isLoading: false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onNewAnnuity: () => {},
   },
 };
 
@@ -20,12 +22,16 @@ export const Loading: Story = {
   args: {
     annuities: [],
     isLoading: true,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onNewAnnuity: () => {},
   },
 };
 
 export const PopulatedFlatRate: Story = {
   args: {
     isLoading: false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onNewAnnuity: () => {},
     annuities: [
       {
         id: "1",
@@ -48,6 +54,8 @@ export const PopulatedFlatRate: Story = {
 export const PopulatedFixedTerm: Story = {
   args: {
     isLoading: false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onNewAnnuity: () => {},
     annuities: [
       {
         id: "1",
@@ -70,6 +78,8 @@ export const PopulatedFixedTerm: Story = {
 export const PopulatedMixed: Story = {
   args: {
     isLoading: false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onNewAnnuity: () => {},
     annuities: [
       {
         id: "1",
