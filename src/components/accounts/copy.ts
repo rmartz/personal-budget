@@ -11,6 +11,7 @@ export const CREATE_ACCOUNT_DIALOG_COPY = {
   targetFloatRequiredError: "Target float is required.",
   title: "New Account",
   typeLabel: "Account Type",
+  typePlaceholder: "Select a type…",
   typeRequiredError: "Account type is required.",
   typeOptions: {
     investment: "Investment (e.g. brokerage, 401k)",

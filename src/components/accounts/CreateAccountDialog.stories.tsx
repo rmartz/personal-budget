@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { CreateAccountDialogView } from "./CreateAccountDialog";
+import { CreateAccountDialogView } from "./CreateAccountDialogView";
 import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
 
 const meta: Meta<typeof CreateAccountDialogView> = {
