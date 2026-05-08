@@ -1,5 +1,5 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { LedgerTransactionListView } from "./LedgerTransactionList";
 import { LEDGER_TRANSACTION_LIST_COPY } from "./copy";
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
@@ -30,6 +30,7 @@ describe("LedgerTransactionListView", () => {
           transactions={[]}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
       expect(
@@ -46,6 +47,7 @@ describe("LedgerTransactionListView", () => {
           transactions={[]}
           isLoading={true}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
       expect(
@@ -62,6 +64,7 @@ describe("LedgerTransactionListView", () => {
           transactions={[]}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
       expect(screen.getByText("My Savings")).toBeDefined();
@@ -100,6 +103,7 @@ describe("LedgerTransactionListView", () => {
           transactions={transactions}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
 
@@ -135,6 +139,7 @@ describe("LedgerTransactionListView", () => {
           transactions={transactions}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
 
@@ -169,6 +174,7 @@ describe("LedgerTransactionListView", () => {
           transactions={transactions}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
 
@@ -189,6 +195,7 @@ describe("LedgerTransactionListView", () => {
           transactions={transactions}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
 
@@ -206,6 +213,7 @@ describe("LedgerTransactionListView", () => {
           transactions={transactions}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
 
@@ -225,11 +233,138 @@ describe("LedgerTransactionListView", () => {
           transactions={transactions}
           isLoading={false}
           onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
         />,
       );
 
       expect(
         screen.getByText(LEDGER_TRANSACTION_LIST_COPY.typeExpense),
+      ).toBeDefined();
+    });
+  });
+
+  describe("delete transaction", () => {
+    it("renders a delete button for each transaction row", () => {
+      const transactions = [
+        makeTransaction({ id: "tx-1", description: "Coffee" }),
+        makeTransaction({ id: "tx-2", description: "Lunch" }),
+      ];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
+        />,
+      );
+
+      const deleteButtons = screen.getAllByRole("button", {
+        name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+      });
+      expect(deleteButtons.length).toBe(2);
+    });
+
+    it("shows the confirmation dialog when delete is clicked", () => {
+      const transactions = [makeTransaction({ id: "tx-1" })];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+        }),
+      );
+
+      expect(
+        screen.getByText(LEDGER_TRANSACTION_LIST_COPY.deleteConfirmTitle),
+      ).toBeDefined();
+    });
+
+    it("calls onDeleteTransaction with the transaction id when confirmed", async () => {
+      const onDeleteTransaction = vi.fn();
+      const transactions = [makeTransaction({ id: "tx-abc" })];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={onDeleteTransaction}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+        }),
+      );
+
+      fireEvent.click(
+        screen.getByText(LEDGER_TRANSACTION_LIST_COPY.deleteConfirmButton),
+      );
+
+      expect(onDeleteTransaction).toHaveBeenCalledWith("tx-abc");
+    });
+
+    it("does not call onDeleteTransaction when the dialog is cancelled", async () => {
+      const onDeleteTransaction = vi.fn();
+      const transactions = [makeTransaction({ id: "tx-abc" })];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={onDeleteTransaction}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+        }),
+      );
+
+      fireEvent.click(
+        screen.getByText(LEDGER_TRANSACTION_LIST_COPY.deleteCancelButton),
+      );
+
+      expect(onDeleteTransaction).not.toHaveBeenCalled();
+    });
+
+    it("renders the permanent deletion warning in the confirmation dialog", () => {
+      const transactions = [makeTransaction({ id: "tx-1" })];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+        }),
+      );
+
+      expect(
+        screen.getByText(LEDGER_TRANSACTION_LIST_COPY.deleteConfirmDescription),
       ).toBeDefined();
     });
   });

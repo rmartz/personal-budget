@@ -1,8 +1,19 @@
 "use client";
 
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialogBackdrop,
+  AlertDialogClose,
+  AlertDialogDescription,
+  AlertDialogPopup,
+  AlertDialogPortal,
+  AlertDialogRoot,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { LEDGER_TRANSACTION_LIST_COPY } from "./copy";
@@ -44,6 +55,7 @@ export interface LedgerTransactionListViewProps {
   isLoading: boolean;
   onAddExpense: () => void;
   onAddDeposit?: () => void;
+  onDeleteTransaction: (id: string) => void;
 }
 
 export function LedgerTransactionListView({
@@ -52,8 +64,30 @@ export function LedgerTransactionListView({
   isLoading,
   onAddExpense,
   onAddDeposit,
+  onDeleteTransaction,
 }: LedgerTransactionListViewProps) {
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | undefined>(
+    undefined,
+  );
+
   const transactionsWithBalance = computeRunningBalances(transactions);
+
+  function handleDeleteClick(id: string) {
+    setPendingDeleteId(id);
+  }
+
+  function handleDeleteConfirm() {
+    if (pendingDeleteId !== undefined) {
+      onDeleteTransaction(pendingDeleteId);
+    }
+    setPendingDeleteId(undefined);
+  }
+
+  function handleDialogOpenChange(open: boolean) {
+    if (!open) {
+      setPendingDeleteId(undefined);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -110,6 +144,7 @@ export function LedgerTransactionListView({
                 <th className="px-4 py-3 text-right">
                   {LEDGER_TRANSACTION_LIST_COPY.columnBalance}
                 </th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -131,12 +166,51 @@ export function LedgerTransactionListView({
                   <td className="px-4 py-3 text-right font-mono text-sm">
                     {currencyFormatter.format(tx.runningBalance)}
                   </td>
+                  <td className="px-4 py-3 text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={
+                        LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel
+                      }
+                      onClick={() => {
+                        handleDeleteClick(tx.id);
+                      }}
+                    >
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </Card>
       )}
+
+      <AlertDialogRoot
+        open={pendingDeleteId !== undefined}
+        onOpenChange={handleDialogOpenChange}
+      >
+        <AlertDialogPortal>
+          <AlertDialogBackdrop />
+          <AlertDialogPopup>
+            <AlertDialogTitle>
+              {LEDGER_TRANSACTION_LIST_COPY.deleteConfirmTitle}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {LEDGER_TRANSACTION_LIST_COPY.deleteConfirmDescription}
+            </AlertDialogDescription>
+            <div className="mt-6 flex justify-end gap-3">
+              <AlertDialogClose>
+                {LEDGER_TRANSACTION_LIST_COPY.deleteCancelButton}
+              </AlertDialogClose>
+              <Button variant="destructive" onClick={handleDeleteConfirm}>
+                {LEDGER_TRANSACTION_LIST_COPY.deleteConfirmButton}
+              </Button>
+            </div>
+          </AlertDialogPopup>
+        </AlertDialogPortal>
+      </AlertDialogRoot>
     </div>
   );
 }
