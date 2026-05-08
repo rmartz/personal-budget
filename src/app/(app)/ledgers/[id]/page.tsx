@@ -7,6 +7,7 @@ import { useTransactions } from "@/hooks/use-transactions";
 import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 import { useCreateTransaction } from "@/hooks/use-create-transaction";
 import { useCreateDeposit } from "@/hooks/use-create-deposit";
+import { useDeleteTransaction } from "@/hooks/use-delete-transaction";
 import {
   LedgerTransactionListView,
   AddExpenseDialog,
@@ -27,6 +28,7 @@ export default function LedgerDetailPage() {
     useCreateTransaction(uid, id);
   const { mutateAsync: createDeposit, isPending: isDepositPending } =
     useCreateDeposit(uid, id);
+  const { mutate: deleteTransaction } = useDeleteTransaction(uid, id);
 
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
@@ -55,6 +57,7 @@ export default function LedgerDetailPage() {
         onAddExpense={() => {
           setExpenseDialogOpen(true);
         }}
+        onDeleteTransaction={deleteTransaction}
       />
       <AddDepositDialog
         open={depositDialogOpen}
