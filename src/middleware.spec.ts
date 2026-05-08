@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
-import { middleware } from "./middleware";
+import { middleware, config } from "./middleware";
 
 function makeSessionCookie(): string {
   const now = Math.floor(Date.now() / 1000);
@@ -122,5 +122,39 @@ describe("middleware", () => {
     expect(response.headers.get("location")).toBe(
       "https://example.com/ledgers",
     );
+  });
+});
+
+// ─── Criterion 1: /api/auth paths are excluded from session check ─────────────
+
+describe("/api/auth and sub-paths are excluded from the session check", () => {
+  it("allows unauthenticated requests to /api/auth through without redirecting", async () => {
+    const response = await middleware(makeRequest("/api/auth"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("allows unauthenticated requests to /api/auth/session through without redirecting", async () => {
+    const response = await middleware(makeRequest("/api/auth/session"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+});
+
+// ─── Criterion 2: config.matcher uses segment-boundary pattern ────────────────
+
+describe("config.matcher excludes /api/auth at a segment boundary", () => {
+  it("config.matcher pattern contains the segment-boundary api/auth lookahead", () => {
+    expect(config.matcher[0]).toMatch(/api\/auth\(\?:\/\|\$\)/);
+  });
+});
+
+// ─── Criterion 3: /api/authentication is NOT excluded ────────────────────────
+
+describe("/api/authentication is not excluded from the session check", () => {
+  it("redirects unauthenticated requests to /api/authentication to /sign-in", async () => {
+    const response = await middleware(makeRequest("/api/authentication"));
+    const location = response.headers.get("location");
+    expect(location).toContain("/sign-in");
   });
 });
