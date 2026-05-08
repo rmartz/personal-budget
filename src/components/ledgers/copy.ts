@@ -38,6 +38,7 @@ export const LEDGER_LIST_ITEM_COPY = {
 } as const;
 
 export const LEDGERS_PAGE_COPY = {
+  capUsageBarLabel: (name: string) => `Cash cap usage for ${name}`,
   columnCapUsage: "Cap usage",
   columnCash: "Cash",
   columnGoals: "Goals",

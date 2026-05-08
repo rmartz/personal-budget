@@ -165,6 +165,9 @@ export function LedgerList({
                           <Bar
                             value={capUsagePercent}
                             className="max-w-[120px]"
+                            aria-label={LEDGERS_PAGE_COPY.capUsageBarLabel(
+                              ledger.name,
+                            )}
                           />
                         )}
                       </div>
