@@ -6,6 +6,7 @@ import {
   update,
   push,
   remove,
+  runTransaction,
 } from "firebase/database";
 import { getClientApp } from "@/lib/firebase/client";
 import {
@@ -85,4 +86,32 @@ export async function deleteSavingsGoal(
   id: string,
 ): Promise<void> {
   await remove(savingsGoalRef(uid, ledgerId, id));
+}
+
+export async function deleteSavingsGoalAndReorder(
+  uid: string,
+  ledgerId: string,
+  id: string,
+): Promise<void> {
+  await runTransaction(savingsGoalsRef(uid, ledgerId), (current) => {
+    if (current === null) {
+      return current;
+    }
+    const data = current as Record<string, FirebaseBudgetLedgerSavingsGoal>;
+    const remaining = Object.entries(data)
+      .filter(([goalId]) => goalId !== id)
+      .map(([goalId, entry]) =>
+        firebaseToBudgetLedgerSavingsGoal(goalId, ledgerId, entry),
+      )
+      .sort((a, b) => a.priority - b.priority);
+
+    const updated: Record<string, FirebaseBudgetLedgerSavingsGoal> = {};
+    remaining.forEach((goal, index) => {
+      updated[goal.id] = budgetLedgerSavingsGoalToFirebase({
+        ...goal,
+        priority: index + 1,
+      });
+    });
+    return updated;
+  });
 }
