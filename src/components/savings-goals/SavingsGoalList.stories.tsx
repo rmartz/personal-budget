@@ -4,6 +4,10 @@ import { SavingsGoalListView } from "./SavingsGoalList";
 const meta: Meta<typeof SavingsGoalListView> = {
   component: SavingsGoalListView,
   title: "Savings Goals/SavingsGoalList",
+  args: {
+    onEdit: () => Promise.resolve(),
+    onReorder: () => Promise.resolve(),
+  },
 };
 
 export default meta;
