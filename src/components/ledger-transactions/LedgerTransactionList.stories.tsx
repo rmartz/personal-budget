@@ -7,6 +7,7 @@ const meta: Meta<typeof LedgerTransactionListView> = {
   title: "Ledgers/LedgerTransactionList",
   args: {
     ledgerName: "Everyday Spending",
+    onAddExpense: () => undefined,
   },
 };
 

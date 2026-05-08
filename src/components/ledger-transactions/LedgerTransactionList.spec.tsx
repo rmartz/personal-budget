@@ -29,6 +29,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={[]}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
       expect(
@@ -44,6 +45,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={[]}
           isLoading={true}
+          onAddExpense={() => undefined}
         />,
       );
       expect(
@@ -59,6 +61,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="My Savings"
           transactions={[]}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
       expect(screen.getByText("My Savings")).toBeDefined();
@@ -96,6 +99,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={transactions}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
 
@@ -130,6 +134,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={transactions}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
 
@@ -163,6 +168,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={transactions}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
 
@@ -182,6 +188,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={transactions}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
 
@@ -198,6 +205,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={transactions}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
 
@@ -216,6 +224,7 @@ describe("LedgerTransactionListView", () => {
           ledgerName="Test Ledger"
           transactions={transactions}
           isLoading={false}
+          onAddExpense={() => undefined}
         />,
       );
 
