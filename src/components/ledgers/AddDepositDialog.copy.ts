@@ -1,0 +1,15 @@
+export const ADD_DEPOSIT_DIALOG_COPY = {
+  amountInvalidError: "Amount must be a positive number.",
+  amountLabel: "Amount",
+  amountPlaceholder: "0.00",
+  amountRequiredError: "Amount is required.",
+  cancelButton: "Cancel",
+  dateLabel: "Date",
+  descriptionLabel: "Description",
+  descriptionPlaceholder: "e.g. Paycheck",
+  descriptionRequiredError: "Description is required.",
+  submitButton: "Add Deposit",
+  submitError: "Failed to add deposit. Please try again.",
+  submittingButton: "Adding…",
+  title: "Add Deposit",
+} as const;

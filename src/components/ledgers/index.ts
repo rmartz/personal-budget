@@ -1,3 +1,9 @@
+export { AddDepositDialog, AddDepositDialogView } from "./AddDepositDialog";
+export type {
+  AddDepositDialogProps,
+  AddDepositDialogViewProps,
+} from "./AddDepositDialog";
+export { ADD_DEPOSIT_DIALOG_COPY } from "./AddDepositDialog.copy";
 export { CreateLedgerDialog } from "./CreateLedgerDialog";
 export { EditLedgerDialog } from "./EditLedgerDialog";
 export { LedgerList } from "./LedgerList";
