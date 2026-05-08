@@ -43,6 +43,7 @@ export interface LedgerTransactionListViewProps {
   transactions: BudgetLedgerTransaction[];
   isLoading: boolean;
   onAddExpense: () => void;
+  onAddDeposit?: () => void;
 }
 
 export function LedgerTransactionListView({
@@ -50,6 +51,7 @@ export function LedgerTransactionListView({
   transactions,
   isLoading,
   onAddExpense,
+  onAddDeposit,
 }: LedgerTransactionListViewProps) {
   const transactionsWithBalance = computeRunningBalances(transactions);
 
@@ -64,9 +66,16 @@ export function LedgerTransactionListView({
             {LEDGER_TRANSACTION_LIST_COPY.title}
           </p>
         </div>
-        <Button onClick={onAddExpense}>
-          {LEDGER_TRANSACTION_LIST_COPY.addExpenseButton}
-        </Button>
+        <div className="flex gap-2">
+          {onAddDeposit !== undefined && (
+            <Button variant="outline" onClick={onAddDeposit}>
+              {LEDGER_TRANSACTION_LIST_COPY.addDepositButton}
+            </Button>
+          )}
+          <Button onClick={onAddExpense}>
+            {LEDGER_TRANSACTION_LIST_COPY.addExpenseButton}
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

@@ -1,4 +1,5 @@
 export const LEDGER_TRANSACTION_LIST_COPY = {
+  addDepositButton: "Add Deposit",
   addExpenseButton: "Add Expense",
   columnAmount: "Amount",
   columnBalance: "Balance",
