@@ -28,3 +28,13 @@ export const EmptyDisplayName: Story = {
     email: "jane@example.com",
   },
 };
+
+export const WithFieldErrors: Story = {
+  args: {
+    displayName: "Jane Smith",
+    email: "jane@example.com",
+    displayNameError: "Display name cannot be empty.",
+    emailError: "This email is already in use.",
+    passwordError: "Current password is incorrect.",
+  },
+};
