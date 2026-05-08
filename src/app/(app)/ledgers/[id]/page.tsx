@@ -10,6 +10,7 @@ import { useCreateDeposit } from "@/hooks/use-create-deposit";
 import { useDeleteTransaction } from "@/hooks/use-delete-transaction";
 import { useSavingsGoals } from "@/hooks/use-savings-goals";
 import { useUpdateSavingsGoal } from "@/hooks/use-update-savings-goal";
+import { useDeleteSavingsGoal } from "@/hooks/use-delete-savings-goal";
 import {
   LedgerTransactionListView,
   AddExpenseDialog,
@@ -34,6 +35,7 @@ export default function LedgerDetailPage() {
   const { mutate: deleteTransaction } = useDeleteTransaction(uid, id);
   const { savingsGoals } = useSavingsGoals(uid, id);
   const { editGoal, reorderGoal } = useUpdateSavingsGoal(uid, id);
+  const { mutate: deleteGoal } = useDeleteSavingsGoal(uid, id);
 
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
@@ -80,6 +82,7 @@ export default function LedgerDetailPage() {
       />
       <SavingsGoalListView
         goals={savingsGoals}
+        onDelete={deleteGoal}
         onEdit={editGoal}
         onReorder={reorderGoal}
       />

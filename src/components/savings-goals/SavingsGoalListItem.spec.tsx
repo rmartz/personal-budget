@@ -23,6 +23,8 @@ function makeSavingsGoal(
   };
 }
 
+const noop = vi.fn().mockResolvedValue(undefined);
+
 describe("A delete action is available on each goal row", () => {
   it("renders an overflow menu button", () => {
     const goal = makeSavingsGoal();
@@ -32,9 +34,15 @@ describe("A delete action is available on each goal row", () => {
           <SavingsGoalListItemView
             goal={goal}
             deleteDialogOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
             onDeleteDialogOpenChange={vi.fn()}
             onDeleteMenuClick={vi.fn()}
             onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
           />
         </tbody>
       </table>,
@@ -54,9 +62,15 @@ describe("A delete action is available on each goal row", () => {
           <SavingsGoalListItemView
             goal={goal}
             deleteDialogOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
             onDeleteDialogOpenChange={vi.fn()}
             onDeleteMenuClick={vi.fn()}
             onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
           />
         </tbody>
       </table>,
@@ -79,7 +93,16 @@ describe("A confirmation dialog warns the user that funded progress will be lost
     render(
       <table>
         <tbody>
-          <SavingsGoalListItem goal={goal} onDelete={vi.fn()} />
+          <SavingsGoalListItem
+            goal={goal}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDelete={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
         </tbody>
       </table>,
     );
@@ -102,7 +125,16 @@ describe("A confirmation dialog warns the user that funded progress will be lost
     render(
       <table>
         <tbody>
-          <SavingsGoalListItem goal={goal} onDelete={vi.fn()} />
+          <SavingsGoalListItem
+            goal={goal}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDelete={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
         </tbody>
       </table>,
     );
@@ -128,7 +160,16 @@ describe("Confirming deletes the goal via the service layer", () => {
     render(
       <table>
         <tbody>
-          <SavingsGoalListItem goal={goal} onDelete={onDelete} />
+          <SavingsGoalListItem
+            goal={goal}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDelete={onDelete}
+            onEdit={noop}
+            onReorder={noop}
+          />
         </tbody>
       </table>,
     );
@@ -153,7 +194,16 @@ describe("Confirming deletes the goal via the service layer", () => {
     render(
       <table>
         <tbody>
-          <SavingsGoalListItem goal={goal} onDelete={onDelete} />
+          <SavingsGoalListItem
+            goal={goal}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDelete={onDelete}
+            onEdit={noop}
+            onReorder={noop}
+          />
         </tbody>
       </table>,
     );

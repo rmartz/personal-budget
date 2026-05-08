@@ -1,11 +1,8 @@
 "use client";
 
-import { ChevronUp, ChevronDown } from "lucide-react";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { SavingsGoalListItem } from "./SavingsGoalListItem";
-import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
 import { SAVINGS_GOAL_LIST_COPY } from "./copy";
 
 export interface SavingsGoalListViewProps {
