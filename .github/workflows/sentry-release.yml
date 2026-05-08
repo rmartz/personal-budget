@@ -1,0 +1,54 @@
+name: Sentry Release
+
+# Creates a Sentry release for every push to main, associates commits with the
+# release, and finalizes it so Sentry can link errors to the correct deploy.
+#
+# TODO: Configure a Sentry webhook (Project Settings → Webhooks) to notify an
+# external endpoint (e.g. Slack) when the release is created. Add the webhook
+# URL as a GitHub Actions secret and POST to it after the finalize step.
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  create-release:
+    name: Create Sentry Release
+    runs-on: ubuntu-latest
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Create Sentry release
+        run: |
+          pnpm exec sentry-cli releases new "${{ github.sha }}" \
+            --org reedmartz \
+            --project personal-budget
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Associate commits with release
+        run: |
+          pnpm exec sentry-cli releases set-commits "${{ github.sha }}" \
+            --auto \
+            --org reedmartz \
+            --project personal-budget
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Finalize release
+        run: |
+          pnpm exec sentry-cli releases finalize "${{ github.sha }}" \
+            --org reedmartz \
+            --project personal-budget
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
