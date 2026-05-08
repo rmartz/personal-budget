@@ -36,9 +36,43 @@ describe("AnnuityListView", () => {
     });
 
     it("renders the remaining term for a fixed-duration annuity", () => {
-      const annuities = [makeAnnuity({ id: "1", durationMonths: 24 })];
+      // startDate in the far future so 0 months have elapsed; remaining = durationMonths
+      const annuities = [
+        makeAnnuity({
+          id: "1",
+          durationMonths: 36,
+          startDate: new Date("2099-01-01T00:00:00.000Z"),
+        }),
+      ];
       render(<AnnuityListView annuities={annuities} isLoading={false} />);
-      expect(screen.getByText("24 months")).toBeDefined();
+      expect(screen.getByText("36 months")).toBeDefined();
+    });
+
+    it("subtracts elapsed months from the term", () => {
+      // startDate 12 months ago, durationMonths 18 → remaining = 6
+      const twelveMonthsAgo = new Date();
+      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+      const annuities = [
+        makeAnnuity({
+          id: "1",
+          durationMonths: 18,
+          startDate: twelveMonthsAgo,
+        }),
+      ];
+      render(<AnnuityListView annuities={annuities} isLoading={false} />);
+      expect(screen.getByText("6 months")).toBeDefined();
+    });
+
+    it("clamps remaining term to zero for an expired annuity", () => {
+      const annuities = [
+        makeAnnuity({
+          id: "1",
+          durationMonths: 6,
+          startDate: new Date("2020-01-01T00:00:00.000Z"),
+        }),
+      ];
+      render(<AnnuityListView annuities={annuities} isLoading={false} />);
+      expect(screen.getByText("0 months")).toBeDefined();
     });
 
     it("renders 'indefinite' for an annuity with no duration", () => {

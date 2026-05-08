@@ -10,6 +10,16 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   currency: "USD",
 });
 
+function remainingMonths(startDate: Date, durationMonths: number): number {
+  const now = new Date();
+  const elapsed = Math.max(
+    0,
+    (now.getFullYear() - startDate.getFullYear()) * 12 +
+      (now.getMonth() - startDate.getMonth()),
+  );
+  return Math.max(0, durationMonths - elapsed);
+}
+
 interface AnnuityListViewProps {
   annuities: Annuity[];
   isLoading: boolean;
@@ -44,9 +54,13 @@ export function AnnuityListView({
           <table className="w-full">
             <thead>
               <tr className="border-b bg-muted/50 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3 text-right">Monthly</th>
-                <th className="px-4 py-3 text-right">Term</th>
+                <th className="px-4 py-3">{ANNUITY_LIST_COPY.columnName}</th>
+                <th className="px-4 py-3 text-right">
+                  {ANNUITY_LIST_COPY.columnMonthly}
+                </th>
+                <th className="px-4 py-3 text-right">
+                  {ANNUITY_LIST_COPY.columnTerm}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -58,7 +72,7 @@ export function AnnuityListView({
                   </td>
                   <td className="px-4 py-3 text-right text-muted-foreground">
                     {annuity.durationMonths !== undefined
-                      ? `${String(annuity.durationMonths)} ${ANNUITY_LIST_COPY.termSuffix}`
+                      ? `${String(remainingMonths(annuity.startDate, annuity.durationMonths))} ${ANNUITY_LIST_COPY.termSuffix}`
                       : ANNUITY_LIST_COPY.indefiniteTerm}
                   </td>
                 </tr>
