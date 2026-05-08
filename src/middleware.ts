@@ -39,7 +39,12 @@ function isAuthRoute(pathname: string): boolean {
 }
 
 function isExcludedPath(pathname: string): boolean {
-  return pathname.startsWith("/_next/") || pathname === "/favicon.ico";
+  return (
+    pathname.startsWith("/_next/") ||
+    pathname === "/favicon.ico" ||
+    pathname === "/api/auth" ||
+    pathname.startsWith("/api/auth/")
+  );
 }
 
 export async function middleware(request: NextRequest) {
@@ -161,5 +166,5 @@ async function verifySessionCookie(
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth/session).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth(?:/|$)).*)"],
 };
