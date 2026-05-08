@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 vi.mock("@sentry/nextjs", () => ({
   init: vi.fn(),
@@ -122,5 +124,49 @@ describe("Unhandled exceptions in server components / route handlers are capture
     );
 
     void initSentry;
+  });
+});
+
+// ─── Criterion 1: Sentry environment tag set from NEXT_PUBLIC_APP_ENV ─────────
+
+describe("Sentry errors from staging are distinguishable from production errors via environment tag", () => {
+  it("initSentry passes NEXT_PUBLIC_APP_ENV as environment to Sentry.init", async () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_ENV", "production");
+    const { initSentry } = await import("./sentry-init");
+    const { init } = await import("@sentry/nextjs");
+
+    initSentry("https://abc@o1.ingest.sentry.io/1");
+
+    expect(init).toHaveBeenCalledWith(
+      expect.objectContaining({ environment: "production" }),
+    );
+  });
+
+  it("initSentry falls back to 'development' when NEXT_PUBLIC_APP_ENV is absent", async () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_ENV", "");
+    const { initSentry } = await import("./sentry-init");
+    const { init } = await import("@sentry/nextjs");
+
+    initSentry("https://abc@o1.ingest.sentry.io/1");
+
+    expect(init).toHaveBeenCalledWith(
+      expect.objectContaining({ environment: "development" }),
+    );
+  });
+});
+
+// ─── Criterion 2: environment tag documented in deployment config ─────────────
+
+describe("The approach is documented in the deployment config", () => {
+  it("deployment/production.yml sets NEXT_PUBLIC_APP_ENV to 'production'", () => {
+    const path = join(import.meta.dirname, "../../deployment/production.yml");
+    const raw = readFileSync(path, "utf-8");
+    expect(raw).toMatch(/NEXT_PUBLIC_APP_ENV:\s*["']?production["']?/);
+  });
+
+  it("deployment/staging.yml sets NEXT_PUBLIC_APP_ENV to 'staging'", () => {
+    const path = join(import.meta.dirname, "../../deployment/staging.yml");
+    const raw = readFileSync(path, "utf-8");
+    expect(raw).toMatch(/NEXT_PUBLIC_APP_ENV:\s*["']?staging["']?/);
   });
 });

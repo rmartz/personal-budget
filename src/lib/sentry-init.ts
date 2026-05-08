@@ -7,8 +7,10 @@ import * as Sentry from "@sentry/nextjs";
  */
 export function initSentry(dsn: string | undefined): void {
   if (!dsn) return;
+  const appEnv = process.env["NEXT_PUBLIC_APP_ENV"];
   Sentry.init({
     dsn,
+    environment: appEnv !== "" ? (appEnv ?? "development") : "development",
     // Error capture only — no performance tracing or session replay.
     tracesSampleRate: 0,
     replaysSessionSampleRate: 0,
