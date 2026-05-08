@@ -1,21 +1,11 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import { makeSentryBuildOptions } from "./src/lib/sentry-build-options";
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  // Never emit browser-side source maps to the public output directory.
+  // withSentryConfig generates and uploads them internally, then deletes them.
+  productionBrowserSourceMaps: false,
+};
 
-export default withSentryConfig(nextConfig, {
-  // Sentry organisation and project are read from SENTRY_ORG / SENTRY_PROJECT env vars.
-  silent: true,
-
-  // Source map upload is handled in companion issue #80 — disable here.
-  sourcemaps: { disable: true },
-
-  webpack: {
-    // Suppress debug logging in production bundles.
-    treeshake: { removeDebugLogging: true },
-    // Instrument server components and route handlers for error capture.
-    autoInstrumentAppDirectory: true,
-    autoInstrumentServerFunctions: false,
-    autoInstrumentMiddleware: false,
-  },
-});
+export default withSentryConfig(nextConfig, makeSentryBuildOptions());
