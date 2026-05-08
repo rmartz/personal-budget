@@ -33,3 +33,6 @@ variables:
   # The actual value is the Client Keys DSN from your Sentry project settings.
   # SENTRY_AUTH_TOKEN and the server DSN are managed as Vercel secrets and never committed.
   NEXT_PUBLIC_SENTRY_DSN: "https://39ad6a2f62056621e3452bee009c1afc@o4511071618072576.ingest.us.sentry.io/4511351011737600"
+  # Sentry environment tag — passed to Sentry.init({ environment }) to separate
+  # production errors from staging noise in the Sentry dashboard.
+  NEXT_PUBLIC_APP_ENV: "production"
