@@ -6,7 +6,6 @@ export const LEDGER_TRANSACTION_LIST_COPY = {
   columnType: "Type",
   emptyStateMessage:
     "No transactions yet. Record your first transaction to get started.",
-  loadingMessage: "Loading transactions…",
   title: "Transaction History",
   typeDeposit: "Deposit",
   typeExpense: "Expense",
