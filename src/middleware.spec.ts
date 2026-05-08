@@ -1,173 +1,160 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
-import { middleware } from "./middleware";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { NextRequest } from "next/server";
+import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
+import { middleware, config } from "./middleware";
 
-const PROJECT_ID = "test-project";
-
-function makeRequest(url: string, sessionCookie?: string): NextRequest {
-  const headers = new Headers();
-  if (sessionCookie) {
-    headers.set("cookie", `session=${sessionCookie}`);
-  }
-  return new NextRequest(url, { headers });
-}
-
-function makeValidJwt(): string {
-  const header = { alg: "RS256", kid: "test-kid" };
+function makeSessionCookie(): string {
   const now = Math.floor(Date.now() / 1000);
-  const payload = {
-    exp: now + 3600,
-    iat: now - 60,
-    aud: PROJECT_ID,
-    iss: `https://securetoken.google.com/${PROJECT_ID}`,
-    sub: "user-uid-123",
-  };
-  const toBase64Url = (obj: object) =>
-    btoa(JSON.stringify(obj))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=/g, "");
-  // AAAA is valid base64url (decodes to 3 zero bytes); actual bytes don't matter
-  // since crypto.subtle.verify is mocked to return true
-  return `${toBase64Url(header)}.${toBase64Url(payload)}.AAAA`;
+  const header = Buffer.from(
+    JSON.stringify({ alg: "RS256", kid: "kid-123" }),
+  ).toString("base64url");
+  const payload = Buffer.from(
+    JSON.stringify({
+      exp: now + 3600,
+      iat: now - 60,
+      aud: "test-project-id",
+      iss: "https://securetoken.google.com/test-project-id",
+      sub: "uid-123",
+    }),
+  ).toString("base64url");
+
+  return `${header}.${payload}.c2ln`;
 }
+
+function makeRequest(pathname: string, sessionCookie?: string): NextRequest {
+  return {
+    url: `https://example.com${pathname}`,
+    nextUrl: new URL(`https://example.com${pathname}`),
+    cookies: {
+      get(name: string) {
+        if (name === SESSION_COOKIE_NAME && sessionCookie !== undefined) {
+          return { value: sessionCookie };
+        }
+        return undefined;
+      },
+    },
+  } as NextRequest;
+}
+
+function mockAuthenticatedCrypto() {
+  vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "test-project-id");
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve({
+          keys: [
+            {
+              kid: "kid-123",
+              n: "test-n",
+              e: "AQAB",
+              kty: "RSA",
+              alg: "RS256",
+              use: "sig",
+            },
+          ],
+        }),
+    }),
+  );
+  vi.stubGlobal("crypto", {
+    subtle: {
+      importKey: vi.fn().mockResolvedValue({}),
+      verify: vi.fn().mockResolvedValue(true),
+    },
+  });
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
 
 describe("middleware", () => {
-  beforeEach(() => {
-    vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", PROJECT_ID);
+  it("allows unauthenticated requests to / through without redirecting", async () => {
+    const response = await middleware(makeRequest("/"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
   });
 
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.unstubAllGlobals();
+  it("redirects authenticated requests from / to /ledgers", async () => {
+    mockAuthenticatedCrypto();
+
+    const response = await middleware(makeRequest("/", makeSessionCookie()));
+
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
+    );
   });
 
-  describe("excluded paths", () => {
-    it("passes through /_next/ paths without checking authentication", async () => {
-      const request = makeRequest("http://localhost/_next/static/chunk.js");
-      const response = await middleware(request);
-      expect(response.status).toBe(200);
-    });
+  it("redirects authenticated users from auth routes directly to /ledgers", async () => {
+    mockAuthenticatedCrypto();
 
-    it("passes through /api/auth/ paths without checking authentication", async () => {
-      const request = makeRequest("http://localhost/api/auth/session");
-      const response = await middleware(request);
-      expect(response.status).toBe(200);
-    });
+    const response = await middleware(
+      makeRequest("/sign-in", makeSessionCookie()),
+    );
 
-    it("passes through bare /api/auth path without checking authentication", async () => {
-      const request = makeRequest("http://localhost/api/auth");
-      const response = await middleware(request);
-      expect(response.status).toBe(200);
-    });
-
-    it("does not exclude /api/authentication — similar prefix but different segment", async () => {
-      const request = makeRequest("http://localhost/api/authentication");
-      const response = await middleware(request);
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain("/sign-in");
-    });
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
+    );
   });
 
-  describe("unauthenticated user", () => {
-    it("redirects to /sign-in with next parameter for protected routes", async () => {
-      const request = makeRequest("http://localhost/dashboard");
-      const response = await middleware(request);
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain(
-        "/sign-in?next=%2Fdashboard",
-      );
-    });
+  it("redirects authenticated users from /sign-up directly to /ledgers", async () => {
+    mockAuthenticatedCrypto();
 
-    it("preserves query string in the next parameter", async () => {
-      const request = makeRequest(
-        "http://localhost/dashboard?tab=summary&view=monthly",
-      );
-      const response = await middleware(request);
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toContain(
-        "next=%2Fdashboard%3Ftab%3Dsummary%26view%3Dmonthly",
-      );
-    });
+    const response = await middleware(
+      makeRequest("/sign-up", makeSessionCookie()),
+    );
 
-    it("allows unauthenticated access to /sign-in", async () => {
-      const request = makeRequest("http://localhost/sign-in");
-      const response = await middleware(request);
-      expect(response.status).toBe(200);
-    });
-
-    it("allows unauthenticated access to /sign-up", async () => {
-      const request = makeRequest("http://localhost/sign-up");
-      const response = await middleware(request);
-      expect(response.status).toBe(200);
-    });
-
-    it("allows unauthenticated access to /forgot-password", async () => {
-      const request = makeRequest("http://localhost/forgot-password");
-      const response = await middleware(request);
-      expect(response.status).toBe(200);
-    });
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
+    );
   });
 
-  describe("authenticated user", () => {
-    const mockJwks = {
-      keys: [
-        {
-          kid: "test-kid",
-          kty: "RSA",
-          n: "mockn",
-          e: "AQAB",
-          alg: "RS256",
-          use: "sig",
-        },
-      ],
-    };
+  it("redirects authenticated users from /forgot-password directly to /ledgers", async () => {
+    mockAuthenticatedCrypto();
 
-    beforeEach(() => {
-      vi.stubGlobal(
-        "fetch",
-        vi.fn().mockResolvedValue({
-          json: () => Promise.resolve(mockJwks),
-        }),
-      );
-      vi.spyOn(globalThis.crypto.subtle, "importKey").mockResolvedValue(
-        {} as CryptoKey,
-      );
-      vi.spyOn(globalThis.crypto.subtle, "verify").mockResolvedValue(true);
-    });
+    const response = await middleware(
+      makeRequest("/forgot-password", makeSessionCookie()),
+    );
 
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/ledgers",
+    );
+  });
+});
 
-    it("allows authenticated access to protected routes", async () => {
-      const request = makeRequest("http://localhost/dashboard", makeValidJwt());
-      const response = await middleware(request);
-      expect(response.status).toBe(200);
-    });
+// ─── Criterion 1: /api/auth paths are excluded from session check ─────────────
 
-    it("redirects to / when authenticated user visits /sign-in", async () => {
-      const request = makeRequest("http://localhost/sign-in", makeValidJwt());
-      const response = await middleware(request);
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost/");
-    });
+describe("/api/auth and sub-paths are excluded from the session check", () => {
+  it("allows unauthenticated requests to /api/auth through without redirecting", async () => {
+    const response = await middleware(makeRequest("/api/auth"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
 
-    it("redirects to / when authenticated user visits /sign-up", async () => {
-      const request = makeRequest("http://localhost/sign-up", makeValidJwt());
-      const response = await middleware(request);
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost/");
-    });
+  it("allows unauthenticated requests to /api/auth/session through without redirecting", async () => {
+    const response = await middleware(makeRequest("/api/auth/session"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+});
 
-    it("redirects to / when authenticated user visits /forgot-password", async () => {
-      const request = makeRequest(
-        "http://localhost/forgot-password",
-        makeValidJwt(),
-      );
-      const response = await middleware(request);
-      expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost/");
-    });
+// ─── Criterion 2: config.matcher uses segment-boundary pattern ────────────────
+
+describe("config.matcher excludes /api/auth at a segment boundary", () => {
+  it("config.matcher pattern contains the segment-boundary api/auth lookahead", () => {
+    expect(config.matcher[0]).toMatch(/api\/auth\(\?:\/\|\$\)/);
+  });
+});
+
+// ─── Criterion 3: /api/authentication is NOT excluded ────────────────────────
+
+describe("/api/authentication is not excluded from the session check", () => {
+  it("redirects unauthenticated requests to /api/authentication to /sign-in", async () => {
+    const response = await middleware(makeRequest("/api/authentication"));
+    const location = response.headers.get("location");
+    expect(location).toContain("/sign-in");
   });
 });

@@ -34,3 +34,4 @@ denied_patterns:
   - "FIREBASE_CLIENT_EMAIL"
   - "SENTRY_AUTH_TOKEN"
   - "SENTRY_DSN" # Server DSN is sensitive; use NEXT_PUBLIC_SENTRY_DSN for the public one
+  # NEXT_PUBLIC_SENTRY_DSN is intentionally allowed via the NEXT_PUBLIC_* pattern above.

@@ -41,9 +41,9 @@ function isAuthRoute(pathname: string): boolean {
 function isExcludedPath(pathname: string): boolean {
   return (
     pathname.startsWith("/_next/") ||
+    pathname === "/favicon.ico" ||
     pathname === "/api/auth" ||
-    pathname.startsWith("/api/auth/") ||
-    pathname === "/favicon.ico"
+    pathname.startsWith("/api/auth/")
   );
 }
 
@@ -59,7 +59,14 @@ export async function middleware(request: NextRequest) {
 
   if (isAuthRoute(pathname)) {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("/ledgers", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname === "/") {
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL("/ledgers", request.url));
     }
     return NextResponse.next();
   }

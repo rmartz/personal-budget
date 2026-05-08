@@ -7,6 +7,7 @@ const sampleLedger = {
   cashCap: 2000,
   cashBalance: 1250.0,
   investmentBalance: 500.0,
+  goalsCount: 2,
 };
 
 const meta: Meta<typeof LedgerListItemView> = {
@@ -14,16 +15,20 @@ const meta: Meta<typeof LedgerListItemView> = {
   title: "Ledgers/LedgerListItem",
   decorators: [
     (Story) => (
-      <ul>
-        <Story />
-      </ul>
+      <table>
+        <tbody>
+          <Story />
+        </tbody>
+      </table>
     ),
   ],
   args: {
     ledger: sampleLedger,
-    dialogOpen: false,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onDialogOpenChange: () => {},
+    onEdit: async () => {},
+    deleteDialogOpen: false,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDeleteDialogOpenChange: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onDeleteMenuClick: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -45,8 +50,17 @@ export const WithNoCashCap: Story = {
   },
 };
 
+export const WithNoGoals: Story = {
+  args: {
+    ledger: {
+      ...sampleLedger,
+      goalsCount: 0,
+    },
+  },
+};
+
 export const DeleteDialogOpen: Story = {
   args: {
-    dialogOpen: true,
+    deleteDialogOpen: true,
   },
 };

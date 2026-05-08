@@ -4,6 +4,7 @@ export interface Ledger {
   cashCap?: number;
   cashBalance: number;
   investmentBalance: number;
+  goalsCount?: number;
 }
 
 export interface CreateLedgerInput {
@@ -13,5 +14,5 @@ export interface CreateLedgerInput {
 
 export interface UpdateLedgerInput {
   name?: string;
-  cashCap?: number;
+  cashCap?: number | null;
 }

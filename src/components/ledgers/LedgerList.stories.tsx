@@ -7,6 +7,7 @@ const meta: Meta<typeof LedgerList> = {
   args: {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onNewLedger: () => {},
+    onEditLedger: () => Promise.resolve(),
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onDeleteLedger: () => {},
   },
@@ -39,6 +40,7 @@ export const Populated: Story = {
         cashCap: 2000,
         cashBalance: 1250.0,
         investmentBalance: 500.0,
+        goalsCount: 2,
       },
       {
         id: "2",
@@ -46,6 +48,7 @@ export const Populated: Story = {
         cashCap: undefined,
         cashBalance: 8500.75,
         investmentBalance: 0,
+        goalsCount: 0,
       },
       {
         id: "3",
@@ -53,6 +56,50 @@ export const Populated: Story = {
         cashCap: 5000,
         cashBalance: 300.5,
         investmentBalance: 1200.0,
+        goalsCount: 1,
+      },
+    ],
+  },
+};
+
+export const LedgerWithoutCap: Story = {
+  args: {
+    isLoading: false,
+    ledgers: [
+      {
+        id: "1",
+        name: "Open Savings",
+        cashCap: undefined,
+        cashBalance: 4200.0,
+        investmentBalance: 800.0,
+        goalsCount: 0,
+      },
+    ],
+  },
+};
+
+export const Mobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: "mobile1" },
+  },
+  args: {
+    isLoading: false,
+    ledgers: [
+      {
+        id: "1",
+        name: "Everyday Spending",
+        cashCap: 2000,
+        cashBalance: 1250.0,
+        investmentBalance: 500.0,
+        goalsCount: 2,
+      },
+      {
+        id: "2",
+        name: "Emergency Fund",
+        cashCap: undefined,
+        cashBalance: 8500.75,
+        investmentBalance: 0,
+        goalsCount: 0,
       },
     ],
   },
