@@ -89,7 +89,7 @@ export function AddExpenseDialog({
 
     try {
       await onSubmit({
-        date: new Date(date),
+        date: new Date(date + "T00:00:00"),
         amount: parseFloat(amount),
         description: description.trim(),
       });

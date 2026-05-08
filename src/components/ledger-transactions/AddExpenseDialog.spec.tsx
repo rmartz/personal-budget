@@ -235,7 +235,7 @@ describe("AddExpenseDialog — Submitting persists the transaction via the servi
     fireEvent.click(screen.getByText(ADD_EXPENSE_DIALOG_COPY.submitButton));
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalledWith({
-        date: new Date("2024-03-15"),
+        date: new Date("2024-03-15T00:00:00"),
         amount: 42.5,
         description: "Coffee",
       });
