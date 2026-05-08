@@ -188,6 +188,32 @@ describe("LedgerListItemView", () => {
       );
       expect(screen.queryByText(LEDGERS_PAGE_COPY.noCashCapLabel)).toBeNull();
     });
+
+    it("renders the cap usage progressbar with a descriptive accessible name", () => {
+      const ledger = makeLedger({
+        name: "Everyday Spending",
+        cashCap: 1000,
+        cashBalance: 750,
+      });
+      render(
+        <table>
+          <tbody>
+            <LedgerListItemView
+              ledger={ledger}
+              onEdit={onEdit}
+              deleteDialogOpen={false}
+              onDeleteDialogOpenChange={vi.fn()}
+              onDeleteMenuClick={vi.fn()}
+              onDeleteConfirm={vi.fn()}
+            />
+          </tbody>
+        </table>,
+      );
+      const bar = screen.getByRole("progressbar", {
+        name: LEDGERS_PAGE_COPY.capUsageBarLabel("Everyday Spending"),
+      });
+      expect(bar).toBeDefined();
+    });
   });
 
   describe("goals column", () => {

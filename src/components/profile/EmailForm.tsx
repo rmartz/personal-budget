@@ -12,7 +12,12 @@ export interface EmailFormProps {
   onSubmit: (e: React.SyntheticEvent) => void;
 }
 
-export function EmailForm({ value, error, onChange, onSubmit }: EmailFormProps) {
+export function EmailForm({
+  value,
+  error,
+  onChange,
+  onSubmit,
+}: EmailFormProps) {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-3" noValidate>
       <div className="flex flex-col gap-1">
