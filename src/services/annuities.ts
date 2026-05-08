@@ -65,8 +65,8 @@ export async function updateAnnuity(
   if (data.startDate !== undefined) {
     updates.startDate = data.startDate.toISOString();
   }
-  if (data.durationMonths !== undefined) {
-    updates.durationMonths = data.durationMonths;
+  if ("durationMonths" in data) {
+    updates.durationMonths = data.durationMonths ?? null;
   }
   await update(annuityRef(uid, id), updates);
 }

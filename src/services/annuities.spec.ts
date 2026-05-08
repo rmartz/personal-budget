@@ -120,6 +120,22 @@ describe("updateAnnuity", () => {
       startDate: "2025-01-01T00:00:00.000Z",
     });
   });
+
+  it("writes null to durationMonths when clearing the field", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    await updateAnnuity("uid-1", "annuity-1", { durationMonths: undefined });
+    expect(update).toHaveBeenCalledWith(mockRef, { durationMonths: null });
+  });
+
+  it("omits durationMonths from the update when the key is absent", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    await updateAnnuity("uid-1", "annuity-1", { monthlyAmount: 20 });
+    const calledWith = vi.mocked(update).mock.calls[0]![1] as Record<
+      string,
+      unknown
+    >;
+    expect("durationMonths" in calledWith).toBe(false);
+  });
 });
 
 describe("deleteAnnuity", () => {
