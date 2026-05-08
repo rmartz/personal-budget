@@ -1,8 +1,11 @@
 "use client";
 
+import { ChevronUp, ChevronDown } from "lucide-react";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 import { Card } from "@/components/ui/card";
 import { Bar } from "@/components/ui/bar";
+import { Button } from "@/components/ui/button";
+import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
 import { SAVINGS_GOAL_LIST_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -12,9 +15,18 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 
 export interface SavingsGoalListViewProps {
   goals: BudgetLedgerSavingsGoal[];
+  onEdit: (
+    id: string,
+    data: { name: string; targetAmount: number },
+  ) => Promise<void>;
+  onReorder: (goalId: string, swapWithId: string) => Promise<void>;
 }
 
-export function SavingsGoalListView({ goals }: SavingsGoalListViewProps) {
+export function SavingsGoalListView({
+  goals,
+  onEdit,
+  onReorder,
+}: SavingsGoalListViewProps) {
   const sorted = [...goals].sort((a, b) => a.priority - b.priority);
 
   return (
@@ -46,14 +58,21 @@ export function SavingsGoalListView({ goals }: SavingsGoalListViewProps) {
                 <th className="px-4 py-3">
                   {SAVINGS_GOAL_LIST_COPY.columnProgress}
                 </th>
+                <th className="px-4 py-3">
+                  {SAVINGS_GOAL_LIST_COPY.columnActions}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {sorted.map((goal) => {
+              {sorted.map((goal, index) => {
                 const progressPercent =
                   goal.targetAmount > 0
                     ? Math.round((goal.fundedAmount / goal.targetAmount) * 100)
                     : 0;
+                const isFirst = index === 0;
+                const isLast = index === sorted.length - 1;
+                const prevGoal = isFirst ? undefined : sorted[index - 1];
+                const nextGoal = isLast ? undefined : sorted[index + 1];
 
                 return (
                   <tr key={goal.id} className="border-b last:border-b-0">
@@ -73,6 +92,35 @@ export function SavingsGoalListView({ goals }: SavingsGoalListViewProps) {
                         <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
                           {progressPercent}%
                         </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        {!isFirst && prevGoal !== undefined && (
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={`${SAVINGS_GOAL_LIST_COPY.moveUpButton} ${goal.name}`}
+                            onClick={() => {
+                              void onReorder(goal.id, prevGoal.id);
+                            }}
+                          >
+                            <ChevronUp aria-hidden="true" />
+                          </Button>
+                        )}
+                        {!isLast && nextGoal !== undefined && (
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={`${SAVINGS_GOAL_LIST_COPY.moveDownButton} ${goal.name}`}
+                            onClick={() => {
+                              void onReorder(goal.id, nextGoal.id);
+                            }}
+                          >
+                            <ChevronDown aria-hidden="true" />
+                          </Button>
+                        )}
+                        <EditSavingsGoalDialog goal={goal} onSave={onEdit} />
                       </div>
                     </td>
                   </tr>
