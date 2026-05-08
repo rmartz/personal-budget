@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { fireEvent, getByRole } from "storybook/test";
 import { AddDepositDialogView } from "./AddDepositDialog";
+import { ADD_DEPOSIT_DIALOG_COPY } from "./AddDepositDialog.copy";
 
 const meta: Meta<typeof AddDepositDialogView> = {
   component: AddDepositDialogView,
@@ -22,5 +24,15 @@ export const Empty: Story = {};
 export const Submitting: Story = {
   args: {
     isSubmitting: true,
+  },
+};
+
+export const WithValidationErrors: Story = {
+  play: ({ canvasElement }) => {
+    void fireEvent.click(
+      getByRole(canvasElement, "button", {
+        name: ADD_DEPOSIT_DIALOG_COPY.submitButton,
+      }),
+    );
   },
 };
