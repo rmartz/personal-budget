@@ -65,7 +65,11 @@ export function LedgerListItemView({
       <td className="w-[25%] px-4 py-3">
         {ledger.cashCap != null ? (
           <div className="flex items-center gap-2">
-            <Bar value={capUsagePercent} className="max-w-24" />
+            <Bar
+              value={capUsagePercent}
+              className="max-w-24"
+              aria-label={LEDGERS_PAGE_COPY.capUsageBarLabel(ledger.name)}
+            />
             <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
               {currencyFormatter.format(ledger.cashBalance)} /{" "}
               {currencyFormatter.format(ledger.cashCap)}
