@@ -1,4 +1,5 @@
 export enum ReconciliationAccountTier {
+  Investment = "investment",
   LongTerm = "long-term",
   Reserve = "reserve",
   ShortTerm = "short-term",
@@ -7,14 +8,14 @@ export enum ReconciliationAccountTier {
 export interface FirebaseReconciliationAccount {
   name: string;
   tier: ReconciliationAccountTier;
-  targetFloat: number;
+  targetFloat?: number;
 }
 
 export interface ReconciliationAccount {
   id: string;
   name: string;
   tier: ReconciliationAccountTier;
-  targetFloat: number;
+  targetFloat?: number;
 }
 
 export function reconciliationAccountToFirebase(
@@ -23,7 +24,9 @@ export function reconciliationAccountToFirebase(
   return {
     name: account.name,
     tier: account.tier,
-    targetFloat: account.targetFloat,
+    ...(account.targetFloat !== undefined
+      ? { targetFloat: account.targetFloat }
+      : {}),
   };
 }
 
@@ -35,6 +38,8 @@ export function firebaseToReconciliationAccount(
     id,
     name: data.name,
     tier: data.tier,
-    targetFloat: data.targetFloat,
+    ...(data.targetFloat !== undefined
+      ? { targetFloat: data.targetFloat }
+      : {}),
   };
 }
