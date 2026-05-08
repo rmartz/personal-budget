@@ -38,6 +38,7 @@ describe("SavingsGoalListView — edit and reorder actions", () => {
       render(
         <SavingsGoalListView
           goals={goals}
+          onDelete={vi.fn()}
           onEdit={onEdit}
           onReorder={onReorder}
         />,
@@ -59,6 +60,7 @@ describe("SavingsGoalListView — edit and reorder actions", () => {
       render(
         <SavingsGoalListView
           goals={goals}
+          onDelete={vi.fn()}
           onEdit={onEdit}
           onReorder={onReorder}
         />,
@@ -80,6 +82,7 @@ describe("SavingsGoalListView — edit and reorder actions", () => {
       render(
         <SavingsGoalListView
           goals={goals}
+          onDelete={vi.fn()}
           onEdit={onEdit}
           onReorder={onReorder}
         />,
@@ -101,6 +104,7 @@ describe("SavingsGoalListView — edit and reorder actions", () => {
       render(
         <SavingsGoalListView
           goals={goals}
+          onDelete={vi.fn()}
           onEdit={onEdit}
           onReorder={onReorder}
         />,
@@ -122,6 +126,7 @@ describe("SavingsGoalListView — edit and reorder actions", () => {
       render(
         <SavingsGoalListView
           goals={goals}
+          onDelete={vi.fn()}
           onEdit={onEdit}
           onReorder={onReorder}
         />,
@@ -141,6 +146,7 @@ describe("SavingsGoalListView — edit and reorder actions", () => {
       render(
         <SavingsGoalListView
           goals={[goalA, goalB]}
+          onDelete={vi.fn()}
           onEdit={onEdit}
           onReorder={onReorder}
         />,
@@ -163,6 +169,7 @@ describe("SavingsGoalListView — edit and reorder actions", () => {
       render(
         <SavingsGoalListView
           goals={[goalA, goalB]}
+          onDelete={vi.fn()}
           onEdit={onEdit}
           onReorder={onReorder}
         />,

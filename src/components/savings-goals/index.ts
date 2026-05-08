@@ -11,4 +11,13 @@ export { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
 export type { EditSavingsGoalDialogProps } from "./EditSavingsGoalDialog";
 export { SavingsGoalListView } from "./SavingsGoalList";
 export type { SavingsGoalListViewProps } from "./SavingsGoalList";
-export { EDIT_SAVINGS_GOAL_DIALOG_COPY, SAVINGS_GOAL_LIST_COPY } from "./copy";
+export {
+  SavingsGoalListItem,
+  SavingsGoalListItemView,
+} from "./SavingsGoalListItem";
+export type { SavingsGoalListItemViewProps } from "./SavingsGoalListItem";
+export {
+  EDIT_SAVINGS_GOAL_DIALOG_COPY,
+  SAVINGS_GOAL_LIST_COPY,
+  SAVINGS_GOAL_LIST_ITEM_COPY,
+} from "./copy";
