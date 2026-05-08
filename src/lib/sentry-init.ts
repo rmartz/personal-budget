@@ -9,6 +9,7 @@ export function initSentry(dsn: string | undefined): void {
   if (!dsn) return;
   Sentry.init({
     dsn,
+    environment: process.env["NEXT_PUBLIC_APP_ENV"] || "development", // eslint-disable-line @typescript-eslint/prefer-nullish-coalescing
     // Error capture only — no performance tracing or session replay.
     tracesSampleRate: 0,
     replaysSessionSampleRate: 0,
