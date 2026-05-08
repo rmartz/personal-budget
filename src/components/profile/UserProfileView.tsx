@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,14 @@ export function UserProfileView({
   const [passwordError, setPasswordError] = useState<string | undefined>(
     undefined,
   );
+
+  useEffect(() => {
+    setDisplayNameValue(displayName);
+  }, [displayName]);
+
+  useEffect(() => {
+    setEmailValue(email);
+  }, [email]);
 
   async function submitDisplayName() {
     try {
@@ -101,6 +109,7 @@ export function UserProfileView({
         <form
           onSubmit={handleDisplayNameSubmit}
           className="flex flex-col gap-3"
+          noValidate
         >
           <div className="flex flex-col gap-1">
             <Label htmlFor="profile-display-name">
@@ -140,7 +149,11 @@ export function UserProfileView({
         <h2 className="text-lg font-medium">
           {USER_PROFILE_COPY.emailSectionTitle}
         </h2>
-        <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
+        <form
+          onSubmit={handleEmailSubmit}
+          className="flex flex-col gap-3"
+          noValidate
+        >
           <div className="flex flex-col gap-1">
             <Label htmlFor="profile-email">
               {USER_PROFILE_COPY.changeEmailLabel}
@@ -178,7 +191,11 @@ export function UserProfileView({
         <h2 className="text-lg font-medium">
           {USER_PROFILE_COPY.passwordSectionTitle}
         </h2>
-        <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-3">
+        <form
+          onSubmit={handlePasswordSubmit}
+          className="flex flex-col gap-3"
+          noValidate
+        >
           <div className="flex flex-col gap-1">
             <Label htmlFor="profile-current-password">
               {USER_PROFILE_COPY.changePasswordCurrentLabel}
