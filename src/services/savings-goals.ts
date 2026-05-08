@@ -6,6 +6,7 @@ import {
   update,
   push,
   remove,
+  runTransaction,
 } from "firebase/database";
 import { getClientApp } from "@/lib/firebase/client";
 import {
@@ -92,27 +93,25 @@ export async function deleteSavingsGoalAndReorder(
   ledgerId: string,
   id: string,
 ): Promise<void> {
-  const snapshot = await get(savingsGoalsRef(uid, ledgerId));
-  await remove(savingsGoalRef(uid, ledgerId, id));
+  await runTransaction(savingsGoalsRef(uid, ledgerId), (current) => {
+    if (current === null) {
+      return current;
+    }
+    const data = current as Record<string, FirebaseBudgetLedgerSavingsGoal>;
+    const remaining = Object.entries(data)
+      .filter(([goalId]) => goalId !== id)
+      .map(([goalId, entry]) =>
+        firebaseToBudgetLedgerSavingsGoal(goalId, ledgerId, entry),
+      )
+      .sort((a, b) => a.priority - b.priority);
 
-  if (!snapshot.exists()) {
-    return;
-  }
-
-  const data = snapshot.val() as Record<
-    string,
-    FirebaseBudgetLedgerSavingsGoal
-  >;
-  const remaining = Object.entries(data)
-    .filter(([goalId]) => goalId !== id)
-    .map(([goalId, entry]) =>
-      firebaseToBudgetLedgerSavingsGoal(goalId, ledgerId, entry),
-    )
-    .sort((a, b) => a.priority - b.priority);
-
-  await Promise.all(
-    remaining.map((goal, index) =>
-      update(savingsGoalRef(uid, ledgerId, goal.id), { priority: index + 1 }),
-    ),
-  );
+    const updated: Record<string, FirebaseBudgetLedgerSavingsGoal> = {};
+    remaining.forEach((goal, index) => {
+      updated[goal.id] = budgetLedgerSavingsGoalToFirebase({
+        ...goal,
+        priority: index + 1,
+      });
+    });
+    return updated;
+  });
 }
