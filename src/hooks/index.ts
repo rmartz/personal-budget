@@ -6,3 +6,4 @@ export { useReconciliationAccounts } from "./use-reconciliation-accounts";
 export { useReconciliationExpenses } from "./use-reconciliation-expenses";
 export { useSavingsGoals } from "./use-savings-goals";
 export { useTransactions } from "./use-transactions";
+export { useUpdateSavingsGoal } from "./use-update-savings-goal";
