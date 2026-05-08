@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { LEDGER_TRANSACTION_LIST_COPY } from "./copy";
@@ -41,22 +42,31 @@ export interface LedgerTransactionListViewProps {
   ledgerName: string;
   transactions: BudgetLedgerTransaction[];
   isLoading: boolean;
+  onAddExpense: () => void;
 }
 
 export function LedgerTransactionListView({
   ledgerName,
   transactions,
   isLoading,
+  onAddExpense,
 }: LedgerTransactionListViewProps) {
   const transactionsWithBalance = computeRunningBalances(transactions);
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{ledgerName}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {LEDGER_TRANSACTION_LIST_COPY.title}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {ledgerName}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {LEDGER_TRANSACTION_LIST_COPY.title}
+          </p>
+        </div>
+        <Button onClick={onAddExpense}>
+          {LEDGER_TRANSACTION_LIST_COPY.addExpenseButton}
+        </Button>
       </div>
 
       {isLoading ? (

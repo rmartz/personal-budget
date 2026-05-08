@@ -1,10 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
-import { LedgerTransactionListView } from "@/components/ledger-transactions";
+import { useCreateTransaction } from "@/hooks/use-create-transaction";
+import {
+  LedgerTransactionListView,
+  AddExpenseDialog,
+} from "@/components/ledger-transactions";
 
 export default function LedgerDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +18,9 @@ export default function LedgerDetailPage() {
 
   const { ledgers, isLoading: ledgersLoading } = useLedgersSubscription(uid);
   const { transactions, isLoading: txLoading } = useTransactions(uid, id);
+  const { addExpense, isSubmitting } = useCreateTransaction(uid, id);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const ledger = ledgers.find((l) => l.id === id);
   const isLoading = authLoading || ledgersLoading || txLoading;
@@ -28,6 +36,17 @@ export default function LedgerDetailPage() {
         ledgerName={ledgerName}
         transactions={transactions}
         isLoading={isLoading}
+        onAddExpense={() => {
+          setDialogOpen(true);
+        }}
+      />
+      <AddExpenseDialog
+        open={dialogOpen}
+        onSubmit={addExpense}
+        onClose={() => {
+          setDialogOpen(false);
+        }}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

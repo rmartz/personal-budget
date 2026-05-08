@@ -1,0 +1,15 @@
+export const ADD_EXPENSE_DIALOG_COPY = {
+  amountInvalidError: "Amount must be a positive number.",
+  amountLabel: "Amount",
+  amountPlaceholder: "e.g. 25.00",
+  amountRequiredError: "Amount is required.",
+  cancelButton: "Cancel",
+  dateLabel: "Date",
+  descriptionLabel: "Description",
+  descriptionPlaceholder: "e.g. Groceries",
+  descriptionRequiredError: "Description is required.",
+  submitButton: "Add Expense",
+  submitError: "Failed to add expense. Please try again.",
+  submittingButton: "Adding…",
+  title: "New Expense",
+} as const;
