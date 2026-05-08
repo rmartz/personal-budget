@@ -7,7 +7,7 @@
 # Sensitive variables are managed directly in Vercel and are never committed.
 # Run `pnpm env:pull` to generate a local .env.local from Vercel's stored values.
 #
-# To update these values and sync them to Vercel: scripts/update-config.sh --env=production
+# To sync these values to Vercel: pnpm exec sync-env --env=production
 
 environment: production
 
@@ -27,5 +27,12 @@ variables:
   FIREBASE_SA_EMAIL: "firebase-adminsdk-fbsvc@personal-budget-7d028.iam.gserviceaccount.com"
 
   # Sentry — slugs only, not credentials
-  SENTRY_ORG: ""
-  SENTRY_PROJECT: ""
+  SENTRY_ORG: "reedmartz"
+  SENTRY_PROJECT: "personal-budget"
+  # Sentry public DSN — safe to expose; matched by the NEXT_PUBLIC_* allowed_pattern in schema.yml.
+  # The actual value is the Client Keys DSN from your Sentry project settings.
+  # SENTRY_AUTH_TOKEN and the server DSN are managed as Vercel secrets and never committed.
+  NEXT_PUBLIC_SENTRY_DSN: "https://39ad6a2f62056621e3452bee009c1afc@o4511071618072576.ingest.us.sentry.io/4511351011737600"
+  # Sentry environment tag — passed to Sentry.init({ environment }) to separate
+  # production errors from staging noise in the Sentry dashboard.
+  NEXT_PUBLIC_APP_ENV: "production"

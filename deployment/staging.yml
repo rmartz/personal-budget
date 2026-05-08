@@ -11,7 +11,7 @@
 #   1. Create the RTDB in the staging Firebase project
 #   2. Populate NEXT_PUBLIC_FIREBASE_DATABASE_URL and FIREBASE_DATABASE_URL below
 #   3. Re-add staging to deployment/environments.yml and set single_environment: false
-#   4. Run: scripts/deploy-config.sh --env=staging
+#   4. Run: pnpm exec sync-env --env=staging
 # ──────────────────────────────────────────────────────────────────────────────
 #
 # Only non-sensitive variables belong here. All keys are validated against
@@ -36,5 +36,10 @@ variables:
   FIREBASE_DATABASE_URL: ""
 
   # Sentry — slugs only, not credentials
-  SENTRY_ORG: ""
-  SENTRY_PROJECT: ""
+  SENTRY_ORG: "reedmartz"
+  SENTRY_PROJECT: "personal-budget"
+  # Sentry public DSN — safe to expose; matched by the NEXT_PUBLIC_* allowed_pattern in schema.yml.
+  NEXT_PUBLIC_SENTRY_DSN: "https://39ad6a2f62056621e3452bee009c1afc@o4511071618072576.ingest.us.sentry.io/4511351011737600"
+  # Sentry environment tag — passed to Sentry.init({ environment }) to separate
+  # staging errors from production in the Sentry dashboard.
+  NEXT_PUBLIC_APP_ENV: "staging"

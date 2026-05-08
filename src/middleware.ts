@@ -31,11 +31,20 @@ interface JwtPayload {
 }
 
 function isAuthRoute(pathname: string): boolean {
-  return pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+  return (
+    pathname.startsWith("/sign-in") ||
+    pathname.startsWith("/sign-up") ||
+    pathname.startsWith("/forgot-password")
+  );
 }
 
 function isExcludedPath(pathname: string): boolean {
-  return pathname.startsWith("/_next/") || pathname === "/favicon.ico";
+  return (
+    pathname.startsWith("/_next/") ||
+    pathname === "/favicon.ico" ||
+    pathname === "/api/auth" ||
+    pathname.startsWith("/api/auth/")
+  );
 }
 
 export async function middleware(request: NextRequest) {
@@ -50,7 +59,14 @@ export async function middleware(request: NextRequest) {
 
   if (isAuthRoute(pathname)) {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("/ledgers", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname === "/") {
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL("/ledgers", request.url));
     }
     return NextResponse.next();
   }
@@ -150,5 +166,5 @@ async function verifySessionCookie(
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth/session).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth(?:/|$)).*)"],
 };
