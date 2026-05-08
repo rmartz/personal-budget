@@ -86,3 +86,33 @@ export async function deleteSavingsGoal(
 ): Promise<void> {
   await remove(savingsGoalRef(uid, ledgerId, id));
 }
+
+export async function deleteSavingsGoalAndReorder(
+  uid: string,
+  ledgerId: string,
+  id: string,
+): Promise<void> {
+  const snapshot = await get(savingsGoalsRef(uid, ledgerId));
+  await remove(savingsGoalRef(uid, ledgerId, id));
+
+  if (!snapshot.exists()) {
+    return;
+  }
+
+  const data = snapshot.val() as Record<
+    string,
+    FirebaseBudgetLedgerSavingsGoal
+  >;
+  const remaining = Object.entries(data)
+    .filter(([goalId]) => goalId !== id)
+    .map(([goalId, entry]) =>
+      firebaseToBudgetLedgerSavingsGoal(goalId, ledgerId, entry),
+    )
+    .sort((a, b) => a.priority - b.priority);
+
+  await Promise.all(
+    remaining.map((goal, index) =>
+      update(savingsGoalRef(uid, ledgerId, goal.id), { priority: index + 1 }),
+    ),
+  );
+}

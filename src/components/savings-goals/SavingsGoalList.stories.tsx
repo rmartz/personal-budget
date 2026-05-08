@@ -12,11 +12,15 @@ type Story = StoryObj<typeof SavingsGoalListView>;
 export const Empty: Story = {
   args: {
     goals: [],
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDelete: () => {},
   },
 };
 
 export const PartiallyFunded: Story = {
   args: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDelete: () => {},
     goals: [
       {
         id: "goal-1",
@@ -48,6 +52,8 @@ export const PartiallyFunded: Story = {
 
 export const FullyFunded: Story = {
   args: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDelete: () => {},
     goals: [
       {
         id: "goal-1",

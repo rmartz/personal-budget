@@ -2,19 +2,18 @@
 
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 import { Card } from "@/components/ui/card";
-import { Bar } from "@/components/ui/bar";
+import { SavingsGoalListItem } from "./SavingsGoalListItem";
 import { SAVINGS_GOAL_LIST_COPY } from "./copy";
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 export interface SavingsGoalListViewProps {
   goals: BudgetLedgerSavingsGoal[];
+  onDelete: (id: string) => void;
 }
 
-export function SavingsGoalListView({ goals }: SavingsGoalListViewProps) {
+export function SavingsGoalListView({
+  goals,
+  onDelete,
+}: SavingsGoalListViewProps) {
   const sorted = [...goals].sort((a, b) => a.priority - b.priority);
 
   return (
@@ -46,38 +45,17 @@ export function SavingsGoalListView({ goals }: SavingsGoalListViewProps) {
                 <th className="px-4 py-3">
                   {SAVINGS_GOAL_LIST_COPY.columnProgress}
                 </th>
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
-              {sorted.map((goal) => {
-                const progressPercent =
-                  goal.targetAmount > 0
-                    ? Math.round((goal.fundedAmount / goal.targetAmount) * 100)
-                    : 0;
-
-                return (
-                  <tr key={goal.id} className="border-b last:border-b-0">
-                    <td className="px-4 py-3 text-center font-mono text-sm text-muted-foreground">
-                      {goal.priority}
-                    </td>
-                    <td className="px-4 py-3 font-medium">{goal.name}</td>
-                    <td className="px-4 py-3 text-right font-mono text-sm">
-                      {currencyFormatter.format(goal.targetAmount)}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-sm">
-                      {currencyFormatter.format(goal.fundedAmount)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Bar value={progressPercent} className="max-w-24" />
-                        <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
-                          {progressPercent}%
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {sorted.map((goal) => (
+                <SavingsGoalListItem
+                  key={goal.id}
+                  goal={goal}
+                  onDelete={onDelete}
+                />
+              ))}
             </tbody>
           </table>
         </Card>
