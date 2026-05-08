@@ -290,7 +290,7 @@ describe("LedgerTransactionListView", () => {
       ).toBeDefined();
     });
 
-    it("calls onDeleteTransaction with the transaction id when confirmed", async () => {
+    it("calls onDeleteTransaction with the transaction id when confirmed", () => {
       const onDeleteTransaction = vi.fn();
       const transactions = [makeTransaction({ id: "tx-abc" })];
 
@@ -317,7 +317,7 @@ describe("LedgerTransactionListView", () => {
       expect(onDeleteTransaction).toHaveBeenCalledWith("tx-abc");
     });
 
-    it("does not call onDeleteTransaction when the dialog is cancelled", async () => {
+    it("does not call onDeleteTransaction when the dialog is cancelled", () => {
       const onDeleteTransaction = vi.fn();
       const transactions = [makeTransaction({ id: "tx-abc" })];
 
