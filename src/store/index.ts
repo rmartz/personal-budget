@@ -1,16 +1,9 @@
-import { configureStore, createSlice } from "@reduxjs/toolkit";
-
-const appSlice = createSlice({
-  name: "app",
-  initialState: {
-    ready: true,
-  },
-  reducers: {},
-});
+import { configureStore } from "@reduxjs/toolkit";
+import { appReducer } from "./app-slice";
 
 export const store = configureStore({
   reducer: {
-    app: appSlice.reducer,
+    app: appReducer,
   },
 });
 
