@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export const appSlice = createSlice({
+const appSlice = createSlice({
   name: "app",
-  initialState: {
-    ready: true,
-  },
+  initialState: {},
   reducers: {},
 });
+
+export default appSlice;

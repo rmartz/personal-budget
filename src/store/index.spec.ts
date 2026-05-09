@@ -3,6 +3,6 @@ import { store } from "./index";
 
 describe("store", () => {
   it("initializes with a valid reducer map", () => {
-    expect(store.getState()).toEqual({ app: { ready: true } });
+    expect(store.getState()).toEqual({ app: {} });
   });
 });
