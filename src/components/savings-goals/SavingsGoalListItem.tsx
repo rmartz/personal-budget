@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { ChevronUp, ChevronDown, MoreHorizontal } from "lucide-react";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Bar } from "@/components/ui/bar";
-import { SAVINGS_GOAL_LIST_ITEM_COPY } from "./copy";
+import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
+import { SAVINGS_GOAL_LIST_COPY, SAVINGS_GOAL_LIST_ITEM_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -32,17 +33,32 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 export interface SavingsGoalListItemViewProps {
   goal: BudgetLedgerSavingsGoal;
   deleteDialogOpen: boolean;
+  isFirst: boolean;
+  isLast: boolean;
+  prevGoalId: string | undefined;
+  nextGoalId: string | undefined;
   onDeleteDialogOpenChange: (open: boolean) => void;
   onDeleteMenuClick: () => void;
   onDeleteConfirm: () => void;
+  onEdit: (
+    id: string,
+    data: { name: string; targetAmount: number },
+  ) => Promise<void>;
+  onReorder: (goalId: string, swapWithId: string) => Promise<void>;
 }
 
 export function SavingsGoalListItemView({
   goal,
   deleteDialogOpen,
+  isFirst,
+  isLast,
+  prevGoalId,
+  nextGoalId,
   onDeleteDialogOpenChange,
   onDeleteMenuClick,
   onDeleteConfirm,
+  onEdit,
+  onReorder,
 }: SavingsGoalListItemViewProps) {
   const progressPercent =
     goal.targetAmount > 0
@@ -70,7 +86,32 @@ export function SavingsGoalListItemView({
         </div>
       </td>
       <td className="px-4 py-3">
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center gap-1">
+          {!isFirst && prevGoalId !== undefined && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`${SAVINGS_GOAL_LIST_COPY.moveUpButton} ${goal.name}`}
+              onClick={() => {
+                void onReorder(goal.id, prevGoalId);
+              }}
+            >
+              <ChevronUp aria-hidden="true" />
+            </Button>
+          )}
+          {!isLast && nextGoalId !== undefined && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`${SAVINGS_GOAL_LIST_COPY.moveDownButton} ${goal.name}`}
+              onClick={() => {
+                void onReorder(goal.id, nextGoalId);
+              }}
+            >
+              <ChevronDown aria-hidden="true" />
+            </Button>
+          )}
+          <EditSavingsGoalDialog goal={goal} onSave={onEdit} />
           <DropdownMenuRoot>
             <DropdownMenuTrigger
               aria-label={SAVINGS_GOAL_LIST_ITEM_COPY.overflowMenuLabel}
@@ -123,12 +164,27 @@ export function SavingsGoalListItemView({
 
 interface SavingsGoalListItemProps {
   goal: BudgetLedgerSavingsGoal;
+  isFirst: boolean;
+  isLast: boolean;
+  prevGoalId: string | undefined;
+  nextGoalId: string | undefined;
   onDelete: (id: string) => void;
+  onEdit: (
+    id: string,
+    data: { name: string; targetAmount: number },
+  ) => Promise<void>;
+  onReorder: (goalId: string, swapWithId: string) => Promise<void>;
 }
 
 export function SavingsGoalListItem({
   goal,
+  isFirst,
+  isLast,
+  prevGoalId,
+  nextGoalId,
   onDelete,
+  onEdit,
+  onReorder,
 }: SavingsGoalListItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -145,9 +201,15 @@ export function SavingsGoalListItem({
     <SavingsGoalListItemView
       goal={goal}
       deleteDialogOpen={deleteDialogOpen}
+      isFirst={isFirst}
+      isLast={isLast}
+      prevGoalId={prevGoalId}
+      nextGoalId={nextGoalId}
       onDeleteDialogOpenChange={setDeleteDialogOpen}
       onDeleteMenuClick={handleDeleteMenuClick}
       onDeleteConfirm={handleDeleteConfirm}
+      onEdit={onEdit}
+      onReorder={onReorder}
     />
   );
 }

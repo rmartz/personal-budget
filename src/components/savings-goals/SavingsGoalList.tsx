@@ -8,11 +8,18 @@ import { SAVINGS_GOAL_LIST_COPY } from "./copy";
 export interface SavingsGoalListViewProps {
   goals: BudgetLedgerSavingsGoal[];
   onDelete: (id: string) => void;
+  onEdit: (
+    id: string,
+    data: { name: string; targetAmount: number },
+  ) => Promise<void>;
+  onReorder: (goalId: string, swapWithId: string) => Promise<void>;
 }
 
 export function SavingsGoalListView({
   goals,
   onDelete,
+  onEdit,
+  onReorder,
 }: SavingsGoalListViewProps) {
   const sorted = [...goals].sort((a, b) => a.priority - b.priority);
 
@@ -45,17 +52,32 @@ export function SavingsGoalListView({
                 <th className="px-4 py-3">
                   {SAVINGS_GOAL_LIST_COPY.columnProgress}
                 </th>
-                <th className="px-4 py-3" />
+                <th className="px-4 py-3">
+                  {SAVINGS_GOAL_LIST_COPY.columnActions}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {sorted.map((goal) => (
-                <SavingsGoalListItem
-                  key={goal.id}
-                  goal={goal}
-                  onDelete={onDelete}
-                />
-              ))}
+              {sorted.map((goal, index) => {
+                const isFirst = index === 0;
+                const isLast = index === sorted.length - 1;
+                const prevGoal = isFirst ? undefined : sorted[index - 1];
+                const nextGoal = isLast ? undefined : sorted[index + 1];
+
+                return (
+                  <SavingsGoalListItem
+                    key={goal.id}
+                    goal={goal}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
+                    onReorder={onReorder}
+                    isFirst={isFirst}
+                    isLast={isLast}
+                    prevGoalId={prevGoal?.id}
+                    nextGoalId={nextGoal?.id}
+                  />
+                );
+              })}
             </tbody>
           </table>
         </Card>

@@ -14,12 +14,18 @@ const meta: Meta<typeof SavingsGoalListItemView> = {
     ),
   ],
   args: {
+    isFirst: false,
+    isLast: false,
+    prevGoalId: "goal-0",
+    nextGoalId: "goal-2",
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onDeleteDialogOpenChange: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onDeleteMenuClick: () => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onDeleteConfirm: () => {},
+    onEdit: () => Promise.resolve(),
+    onReorder: () => Promise.resolve(),
   },
 };
 
@@ -39,6 +45,24 @@ export const Default: Story = {
   args: {
     goal,
     deleteDialogOpen: false,
+  },
+};
+
+export const FirstItem: Story = {
+  args: {
+    goal,
+    deleteDialogOpen: false,
+    isFirst: true,
+    prevGoalId: undefined,
+  },
+};
+
+export const LastItem: Story = {
+  args: {
+    goal,
+    deleteDialogOpen: false,
+    isLast: true,
+    nextGoalId: undefined,
   },
 };
 
