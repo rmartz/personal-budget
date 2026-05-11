@@ -111,7 +111,6 @@ export default function LedgerDetailPage() {
           initialDate={editingTransaction.date}
           initialAmount={editingTransaction.amount}
           initialDescription={editingTransaction.description}
-          transactionType={editingTransaction.type}
         />
       )}
     </div>

@@ -9,14 +9,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
+import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { EDIT_TRANSACTION_DIALOG_COPY } from "./EditTransactionDialog.copy";
 
-export interface EditTransactionInput {
-  date: Date;
-  amount: number;
-  description: string;
-}
+export type EditTransactionInput = Pick<
+  BudgetLedgerTransaction,
+  "date" | "amount" | "description"
+>;
 
 export interface EditTransactionDialogViewProps {
   open: boolean;
@@ -32,7 +31,6 @@ export interface EditTransactionDialogViewProps {
   descriptionError: string | undefined;
   submitError: string | undefined;
   onSubmit: () => void;
-  transactionType: BudgetLedgerTransactionType;
 }
 
 export function EditTransactionDialogView({
@@ -193,11 +191,13 @@ export interface EditTransactionDialogProps {
   initialDate: Date;
   initialAmount: number;
   initialDescription: string;
-  transactionType: BudgetLedgerTransactionType;
 }
 
 function toDateInputValue(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  const year = String(date.getFullYear()).padStart(4, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function EditTransactionDialog({
@@ -208,7 +208,6 @@ export function EditTransactionDialog({
   initialDate,
   initialAmount,
   initialDescription,
-  transactionType,
 }: EditTransactionDialogProps) {
   const [date, setDate] = useState(() => toDateInputValue(initialDate));
   const [amount, setAmount] = useState(() => String(initialAmount));
@@ -257,7 +256,7 @@ export function EditTransactionDialog({
 
     try {
       await onSubmit({
-        date: new Date(date),
+        date: new Date(date + "T00:00:00"),
         amount: parsedAmount,
         description: description.trim(),
       });
@@ -288,7 +287,6 @@ export function EditTransactionDialog({
       descriptionError={descriptionError}
       submitError={submitError}
       onSubmit={() => void handleSubmit()}
-      transactionType={transactionType}
     />
   );
 }

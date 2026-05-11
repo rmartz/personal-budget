@@ -1,12 +1,17 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { updateTransaction } from "@/services/transactions";
-import type { EditTransactionInput } from "@/components/ledger-transactions/EditTransactionDialog";
+
+type UpdateTransactionInput = Pick<
+  BudgetLedgerTransaction,
+  "date" | "amount" | "description"
+>;
 
 interface UpdateTransactionArgs {
   id: string;
-  data: EditTransactionInput;
+  data: UpdateTransactionInput;
 }
 
 export function useUpdateTransaction(uid: string, ledgerId: string) {

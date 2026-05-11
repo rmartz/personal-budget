@@ -1,10 +1,18 @@
 "use client";
 
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { EditTransactionDialogView } from "./EditTransactionDialog";
+import {
+  render,
+  screen,
+  cleanup,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
+import {
+  EditTransactionDialog,
+  EditTransactionDialogView,
+} from "./EditTransactionDialog";
 import { EDIT_TRANSACTION_DIALOG_COPY } from "./EditTransactionDialog.copy";
-import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 
 afterEach(cleanup);
 
@@ -22,7 +30,15 @@ const defaultProps = {
   descriptionError: undefined,
   submitError: undefined,
   onSubmit: vi.fn(),
-  transactionType: BudgetLedgerTransactionType.Expense,
+};
+
+const containerDefaultProps = {
+  open: true,
+  onOpenChange: vi.fn(),
+  isSubmitting: false,
+  initialDate: new Date("2024-03-15T00:00:00"),
+  initialAmount: 42.5,
+  initialDescription: "Coffee",
 };
 
 describe("EditTransactionDialog — An edit action on each transaction row opens a pre-populated edit dialog", () => {
@@ -232,5 +248,146 @@ describe("EditTransactionDialog — All user-facing strings in a co-located copy
     expect(
       screen.getByText(EDIT_TRANSACTION_DIALOG_COPY.submitButton),
     ).toBeDefined();
+  });
+});
+
+describe("EditTransactionDialog container — validation", () => {
+  it("shows the amount-required error when the amount is empty on submit", () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <EditTransactionDialog
+        {...containerDefaultProps}
+        initialAmount={42.5}
+        onSubmit={onSubmit}
+      />,
+    );
+    fireEvent.change(
+      screen.getByLabelText(EDIT_TRANSACTION_DIALOG_COPY.amountLabel),
+      { target: { value: "" } },
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: EDIT_TRANSACTION_DIALOG_COPY.submitButton,
+      }),
+    );
+    expect(
+      screen.getByText(EDIT_TRANSACTION_DIALOG_COPY.amountRequiredError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("shows the amount-invalid error when the amount is not a positive number", () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <EditTransactionDialog {...containerDefaultProps} onSubmit={onSubmit} />,
+    );
+    fireEvent.change(
+      screen.getByLabelText(EDIT_TRANSACTION_DIALOG_COPY.amountLabel),
+      { target: { value: "-5" } },
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: EDIT_TRANSACTION_DIALOG_COPY.submitButton,
+      }),
+    );
+    expect(
+      screen.getByText(EDIT_TRANSACTION_DIALOG_COPY.amountInvalidError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("shows the description-required error when the description is blank on submit", () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <EditTransactionDialog
+        {...containerDefaultProps}
+        initialDescription="Coffee"
+        onSubmit={onSubmit}
+      />,
+    );
+    fireEvent.change(
+      screen.getByLabelText(EDIT_TRANSACTION_DIALOG_COPY.descriptionLabel),
+      { target: { value: "   " } },
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: EDIT_TRANSACTION_DIALOG_COPY.submitButton,
+      }),
+    );
+    expect(
+      screen.getByText(EDIT_TRANSACTION_DIALOG_COPY.descriptionRequiredError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("shows the submit error when onSubmit rejects", async () => {
+    const onSubmit = vi.fn().mockRejectedValue(new Error("boom"));
+    render(
+      <EditTransactionDialog {...containerDefaultProps} onSubmit={onSubmit} />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: EDIT_TRANSACTION_DIALOG_COPY.submitButton,
+      }),
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByText(EDIT_TRANSACTION_DIALOG_COPY.submitError),
+      ).toBeDefined();
+    });
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it("submits the parsed values and closes when onSubmit resolves", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const onOpenChange = vi.fn();
+    render(
+      <EditTransactionDialog
+        {...containerDefaultProps}
+        initialDate={new Date("2024-03-15T00:00:00")}
+        initialAmount={42.5}
+        initialDescription="Coffee"
+        onSubmit={onSubmit}
+        onOpenChange={onOpenChange}
+      />,
+    );
+    fireEvent.change(
+      screen.getByLabelText(EDIT_TRANSACTION_DIALOG_COPY.amountLabel),
+      { target: { value: "100" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText(EDIT_TRANSACTION_DIALOG_COPY.descriptionLabel),
+      { target: { value: "Rent" } },
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: EDIT_TRANSACTION_DIALOG_COPY.submitButton,
+      }),
+    );
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+    expect(onSubmit).toHaveBeenCalledWith({
+      date: new Date("2024-03-15T00:00:00"),
+      amount: 100,
+      description: "Rent",
+    });
+    await waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  it("pre-populates the date input using local-date components (no timezone shift)", () => {
+    render(
+      <EditTransactionDialog
+        {...containerDefaultProps}
+        initialDate={new Date(2024, 2, 15, 0, 0, 0)}
+        onSubmit={vi.fn().mockResolvedValue(undefined)}
+      />,
+    );
+    const dateInput = screen.getByLabelText(
+      EDIT_TRANSACTION_DIALOG_COPY.dateLabel,
+    );
+    expect((dateInput as HTMLInputElement).value).toBe("2024-03-15");
   });
 });
