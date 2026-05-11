@@ -26,6 +26,7 @@ const defaultProps = {
   onAmountChange: vi.fn(),
   description: "Coffee",
   onDescriptionChange: vi.fn(),
+  dateError: undefined,
   amountError: undefined,
   descriptionError: undefined,
   submitError: undefined,
@@ -389,5 +390,70 @@ describe("EditTransactionDialog container — validation", () => {
       EDIT_TRANSACTION_DIALOG_COPY.dateLabel,
     );
     expect((dateInput as HTMLInputElement).value).toBe("2024-03-15");
+  });
+
+  it("shows the date-required error when the date is empty on submit", () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <EditTransactionDialog {...containerDefaultProps} onSubmit={onSubmit} />,
+    );
+    fireEvent.change(
+      screen.getByLabelText(EDIT_TRANSACTION_DIALOG_COPY.dateLabel),
+      { target: { value: "" } },
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: EDIT_TRANSACTION_DIALOG_COPY.submitButton,
+      }),
+    );
+    expect(
+      screen.getByText(EDIT_TRANSACTION_DIALOG_COPY.dateRequiredError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+});
+
+describe("EditTransactionDialog container — state sync across transactions", () => {
+  it("resyncs inputs when the initial* props change while the dialog stays mounted", () => {
+    const { rerender } = render(
+      <EditTransactionDialog
+        open={true}
+        onOpenChange={() => undefined}
+        onSubmit={() => Promise.resolve()}
+        isSubmitting={false}
+        initialDate={new Date(2024, 2, 15, 0, 0, 0)}
+        initialAmount={42.5}
+        initialDescription="Coffee"
+      />,
+    );
+    const descriptionInputA = screen.getByLabelText(
+      EDIT_TRANSACTION_DIALOG_COPY.descriptionLabel,
+    );
+    expect((descriptionInputA as HTMLInputElement).value).toBe("Coffee");
+
+    rerender(
+      <EditTransactionDialog
+        open={true}
+        onOpenChange={() => undefined}
+        onSubmit={() => Promise.resolve()}
+        isSubmitting={false}
+        initialDate={new Date(2024, 6, 4, 0, 0, 0)}
+        initialAmount={1000}
+        initialDescription="Paycheck"
+      />,
+    );
+
+    const dateInputB = screen.getByLabelText(
+      EDIT_TRANSACTION_DIALOG_COPY.dateLabel,
+    );
+    expect((dateInputB as HTMLInputElement).value).toBe("2024-07-04");
+    const amountInputB = screen.getByLabelText(
+      EDIT_TRANSACTION_DIALOG_COPY.amountLabel,
+    );
+    expect((amountInputB as HTMLInputElement).value).toBe("1000");
+    const descriptionInputB = screen.getByLabelText(
+      EDIT_TRANSACTION_DIALOG_COPY.descriptionLabel,
+    );
+    expect((descriptionInputB as HTMLInputElement).value).toBe("Paycheck");
   });
 });

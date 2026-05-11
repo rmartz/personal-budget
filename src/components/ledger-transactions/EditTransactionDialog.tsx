@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useId } from "react";
+import { useEffect, useState, useId } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,6 +27,7 @@ export interface EditTransactionDialogViewProps {
   onAmountChange: (value: string) => void;
   description: string;
   onDescriptionChange: (value: string) => void;
+  dateError: string | undefined;
   amountError: string | undefined;
   descriptionError: string | undefined;
   submitError: string | undefined;
@@ -43,6 +44,7 @@ export function EditTransactionDialogView({
   onAmountChange,
   description,
   onDescriptionChange,
+  dateError,
   amountError,
   descriptionError,
   submitError,
@@ -50,6 +52,7 @@ export function EditTransactionDialogView({
 }: EditTransactionDialogViewProps) {
   const baseId = useId();
   const dateInputId = `${baseId}-date`;
+  const dateErrorId = `${baseId}-date-error`;
   const amountInputId = `${baseId}-amount`;
   const amountErrorId = `${baseId}-amount-error`;
   const descriptionInputId = `${baseId}-description`;
@@ -85,12 +88,24 @@ export function EditTransactionDialogView({
               <input
                 id={dateInputId}
                 type="date"
+                required
                 value={date}
                 onChange={(e) => {
                   onDateChange(e.target.value);
                 }}
+                aria-invalid={dateError !== undefined}
+                aria-describedby={dateError ? dateErrorId : undefined}
                 className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
+              {dateError !== undefined && (
+                <p
+                  id={dateErrorId}
+                  role="alert"
+                  className="text-xs text-destructive"
+                >
+                  {dateError}
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-1.5">
               <label
@@ -212,16 +227,30 @@ export function EditTransactionDialog({
   const [date, setDate] = useState(() => toDateInputValue(initialDate));
   const [amount, setAmount] = useState(() => String(initialAmount));
   const [description, setDescription] = useState(initialDescription);
+  const [dateError, setDateError] = useState<string | undefined>(undefined);
   const [amountError, setAmountError] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState<string | undefined>(
     undefined,
   );
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
+  // Sync local state when the dialog is reused for a different transaction
+  // (initial* props change while the component stays mounted).
+  useEffect(() => {
+    setDate(toDateInputValue(initialDate));
+    setAmount(String(initialAmount));
+    setDescription(initialDescription);
+    setDateError(undefined);
+    setAmountError(undefined);
+    setDescriptionError(undefined);
+    setSubmitError(undefined);
+  }, [initialDate, initialAmount, initialDescription]);
+
   const handleClose = () => {
     setDate(toDateInputValue(initialDate));
     setAmount(String(initialAmount));
     setDescription(initialDescription);
+    setDateError(undefined);
     setAmountError(undefined);
     setDescriptionError(undefined);
     setSubmitError(undefined);
@@ -233,6 +262,18 @@ export function EditTransactionDialog({
     setSubmitError(undefined);
 
     let valid = true;
+
+    let parsedDate: Date | undefined;
+    if (date.trim().length === 0) {
+      setDateError(EDIT_TRANSACTION_DIALOG_COPY.dateRequiredError);
+      valid = false;
+    } else {
+      parsedDate = new Date(date + "T00:00:00");
+      if (isNaN(parsedDate.getTime())) {
+        setDateError(EDIT_TRANSACTION_DIALOG_COPY.dateInvalidError);
+        valid = false;
+      }
+    }
 
     const parsedAmount = parseFloat(amount);
     if (amount.trim().length === 0) {
@@ -250,13 +291,13 @@ export function EditTransactionDialog({
       valid = false;
     }
 
-    if (!valid) {
+    if (!valid || parsedDate === undefined) {
       return;
     }
 
     try {
       await onSubmit({
-        date: new Date(date + "T00:00:00"),
+        date: parsedDate,
         amount: parsedAmount,
         description: description.trim(),
       });
@@ -272,7 +313,10 @@ export function EditTransactionDialog({
       onClose={handleClose}
       isSubmitting={isSubmitting}
       date={date}
-      onDateChange={setDate}
+      onDateChange={(value) => {
+        setDate(value);
+        setDateError(undefined);
+      }}
       amount={amount}
       onAmountChange={(value) => {
         setAmount(value);
@@ -283,6 +327,7 @@ export function EditTransactionDialog({
         setDescription(value);
         setDescriptionError(undefined);
       }}
+      dateError={dateError}
       amountError={amountError}
       descriptionError={descriptionError}
       submitError={submitError}
