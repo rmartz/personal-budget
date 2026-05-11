@@ -261,13 +261,35 @@ describe("LedgerTransactionListView", () => {
       );
 
       const deleteButtons = screen.getAllByRole("button", {
-        name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+        name: new RegExp(`^${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}:`),
       });
       expect(deleteButtons.length).toBe(2);
     });
 
+    it("includes the transaction description in the delete button aria-label", () => {
+      const transactions = [makeTransaction({ description: "Electric bill" })];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
+        />,
+      );
+
+      expect(
+        screen.getByRole("button", {
+          name: `${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}: Electric bill`,
+        }),
+      ).toBeDefined();
+    });
+
     it("shows the confirmation dialog when delete is clicked", () => {
-      const transactions = [makeTransaction({ id: "tx-1" })];
+      const transactions = [
+        makeTransaction({ id: "tx-1", description: "Coffee" }),
+      ];
 
       render(
         <LedgerTransactionListView
@@ -281,7 +303,7 @@ describe("LedgerTransactionListView", () => {
 
       fireEvent.click(
         screen.getByRole("button", {
-          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+          name: `${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}: Coffee`,
         }),
       );
 
@@ -292,7 +314,9 @@ describe("LedgerTransactionListView", () => {
 
     it("calls onDeleteTransaction with the transaction id when confirmed", () => {
       const onDeleteTransaction = vi.fn();
-      const transactions = [makeTransaction({ id: "tx-abc" })];
+      const transactions = [
+        makeTransaction({ id: "tx-abc", description: "Coffee" }),
+      ];
 
       render(
         <LedgerTransactionListView
@@ -306,7 +330,7 @@ describe("LedgerTransactionListView", () => {
 
       fireEvent.click(
         screen.getByRole("button", {
-          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+          name: `${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}: Coffee`,
         }),
       );
 
@@ -319,7 +343,9 @@ describe("LedgerTransactionListView", () => {
 
     it("does not call onDeleteTransaction when the dialog is cancelled", () => {
       const onDeleteTransaction = vi.fn();
-      const transactions = [makeTransaction({ id: "tx-abc" })];
+      const transactions = [
+        makeTransaction({ id: "tx-abc", description: "Coffee" }),
+      ];
 
       render(
         <LedgerTransactionListView
@@ -333,7 +359,7 @@ describe("LedgerTransactionListView", () => {
 
       fireEvent.click(
         screen.getByRole("button", {
-          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+          name: `${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}: Coffee`,
         }),
       );
 
@@ -345,7 +371,9 @@ describe("LedgerTransactionListView", () => {
     });
 
     it("renders the permanent deletion warning in the confirmation dialog", () => {
-      const transactions = [makeTransaction({ id: "tx-1" })];
+      const transactions = [
+        makeTransaction({ id: "tx-1", description: "Coffee" }),
+      ];
 
       render(
         <LedgerTransactionListView
@@ -359,13 +387,85 @@ describe("LedgerTransactionListView", () => {
 
       fireEvent.click(
         screen.getByRole("button", {
-          name: LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel,
+          name: `${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}: Coffee`,
         }),
       );
 
       expect(
         screen.getByText(LEDGER_TRANSACTION_LIST_COPY.deleteConfirmDescription),
       ).toBeDefined();
+    });
+  });
+
+  describe("edit transaction", () => {
+    it("does not render an edit button when onEditTransaction is not provided", () => {
+      const transactions = [makeTransaction({ description: "Coffee" })];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
+        />,
+      );
+
+      expect(
+        screen.queryByRole("button", {
+          name: `${LEDGER_TRANSACTION_LIST_COPY.editButtonLabel}: Coffee`,
+        }),
+      ).toBeNull();
+    });
+
+    it("renders an edit button when onEditTransaction is provided", () => {
+      const transactions = [makeTransaction({ description: "Coffee" })];
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={transactions}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
+          onEditTransaction={() => undefined}
+        />,
+      );
+
+      expect(
+        screen.getByRole("button", {
+          name: `${LEDGER_TRANSACTION_LIST_COPY.editButtonLabel}: Coffee`,
+        }),
+      ).toBeDefined();
+    });
+
+    it("calls onEditTransaction with the row transaction when the edit button is clicked", () => {
+      const onEditTransaction = vi.fn();
+      const transaction = makeTransaction({
+        id: "tx-edit",
+        description: "Electric bill",
+      });
+
+      render(
+        <LedgerTransactionListView
+          ledgerName="Test Ledger"
+          transactions={[transaction]}
+          isLoading={false}
+          onAddExpense={() => undefined}
+          onDeleteTransaction={() => undefined}
+          onEditTransaction={onEditTransaction}
+        />,
+      );
+
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: `${LEDGER_TRANSACTION_LIST_COPY.editButtonLabel}: Electric bill`,
+        }),
+      );
+
+      expect(onEditTransaction).toHaveBeenCalledWith(
+        expect.objectContaining(transaction),
+      );
     });
   });
 });

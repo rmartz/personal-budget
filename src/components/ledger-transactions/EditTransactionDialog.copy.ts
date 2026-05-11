@@ -10,7 +10,6 @@ export const EDIT_TRANSACTION_DIALOG_COPY = {
   descriptionLabel: "Description",
   descriptionPlaceholder: "e.g. Groceries",
   descriptionRequiredError: "Description is required.",
-  editButton: "Edit",
   submitButton: "Save",
   submitError: "Failed to save. Please try again.",
   submittingButton: "Saving…",

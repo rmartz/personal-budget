@@ -189,14 +189,15 @@ export function LedgerTransactionListView({
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={
-                          LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel
-                        }
+                        aria-label={`${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}: ${tx.description}`}
                         onClick={() => {
                           handleDeleteClick(tx.id);
                         }}
                       >
-                        <Trash2 className="size-4 text-destructive" />
+                        <Trash2
+                          aria-hidden="true"
+                          className="size-4 text-destructive"
+                        />
                       </Button>
                     </div>
                   </td>
