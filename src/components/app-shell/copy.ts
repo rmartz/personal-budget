@@ -9,6 +9,7 @@ export const APP_SHELL_COPY = {
   linkProfile: "Profile",
   linkReconcile: "Reconcile",
   menuButtonLabel: "Open navigation menu",
+  mobileNavLabel: "Mobile navigation",
   moreLabel: "More",
   moreOverflowTitle: "More destinations",
   userMenuLabel: "Open user menu",

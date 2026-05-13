@@ -119,7 +119,7 @@ export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
       <main className="flex-1 pb-20 md:pb-0">{children}</main>
 
       <nav
-        aria-label="Mobile navigation"
+        aria-label={APP_SHELL_COPY.mobileNavLabel}
         className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-stretch border-t bg-background md:hidden"
       >
         {MOBILE_TABS.map((tab) => {
@@ -151,7 +151,7 @@ export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
 
       <Dialog open={overflowOpen} onOpenChange={setOverflowOpen}>
         <DialogPortal>
-          <DialogBackdrop />
+          <DialogBackdrop className="z-50" />
           <DialogPopup className="max-w-sm">
             <DialogTitle>{APP_SHELL_COPY.moreOverflowTitle}</DialogTitle>
             <ul className="mt-4 flex flex-col gap-1">

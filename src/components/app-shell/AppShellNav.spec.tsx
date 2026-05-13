@@ -103,6 +103,14 @@ describe("AppShellNavView — active-route styling", () => {
 });
 
 describe("AppShellNavView — mobile bottom tab bar", () => {
+  it("renders the mobile nav with the correct aria-label from copy", () => {
+    render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
+    const nav = screen.getByRole("navigation", {
+      name: APP_SHELL_COPY.mobileNavLabel,
+    });
+    expect(nav).toBeDefined();
+  });
+
   it("renders a mobile Reconcile tab link pointing to /reconcile", () => {
     render(<AppShellNavView pathname="/ledgers">content</AppShellNavView>);
     const tabs = screen
