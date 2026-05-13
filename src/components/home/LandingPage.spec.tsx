@@ -42,9 +42,11 @@ describe("LandingPage — CTAs", () => {
     expect((link as HTMLAnchorElement).getAttribute("href")).toBe("/sign-up");
   });
 
-  it("renders a How it works element", () => {
+  it("renders a How it works button", () => {
     render(<LandingPage />);
-    expect(screen.getByText(LANDING_PAGE_COPY.secondaryCta)).toBeDefined();
+    expect(
+      screen.getByRole("button", { name: LANDING_PAGE_COPY.secondaryCta }),
+    ).toBeDefined();
   });
 });
 

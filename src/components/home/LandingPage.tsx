@@ -22,9 +22,9 @@ export function LandingPage() {
             <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
               {LANDING_PAGE_COPY.primaryCta}
             </Link>
-            <span className="text-sm text-muted-foreground">
+            <button type="button" className="text-sm text-muted-foreground">
               {LANDING_PAGE_COPY.secondaryCta}
-            </span>
+            </button>
           </div>
         </div>
         <div className="mt-16 flex w-full max-w-4xl items-center justify-center rounded-xl border bg-muted px-6 py-20 text-sm text-muted-foreground">
