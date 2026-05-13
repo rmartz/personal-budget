@@ -79,7 +79,7 @@ export function ReconcileView() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <p className="mb-2 text-xs font-medium text-muted-foreground">
-              Account balances
+              {RECONCILE_VIEW_COPY.cashFlowAccountBalancesLabel}
             </p>
             <ul className="space-y-2">
               {PLACEHOLDER_CASH_FLOW_ACCOUNTS.map((row) => (
@@ -92,7 +92,7 @@ export function ReconcileView() {
           </div>
           <div>
             <p className="mb-2 text-xs font-medium text-muted-foreground">
-              Recommended actions
+              {RECONCILE_VIEW_COPY.cashFlowRecommendedActionsLabel}
             </p>
             <ul className="space-y-2">
               {PLACEHOLDER_CASH_FLOW_ACTIONS.map((row) => (
@@ -129,9 +129,15 @@ export function ReconcileView() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-xs text-muted-foreground">
-                <th className="pb-2 text-left font-medium">Account</th>
-                <th className="pb-2 text-right font-medium">Balance</th>
-                <th className="pb-2 text-right font-medium">Status</th>
+                <th className="pb-2 text-left font-medium">
+                  {RECONCILE_VIEW_COPY.inputsTableAccountHeader}
+                </th>
+                <th className="pb-2 text-right font-medium">
+                  {RECONCILE_VIEW_COPY.inputsTableBalanceHeader}
+                </th>
+                <th className="pb-2 text-right font-medium">
+                  {RECONCILE_VIEW_COPY.inputsTableStatusHeader}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -140,7 +146,9 @@ export function ReconcileView() {
                   <td className="py-2">{row.account}</td>
                   <td className="py-2 text-right">{row.balance}</td>
                   <td className="py-2 text-right text-xs text-muted-foreground">
-                    {row.confirmed ? "✓ confirmed" : "pending"}
+                    {row.confirmed
+                      ? RECONCILE_VIEW_COPY.inputsTableStatusConfirmed
+                      : RECONCILE_VIEW_COPY.inputsTableStatusPending}
                   </td>
                 </tr>
               ))}

@@ -3,7 +3,7 @@
 // use once the real reconciliation service layer is built.
 
 export interface ReconciliationData {
-  month: string;
+  month?: string;
 }
 
 export function useReconciliation(
