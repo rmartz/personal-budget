@@ -1,4 +1,12 @@
-import { getDatabase, ref, get, set, push, remove } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  get,
+  set,
+  push,
+  remove,
+  update,
+} from "firebase/database";
 import { getClientApp } from "@/lib/firebase/client";
 import {
   budgetLedgerTransactionToFirebase,
@@ -47,6 +55,19 @@ export async function createTransaction(
   }
   await set(newRef, budgetLedgerTransactionToFirebase(data));
   return { id: newRef.key, ledgerId, ...data };
+}
+
+export async function updateTransaction(
+  uid: string,
+  ledgerId: string,
+  id: string,
+  data: Pick<BudgetLedgerTransaction, "date" | "amount" | "description">,
+): Promise<void> {
+  await update(transactionRef(uid, ledgerId, id), {
+    date: data.date.toISOString(),
+    amount: data.amount,
+    description: data.description,
+  });
 }
 
 export async function deleteTransaction(

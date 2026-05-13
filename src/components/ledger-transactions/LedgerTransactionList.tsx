@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,7 @@ export interface LedgerTransactionListViewProps {
   onAddExpense: () => void;
   onAddDeposit?: () => void;
   onDeleteTransaction: (id: string) => void;
+  onEditTransaction?: (transaction: BudgetLedgerTransaction) => void;
 }
 
 export function LedgerTransactionListView({
@@ -65,6 +66,7 @@ export function LedgerTransactionListView({
   onAddExpense,
   onAddDeposit,
   onDeleteTransaction,
+  onEditTransaction,
 }: LedgerTransactionListViewProps) {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | undefined>(
     undefined,
@@ -144,7 +146,11 @@ export function LedgerTransactionListView({
                 <th className="px-4 py-3 text-right">
                   {LEDGER_TRANSACTION_LIST_COPY.columnBalance}
                 </th>
-                <th className="px-4 py-3" />
+                <th className="px-4 py-3">
+                  <span className="sr-only">
+                    {LEDGER_TRANSACTION_LIST_COPY.columnActions}
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -167,18 +173,33 @@ export function LedgerTransactionListView({
                     {currencyFormatter.format(tx.runningBalance)}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={
-                        LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel
-                      }
-                      onClick={() => {
-                        handleDeleteClick(tx.id);
-                      }}
-                    >
-                      <Trash2 className="size-4 text-destructive" />
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      {onEditTransaction !== undefined && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`${LEDGER_TRANSACTION_LIST_COPY.editButtonLabel}: ${tx.description}`}
+                          onClick={() => {
+                            onEditTransaction(tx);
+                          }}
+                        >
+                          <Pencil aria-hidden="true" className="size-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`${LEDGER_TRANSACTION_LIST_COPY.deleteButtonLabel}: ${tx.description}`}
+                        onClick={() => {
+                          handleDeleteClick(tx.id);
+                        }}
+                      >
+                        <Trash2
+                          aria-hidden="true"
+                          className="size-4 text-destructive"
+                        />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}

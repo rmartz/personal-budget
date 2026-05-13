@@ -1,0 +1,17 @@
+export const EDIT_TRANSACTION_DIALOG_COPY = {
+  amountInvalidError: "Amount must be a positive number.",
+  amountLabel: "Amount",
+  amountPlaceholder: "0.00",
+  amountRequiredError: "Amount is required.",
+  cancelButton: "Cancel",
+  dateInvalidError: "Date is invalid.",
+  dateLabel: "Date",
+  dateRequiredError: "Date is required.",
+  descriptionLabel: "Description",
+  descriptionPlaceholder: "e.g. Groceries",
+  descriptionRequiredError: "Description is required.",
+  submitButton: "Save",
+  submitError: "Failed to save. Please try again.",
+  submittingButton: "Saving…",
+  title: "Edit Transaction",
+} as const;

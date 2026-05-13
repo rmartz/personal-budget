@@ -7,17 +7,27 @@ vi.mock("firebase/database", () => ({
   set: vi.fn(),
   push: vi.fn(),
   remove: vi.fn(),
+  update: vi.fn(),
 }));
 
 vi.mock("@/lib/firebase/client", () => ({
   getClientApp: vi.fn(() => ({ name: "mock-app" })),
 }));
 
-import { getDatabase, ref, get, set, push, remove } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  get,
+  set,
+  push,
+  remove,
+  update,
+} from "firebase/database";
 import {
   getTransactions,
   createTransaction,
   deleteTransaction,
+  updateTransaction,
 } from "./transactions";
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 
@@ -103,5 +113,45 @@ describe("deleteTransaction", () => {
     vi.mocked(remove).mockResolvedValue(undefined);
     await deleteTransaction("uid-1", "ledger-1", "tx-1");
     expect(remove).toHaveBeenCalledWith(mockRef);
+  });
+});
+
+describe("updateTransaction", () => {
+  it("calls update on the transaction ref with the partial payload", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    const date = new Date("2024-03-01T00:00:00.000Z");
+    await updateTransaction("uid-1", "ledger-1", "tx-1", {
+      date,
+      amount: 250,
+      description: "Updated coffee",
+    });
+    expect(ref).toHaveBeenCalledWith(
+      mockDb,
+      "users/uid-1/budgetLedgerTransactions/ledger-1/tx-1",
+    );
+    expect(update).toHaveBeenCalledWith(mockRef, {
+      date: "2024-03-01T00:00:00.000Z",
+      amount: 250,
+      description: "Updated coffee",
+    });
+  });
+
+  it("does not include a type field in the update payload", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    await updateTransaction("uid-1", "ledger-1", "tx-1", {
+      date: new Date("2024-03-01T00:00:00.000Z"),
+      amount: 250,
+      description: "Updated coffee",
+    });
+    const payload = vi.mocked(update).mock.calls[0]![1] as Record<
+      string,
+      unknown
+    >;
+    expect(Object.keys(payload).sort()).toEqual([
+      "amount",
+      "date",
+      "description",
+    ]);
+    expect(payload["type"]).toBeUndefined();
   });
 });
