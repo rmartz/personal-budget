@@ -37,8 +37,7 @@ export function LedgerList({
 
   const summaryLine = LEDGERS_PAGE_COPY.headerSummary(
     ledgers.length,
-    currencyFormatter.format(totalCash),
-    currencyFormatter.format(totalInvested),
+    currencyFormatter.format(totalBalance),
   );
 
   return (
@@ -102,6 +101,9 @@ export function LedgerList({
                   </th>
                   <th className="px-4 py-3 text-right">
                     {LEDGERS_PAGE_COPY.columnGoals}
+                  </th>
+                  <th className="px-4 py-3 text-right">
+                    {LEDGERS_PAGE_COPY.columnActivity}
                   </th>
                   <th className="px-4 py-3" />
                 </tr>

@@ -27,6 +27,7 @@ export const EDIT_LEDGER_DIALOG_COPY = {
 } as const;
 
 export const LEDGER_LIST_ITEM_COPY = {
+  activityNone: "—",
   deleteCancelButton: "Cancel",
   deleteConfirmButton: "Delete",
   deleteConfirmDescription:
@@ -39,6 +40,7 @@ export const LEDGER_LIST_ITEM_COPY = {
 
 export const LEDGERS_PAGE_COPY = {
   capUsageBarLabel: (name: string) => `Cash cap usage for ${name}`,
+  columnActivity: "Activity",
   columnCapUsage: "Cap usage",
   columnCash: "Cash",
   columnGoals: "Goals",
@@ -46,14 +48,14 @@ export const LEDGERS_PAGE_COPY = {
   columnLedger: "Ledger",
   columnTotal: "Total",
   emptyStateMessage: "You don't have any ledgers yet.",
-  headerSummary: (count: number, cash: string, invested: string) =>
-    `${String(count)} ${count === 1 ? "ledger" : "ledgers"} · ${cash} cash · ${invested} invested`,
+  headerSummary: (count: number, total: string) =>
+    `${String(count)} active · ${total} total`,
   importButton: "Import",
   loadingMessage: "Loading ledgers…",
   mobileTotalLabel: "Total",
-  newLedgerButton: "New Ledger",
+  newLedgerButton: "+ New ledger",
   noCashCapLabel: "no cash cap",
-  title: "Budget Ledgers",
+  title: "Ledgers",
 } as const;
 
 export const NEW_LEDGER_DIALOG_COPY = {

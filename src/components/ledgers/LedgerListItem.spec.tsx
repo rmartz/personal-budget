@@ -233,7 +233,9 @@ describe("LedgerListItemView", () => {
           </tbody>
         </table>,
       );
-      expect(screen.getByText(LEDGER_LIST_ITEM_COPY.goalsNone)).toBeDefined();
+      expect(
+        screen.getAllByText(LEDGER_LIST_ITEM_COPY.goalsNone).length,
+      ).toBeGreaterThan(0);
     });
 
     it("renders the goals count when goalsCount is non-zero", () => {

@@ -89,6 +89,10 @@ export function LedgerListItemView({
           ? ledger.goalsCount
           : LEDGER_LIST_ITEM_COPY.goalsNone}
       </td>
+      {/* TODO: Replace placeholder with real activity data (epic #18) */}
+      <td className="px-4 py-3 text-right text-sm text-muted-foreground">
+        {LEDGER_LIST_ITEM_COPY.activityNone}
+      </td>
       <td className="px-4 py-3">
         <div className="flex items-center justify-end gap-2">
           <EditLedgerDialog
