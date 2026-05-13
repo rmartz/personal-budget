@@ -1,0 +1,15 @@
+export const APP_SHELL_COPY = {
+  brand: "Ledgerly",
+  linkAccounts: "Accounts",
+  linkAnnuities: "Annuities",
+  linkGoals: "Goals",
+  linkInvest: "Invest",
+  linkInvestments: "Investments",
+  linkLedgers: "Ledgers",
+  linkProfile: "Profile",
+  linkReconcile: "Reconcile",
+  menuButtonLabel: "Open navigation menu",
+  moreLabel: "More",
+  moreOverflowTitle: "More destinations",
+  userMenuLabel: "Open user menu",
+} as const;
