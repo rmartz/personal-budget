@@ -1,3 +1,15 @@
+export const PROFILE_SETTINGS_COPY = {
+  accountEyebrow: "ACCOUNT",
+  currencyDefault: "USD",
+  rowChangePassword: "Change password",
+  rowCurrency: "Currency",
+  rowDisplayName: "Display name",
+  rowNotifications: "Notifications",
+  rowSignOut: "Sign out",
+  rowTimeZone: "Time zone",
+  title: "Profile",
+} as const;
+
 export const USER_PROFILE_COPY = {
   changeEmailButton: "Update Email",
   changeEmailLabel: "New Email Address",
