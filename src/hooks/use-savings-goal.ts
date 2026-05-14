@@ -33,6 +33,9 @@ export function useSavingsGoal(
       return;
     }
 
+    setIsLoading(true);
+    setError(undefined);
+
     const db = getDatabase(getClientApp());
     const allGoalsRef = ref(db, `users/${uid}/budgetLedgerSavingsGoals`);
 

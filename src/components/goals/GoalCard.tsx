@@ -20,9 +20,10 @@ export interface GoalCardProps {
 
 export function GoalCard({ goal, ledgerName }: GoalCardProps) {
   const isFullyFunded = goal.fundedAmount >= goal.targetAmount;
-  const progressPercent =
-    goal.targetAmount > 0
-      ? Math.min(100, Math.round((goal.fundedAmount / goal.targetAmount) * 100))
+  const progressPercent = isFullyFunded
+    ? 100
+    : goal.targetAmount > 0
+      ? Math.min(99, Math.floor((goal.fundedAmount / goal.targetAmount) * 100))
       : 0;
   const amountToGo = Math.max(0, goal.targetAmount - goal.fundedAmount);
 

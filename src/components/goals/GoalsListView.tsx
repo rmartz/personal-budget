@@ -31,13 +31,15 @@ export function GoalsListView({
           <h1 className="text-2xl font-semibold tracking-tight">
             {GOALS_LIST_COPY.title}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {GOALS_LIST_COPY.goalCount(goals.length)}
-            {" · "}
-            {GOALS_LIST_COPY.fullyFundedCount(fullyFunded)}
-            {" · "}
-            {GOALS_LIST_COPY.zipfProgress}
-          </p>
+          {!isLoading && (
+            <p className="text-sm text-muted-foreground">
+              {GOALS_LIST_COPY.goalCount(goals.length)}
+              {" · "}
+              {GOALS_LIST_COPY.fullyFundedCount(fullyFunded)}
+              {" · "}
+              {GOALS_LIST_COPY.zipfProgress}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <button disabled className="text-sm text-muted-foreground">
