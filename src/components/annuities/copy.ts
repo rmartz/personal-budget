@@ -1,3 +1,36 @@
+export const ANNUITY_CARD_COPY = {
+  balanceTrendChartPlaceholder: "Balance trend chart",
+  balanceTrendNowLabel: "Now",
+  balanceTrendPayoffLabel: "Payoff",
+  balanceTrendPlaceholderValue: "—",
+  balanceTrendStartedLabel: "Started",
+  balanceTrendTitle: (annuityName: string) =>
+    `Balance trend · ${annuityName} principal`,
+  columnBalance: "Balance",
+  columnInterest: "Interest",
+  columnMonth: "Month",
+  columnPayment: "Payment",
+  columnPrincipal: "Principal",
+  monthlyModeFlatSublabel: "monthly · Flat",
+  monthlyModePVDerivedSublabel: "monthly · PV-derived",
+  paymentHistoryEmpty: "No payment history yet.",
+  paymentHistoryTitle: (annuityName: string) =>
+    `${annuityName} · payment history`,
+  termRemainingIndefinite: "Ongoing",
+  termRemainingLabel: "Term remaining",
+  termRemainingMonths: (months: number) => {
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    if (years > 0 && remainingMonths > 0) {
+      return `${String(years)} yr ${String(remainingMonths)} mo left`;
+    } else if (years > 0) {
+      return `${String(years)} yr left`;
+    } else {
+      return `${String(remainingMonths)} mo left`;
+    }
+  },
+} as const;
+
 export const ANNUITY_LIST_COPY = {
   columnMonthly: "Monthly",
   columnName: "Name",
@@ -5,6 +38,8 @@ export const ANNUITY_LIST_COPY = {
   emptyStateMessage: "You don't have any annuities yet.",
   indefiniteTerm: "Indefinite",
   newAnnuityButton: "New Annuity",
+  summaryLine: (count: number, total: string) =>
+    `${String(count)} active · ${total} / month total`,
   termSuffix: "months",
   title: "Annuities",
 } as const;

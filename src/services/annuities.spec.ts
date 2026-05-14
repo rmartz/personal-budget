@@ -24,6 +24,8 @@ import {
   update,
 } from "firebase/database";
 
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
+
 import {
   createAnnuity,
   deleteAnnuity,
@@ -86,6 +88,7 @@ describe("createAnnuity", () => {
       monthlyAmount: 10,
       startDate: new Date("2024-01-01T00:00:00.000Z"),
       durationMonths: undefined,
+      monthlyMode: AnnuityMonthlyMode.Flat,
     });
 
     expect(push).toHaveBeenCalledWith(mockRef);
@@ -101,6 +104,7 @@ describe("createAnnuity", () => {
         monthlyAmount: 50,
         startDate: new Date(),
         durationMonths: 12,
+        monthlyMode: AnnuityMonthlyMode.Flat,
       }),
     ).rejects.toThrow("Failed to generate annuity key");
   });
@@ -136,6 +140,26 @@ describe("updateAnnuity", () => {
       unknown
     >;
     expect("durationMonths" in calledWith).toBe(false);
+  });
+
+  it("serializes monthlyMode when provided", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    await updateAnnuity("uid-1", "annuity-1", {
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+    });
+    expect(update).toHaveBeenCalledWith(mockRef, {
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+    });
+  });
+
+  it("omits monthlyMode from the update when not provided", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    await updateAnnuity("uid-1", "annuity-1", { monthlyAmount: 20 });
+    const calledWith = vi.mocked(update).mock.calls[0]![1] as Record<
+      string,
+      unknown
+    >;
+    expect("monthlyMode" in calledWith).toBe(false);
   });
 });
 

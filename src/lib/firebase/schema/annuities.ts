@@ -1,8 +1,14 @@
+export enum AnnuityMonthlyMode {
+  Flat = "flat",
+  PVDerived = "pv-derived",
+}
+
 export interface FirebaseAnnuity {
   name: string;
   monthlyAmount: number;
   startDate: string;
   durationMonths: number | null;
+  monthlyMode?: AnnuityMonthlyMode;
 }
 
 export interface Annuity {
@@ -11,6 +17,7 @@ export interface Annuity {
   monthlyAmount: number;
   startDate: Date;
   durationMonths: number | undefined;
+  monthlyMode: AnnuityMonthlyMode;
 }
 
 export function annuityToFirebase(
@@ -21,6 +28,7 @@ export function annuityToFirebase(
     monthlyAmount: annuity.monthlyAmount,
     startDate: annuity.startDate.toISOString(),
     durationMonths: annuity.durationMonths ?? null,
+    monthlyMode: annuity.monthlyMode,
   };
 }
 
@@ -31,5 +39,6 @@ export function firebaseToAnnuity(id: string, data: FirebaseAnnuity): Annuity {
     monthlyAmount: data.monthlyAmount,
     startDate: new Date(data.startDate),
     durationMonths: data.durationMonths ?? undefined,
+    monthlyMode: data.monthlyMode ?? AnnuityMonthlyMode.Flat,
   };
 }
