@@ -1,0 +1,58 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { getClientApp } from "@/lib/firebase/client";
+import {
+  firebaseToBudgetLedgerSavingsGoal,
+  type FirebaseBudgetLedgerSavingsGoal,
+  type BudgetLedgerSavingsGoal,
+} from "@/lib/firebase/schema/savings-goals";
+
+export function useAllSavingsGoals(uid: string) {
+  const [goals, setGoals] = useState<BudgetLedgerSavingsGoal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  useEffect(() => {
+    if (!uid) {
+      setGoals([]);
+      setIsLoading(false);
+      return;
+    }
+
+    const db = getDatabase(getClientApp());
+    const allGoalsRef = ref(db, `users/${uid}/budgetLedgerSavingsGoals`);
+
+    const unsubscribe = onValue(
+      allGoalsRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          setGoals([]);
+        } else {
+          const data = snapshot.val() as Record<
+            string,
+            Record<string, FirebaseBudgetLedgerSavingsGoal>
+          >;
+          const flattened: BudgetLedgerSavingsGoal[] = Object.entries(
+            data,
+          ).flatMap(([ledgerId, ledgerGoals]) =>
+            Object.entries(ledgerGoals).map(([id, entry]) =>
+              firebaseToBudgetLedgerSavingsGoal(id, ledgerId, entry),
+            ),
+          );
+          setGoals(flattened);
+        }
+        setIsLoading(false);
+      },
+      (err) => {
+        setError(err);
+        setIsLoading(false);
+      },
+    );
+
+    return unsubscribe;
+  }, [uid]);
+
+  return { goals, isLoading, error };
+}
