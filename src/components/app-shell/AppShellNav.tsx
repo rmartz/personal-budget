@@ -55,6 +55,9 @@ export interface AppShellNavViewProps {
 
 export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
   const [overflowOpen, setOverflowOpen] = useState(false);
+  const moreActive = OVERFLOW_LINKS.some((link) =>
+    isActiveRoute(pathname, link.href),
+  );
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -142,10 +145,14 @@ export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
         })}
         <button
           type="button"
+          aria-current={moreActive ? "page" : undefined}
           onClick={() => {
             setOverflowOpen(true);
           }}
-          className="flex flex-1 items-center justify-center text-xs text-muted-foreground"
+          className={cn(
+            "flex flex-1 items-center justify-center text-xs",
+            moreActive ? "font-semibold" : "text-muted-foreground",
+          )}
         >
           {APP_SHELL_COPY.moreLabel}
         </button>

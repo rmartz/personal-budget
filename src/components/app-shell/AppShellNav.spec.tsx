@@ -185,6 +185,34 @@ describe("AppShellNavView — More overflow", () => {
   });
 });
 
+describe("AppShellNavView — More tab active-route styling", () => {
+  it("marks the More button as active when pathname is an overflow destination like /profile", () => {
+    render(<AppShellNavView pathname="/profile">content</AppShellNavView>);
+    const moreBtn = screen.getByRole("button", {
+      name: APP_SHELL_COPY.moreLabel,
+    });
+    expect(moreBtn.getAttribute("aria-current")).toBe("page");
+  });
+
+  it("marks the More button as active for nested paths under an overflow destination like /accounts/savings", () => {
+    render(
+      <AppShellNavView pathname="/accounts/savings">content</AppShellNavView>,
+    );
+    const moreBtn = screen.getByRole("button", {
+      name: APP_SHELL_COPY.moreLabel,
+    });
+    expect(moreBtn.getAttribute("aria-current")).toBe("page");
+  });
+
+  it("does not mark the More button as active when pathname is a primary tab like /reconcile", () => {
+    render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
+    const moreBtn = screen.getByRole("button", {
+      name: APP_SHELL_COPY.moreLabel,
+    });
+    expect(moreBtn.getAttribute("aria-current")).not.toBe("page");
+  });
+});
+
 describe("AppShellNavView — children render", () => {
   it("renders the child content inside the shell", () => {
     render(
