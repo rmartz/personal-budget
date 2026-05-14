@@ -67,12 +67,11 @@ export const LastItem: Story = {
   },
 };
 
-// Shows the row state just before the delete menu is opened (overflow button visible).
-// Click "More options" in Storybook to see the dropdown menu.
 export const DeleteMenuOpen: Story = {
   args: {
     goal,
     deleteDialogOpen: false,
+    dropdownOpen: true,
   },
 };
 
