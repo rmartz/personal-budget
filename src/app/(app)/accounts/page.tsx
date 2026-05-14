@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
-import { useAccounts } from "@/hooks/use-accounts";
 import { AccountsView } from "@/components/accounts/AccountsView";
+import { useAccounts } from "@/hooks/use-accounts";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AccountsPage() {
   const { user, loading: authLoading } = useAuth();

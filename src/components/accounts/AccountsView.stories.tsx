@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { AccountsView } from "./AccountsView";
+
 import { AccountTier } from "@/lib/firebase/schema/accounts";
+
+import { AccountsView } from "./AccountsView";
 
 const meta: Meta<typeof AccountsView> = {
   component: AccountsView,

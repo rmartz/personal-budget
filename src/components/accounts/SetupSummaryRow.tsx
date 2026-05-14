@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+
 import { ACCOUNTS_PAGE_COPY } from "./copy";
 
 export interface SetupSummaryRowProps {

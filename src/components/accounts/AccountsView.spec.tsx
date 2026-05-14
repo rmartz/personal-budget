@@ -1,9 +1,11 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { AccountsView } from "./AccountsView";
-import { AccountTier } from "@/lib/firebase/schema/accounts";
-import { ACCOUNTS_PAGE_COPY } from "./copy";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
 import type { Account, RecurringExpense } from "@/lib/firebase/schema/accounts";
+import { AccountTier } from "@/lib/firebase/schema/accounts";
+
+import { AccountsView } from "./AccountsView";
+import { ACCOUNTS_PAGE_COPY } from "./copy";
 
 afterEach(cleanup);
 
@@ -164,9 +166,7 @@ describe("AccountsView", () => {
           onAddAccount={() => undefined}
         />,
       );
-      expect(
-        screen.getByText(ACCOUNTS_PAGE_COPY.emptyStateBody),
-      ).toBeDefined();
+      expect(screen.getByText(ACCOUNTS_PAGE_COPY.emptyStateBody)).toBeDefined();
     });
 
     it("hides the empty state when accounts are populated", () => {
