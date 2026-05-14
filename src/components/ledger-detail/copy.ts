@@ -1,0 +1,20 @@
+export const LEDGER_DETAIL_COPY = {
+  addDepositButton: "+ Deposit",
+  addExpenseButton: "+ Expense",
+  addGoalButton: "+ Goal",
+  breadcrumbParent: "Ledgers",
+  editButton: "Edit",
+  goalsSectionTitle: "Goals in this ledger",
+  headerGoalWord: (count: number) => (count === 1 ? "goal" : "goals"),
+  headerNoCashCap: "No cash cap",
+  monthDepositsLabel: "Deposits",
+  monthExpensesLabel: "Expenses",
+  monthNetLabel: "Net",
+  monthSectionTitle: "This month",
+  splitCashLabel: "Cash",
+  splitInvestmentLabel: "Invested",
+  splitSectionTitle: "Cash / Investment",
+  totalSectionTitle: "Total balance",
+  totalSubLabel: (cash: string, invested: string) =>
+    `${cash} cash + ${invested} invested`,
+} as const;

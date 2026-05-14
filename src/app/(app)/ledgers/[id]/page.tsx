@@ -13,13 +13,16 @@ import { useUpdateSavingsGoal } from "@/hooks/use-update-savings-goal";
 import { useDeleteSavingsGoal } from "@/hooks/use-delete-savings-goal";
 import { useUpdateTransaction } from "@/hooks/use-update-transaction";
 import {
-  LedgerTransactionListView,
   AddExpenseDialog,
   EditTransactionDialog,
 } from "@/components/ledger-transactions";
 import { AddDepositDialog } from "@/components/ledgers";
-import { SavingsGoalListView } from "@/components/savings-goals";
+import { NewSavingsGoalDialog } from "@/components/savings-goals";
+import { LedgerDetailView } from "@/components/ledger-detail/LedgerDetailView";
+import { updateLedger } from "@/services/ledgers";
+import { createSavingsGoal } from "@/services/savings-goals";
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
+import type { Ledger, UpdateLedgerInput } from "@/lib/types";
 
 type DepositInput = Omit<BudgetLedgerTransaction, "id" | "ledgerId" | "type">;
 
@@ -43,20 +46,38 @@ export default function LedgerDetailPage() {
 
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<
     BudgetLedgerTransaction | undefined
   >(undefined);
 
-  const ledger = ledgers.find((l) => l.id === id);
+  const budgetLedger = ledgers.find((l) => l.id === id);
+  const ledger: Ledger | undefined = budgetLedger
+    ? { ...budgetLedger, cashBalance: 0, investmentBalance: 0 }
+    : undefined;
   const isLoading = authLoading || ledgersLoading || txLoading;
-  const ledgerName = ledger?.name ?? "";
 
   const handleAddDeposit = async (data: DepositInput): Promise<void> => {
     await createDeposit(data);
   };
 
-  const handleEditTransaction = (transaction: BudgetLedgerTransaction) => {
-    setEditingTransaction(transaction);
+  const handleSaveLedger = async (
+    ledgerId: string,
+    data: UpdateLedgerInput,
+  ): Promise<void> => {
+    await updateLedger(uid, ledgerId, data);
+  };
+
+  const handleAddGoal = async (
+    name: string,
+    targetAmount: number,
+  ): Promise<void> => {
+    await createSavingsGoal(uid, id, {
+      name,
+      targetAmount,
+      fundedAmount: 0,
+      priority: savingsGoals.length + 1,
+    });
   };
 
   if (authLoading || !user) {
@@ -64,19 +85,29 @@ export default function LedgerDetailPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-8">
-      <LedgerTransactionListView
-        ledgerName={ledgerName}
+    <>
+      <LedgerDetailView
+        ledger={ledger}
         transactions={transactions}
+        savingsGoals={savingsGoals}
         isLoading={isLoading}
-        onAddDeposit={() => {
-          setDepositDialogOpen(true);
-        }}
+        onSaveLedger={handleSaveLedger}
         onAddExpense={() => {
           setExpenseDialogOpen(true);
         }}
+        onAddDeposit={() => {
+          setDepositDialogOpen(true);
+        }}
+        onAddGoal={() => {
+          setGoalDialogOpen(true);
+        }}
         onDeleteTransaction={deleteTransaction}
-        onEditTransaction={handleEditTransaction}
+        onEditTransaction={(tx) => {
+          setEditingTransaction(tx);
+        }}
+        onDeleteGoal={deleteGoal}
+        onEditGoal={editGoal}
+        onReorderGoal={reorderGoal}
       />
       <AddDepositDialog
         open={depositDialogOpen}
@@ -92,11 +123,10 @@ export default function LedgerDetailPage() {
         }}
         isSubmitting={isExpenseSubmitting}
       />
-      <SavingsGoalListView
-        goals={savingsGoals}
-        onDelete={deleteGoal}
-        onEdit={editGoal}
-        onReorder={reorderGoal}
+      <NewSavingsGoalDialog
+        open={goalDialogOpen}
+        onOpenChange={setGoalDialogOpen}
+        onSubmit={handleAddGoal}
       />
       {editingTransaction !== undefined && (
         <EditTransactionDialog
@@ -113,6 +143,6 @@ export default function LedgerDetailPage() {
           initialDescription={editingTransaction.description}
         />
       )}
-    </div>
+    </>
   );
 }
