@@ -12,6 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
 import { EDIT_SAVINGS_GOAL_DIALOG_COPY } from "./copy";
@@ -139,10 +141,10 @@ export function EditSavingsGoalDialog({
           className="flex flex-col gap-4"
         >
           <div className="flex flex-col gap-1">
-            <label htmlFor={nameInputId} className="text-sm font-medium">
+            <Label htmlFor={nameInputId}>
               {EDIT_SAVINGS_GOAL_DIALOG_COPY.nameLabel}
-            </label>
-            <input
+            </Label>
+            <Input
               id={nameInputId}
               type="text"
               value={name}
@@ -154,7 +156,6 @@ export function EditSavingsGoalDialog({
               aria-describedby={
                 nameError !== undefined ? nameErrorId : undefined
               }
-              className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
             />
             {nameError !== undefined && (
               <p
@@ -167,13 +168,10 @@ export function EditSavingsGoalDialog({
             )}
           </div>
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor={targetAmountInputId}
-              className="text-sm font-medium"
-            >
+            <Label htmlFor={targetAmountInputId}>
               {EDIT_SAVINGS_GOAL_DIALOG_COPY.targetAmountLabel}
-            </label>
-            <input
+            </Label>
+            <Input
               id={targetAmountInputId}
               type="number"
               min="0.01"
@@ -191,7 +189,6 @@ export function EditSavingsGoalDialog({
                   ? targetAmountErrorId
                   : undefined
               }
-              className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
             />
             {targetAmountError !== undefined && (
               <p

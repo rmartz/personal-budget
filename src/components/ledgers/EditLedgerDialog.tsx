@@ -12,6 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { UpdateLedgerInput } from "@/lib/types";
 
 import { EDIT_LEDGER_DIALOG_COPY } from "./copy";
@@ -146,10 +148,10 @@ export function EditLedgerDialog({
           className="flex flex-col gap-4"
         >
           <div className="flex flex-col gap-1">
-            <label htmlFor={nameInputId} className="text-sm font-medium">
+            <Label htmlFor={nameInputId}>
               {EDIT_LEDGER_DIALOG_COPY.nameLabel}
-            </label>
-            <input
+            </Label>
+            <Input
               id={nameInputId}
               type="text"
               value={name}
@@ -161,7 +163,6 @@ export function EditLedgerDialog({
               aria-describedby={
                 nameError !== undefined ? nameErrorId : undefined
               }
-              className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
             />
             {nameError !== undefined && (
               <p
@@ -174,10 +175,10 @@ export function EditLedgerDialog({
             )}
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor={cashCapInputId} className="text-sm font-medium">
+            <Label htmlFor={cashCapInputId}>
               {EDIT_LEDGER_DIALOG_COPY.cashCapLabel}
-            </label>
-            <input
+            </Label>
+            <Input
               id={cashCapInputId}
               type="number"
               min="0.01"
@@ -191,7 +192,6 @@ export function EditLedgerDialog({
               aria-describedby={
                 cashCapError !== undefined ? cashCapErrorId : undefined
               }
-              className="rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring aria-invalid:border-destructive"
             />
             {cashCapError !== undefined && (
               <p

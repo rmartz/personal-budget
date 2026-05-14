@@ -3,16 +3,12 @@
 import Link from "next/link";
 
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+import { currencyFormatter } from "@/lib/formatters";
 
 import { GOAL_PURCHASE_VIEW_COPY } from "./copy";
 import { GoalPurchaseForm } from "./GoalPurchaseForm";
 import { GoalPurchaseWarning } from "./GoalPurchaseWarning";
 import { GoalSiblingProjections } from "./GoalSiblingProjections";
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 
 export interface GoalPurchaseViewProps {
   goal: BudgetLedgerSavingsGoal;

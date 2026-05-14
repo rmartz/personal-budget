@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import { ADD_EXPENSE_DIALOG_COPY } from "./AddExpenseDialog.copy";
 
@@ -121,30 +123,23 @@ export function AddExpenseDialog({
         >
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={dateInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={dateInputId}>
                 {ADD_EXPENSE_DIALOG_COPY.dateLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={dateInputId}
                 type="date"
                 value={date}
                 onChange={(e) => {
                   setDate(e.target.value);
                 }}
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={amountInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={amountInputId}>
                 {ADD_EXPENSE_DIALOG_COPY.amountLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={amountInputId}
                 type="number"
                 min="0.01"
@@ -157,7 +152,6 @@ export function AddExpenseDialog({
                 placeholder={ADD_EXPENSE_DIALOG_COPY.amountPlaceholder}
                 aria-invalid={amountError !== undefined}
                 aria-describedby={amountError ? amountErrorId : undefined}
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {amountError !== undefined && (
                 <p
@@ -170,13 +164,10 @@ export function AddExpenseDialog({
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={descriptionInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={descriptionInputId}>
                 {ADD_EXPENSE_DIALOG_COPY.descriptionLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={descriptionInputId}
                 type="text"
                 value={description}
@@ -189,7 +180,6 @@ export function AddExpenseDialog({
                 aria-describedby={
                   descriptionError ? descriptionErrorId : undefined
                 }
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {descriptionError !== undefined && (
                 <p

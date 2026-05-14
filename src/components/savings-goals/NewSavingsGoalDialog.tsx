@@ -5,12 +5,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DialogBackdrop,
-  DialogClose,
   DialogPopup,
   DialogPortal,
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import { NEW_SAVINGS_GOAL_DIALOG_COPY } from "./NewSavingsGoalDialog.copy";
 
@@ -56,13 +57,10 @@ export function NewSavingsGoalDialogView({
           >
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor="new-savings-goal-name"
-                >
+                <Label htmlFor="new-savings-goal-name">
                   {NEW_SAVINGS_GOAL_DIALOG_COPY.nameLabel}
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-savings-goal-name"
                   type="text"
                   value={name}
@@ -76,7 +74,6 @@ export function NewSavingsGoalDialogView({
                       ? "new-savings-goal-name-error"
                       : undefined
                   }
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
                 />
                 {nameError !== undefined && (
                   <p
@@ -89,13 +86,10 @@ export function NewSavingsGoalDialogView({
                 )}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor="new-savings-goal-target-amount"
-                >
+                <Label htmlFor="new-savings-goal-target-amount">
                   {NEW_SAVINGS_GOAL_DIALOG_COPY.targetAmountLabel}
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-savings-goal-target-amount"
                   type="number"
                   min="0.01"
@@ -113,7 +107,6 @@ export function NewSavingsGoalDialogView({
                       ? "new-savings-goal-target-amount-error"
                       : undefined
                   }
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
                 />
                 {targetAmountError !== undefined && (
                   <p
@@ -132,13 +125,16 @@ export function NewSavingsGoalDialogView({
               </p>
             )}
             <div className="mt-6 flex justify-end gap-3">
-              <DialogClose
+              <Button
                 type="button"
-                className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted"
+                variant="outline"
                 disabled={isSubmitting}
+                onClick={() => {
+                  onOpenChange(false);
+                }}
               >
                 {NEW_SAVINGS_GOAL_DIALOG_COPY.cancelButton}
-              </DialogClose>
+              </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {NEW_SAVINGS_GOAL_DIALOG_COPY.submitButton}
               </Button>
