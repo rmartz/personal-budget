@@ -224,3 +224,85 @@ describe("Confirming deletes the goal via the service layer", () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 });
+
+describe("dropdownOpen prop controls the dropdown menu open state statically", () => {
+  it("shows the delete menu item immediately when dropdownOpen is true", () => {
+    const goal = makeSavingsGoal();
+    render(
+      <table>
+        <tbody>
+          <SavingsGoalListItemView
+            goal={goal}
+            deleteDialogOpen={false}
+            dropdownOpen={true}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDeleteDialogOpenChange={vi.fn()}
+            onDeleteMenuClick={vi.fn()}
+            onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(
+      screen.getByText(SAVINGS_GOAL_LIST_ITEM_COPY.deleteMenuLabel),
+    ).toBeDefined();
+  });
+
+  it("does not show the delete menu item when dropdownOpen is false", () => {
+    const goal = makeSavingsGoal();
+    render(
+      <table>
+        <tbody>
+          <SavingsGoalListItemView
+            goal={goal}
+            deleteDialogOpen={false}
+            dropdownOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDeleteDialogOpenChange={vi.fn()}
+            onDeleteMenuClick={vi.fn()}
+            onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(
+      screen.queryByText(SAVINGS_GOAL_LIST_ITEM_COPY.deleteMenuLabel),
+    ).toBeNull();
+  });
+
+  it("omitting dropdownOpen leaves menu closed by default", () => {
+    const goal = makeSavingsGoal();
+    render(
+      <table>
+        <tbody>
+          <SavingsGoalListItemView
+            goal={goal}
+            deleteDialogOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDeleteDialogOpenChange={vi.fn()}
+            onDeleteMenuClick={vi.fn()}
+            onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(
+      screen.queryByText(SAVINGS_GOAL_LIST_ITEM_COPY.deleteMenuLabel),
+    ).toBeNull();
+  });
+});
