@@ -2,7 +2,7 @@ export const INVESTMENTS_VIEW_COPY = {
   applyRebalanceButton: "Apply rebalance",
   title: "Investments",
   titleSummary: (invested: string, numAccounts: number, margin: string) =>
-    `${invested} invested across ${String(numAccounts)} accounts · ${margin} margin available`,
+    `${invested} invested across ${String(numAccounts)} ${numAccounts === 1 ? "account" : "accounts"} · ${margin} margin available`,
 } as const;
 
 export const POSTURE_CARD_COPY = {
