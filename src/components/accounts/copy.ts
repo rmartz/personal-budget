@@ -1,3 +1,15 @@
+export const ACCOUNTS_PAGE_COPY = {
+  accountsLabel: "Accounts",
+  accountsSublabel: "Short-term · Reserve · Long-term · Investment",
+  addAccountButton: "+ Add account",
+  configuredCount: (n: number) => `${String(n)} configured`,
+  recurringExpensesLabel: "Recurring expenses",
+  recurringExpensesSublabel: (missingCount: number) =>
+    `${String(missingCount)} missing this month`,
+  setupSectionHeading: "SETUP",
+  title: "Accounts",
+} as const;
+
 export const CREATE_ACCOUNT_DIALOG_COPY = {
   cancelButton: "Cancel",
   nameLabel: "Name",
