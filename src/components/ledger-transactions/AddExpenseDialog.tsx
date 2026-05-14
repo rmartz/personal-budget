@@ -27,7 +27,7 @@ export interface AddExpenseDialogProps {
 }
 
 function todayIso(): string {
-  return new Date().toISOString().split("T")[0] ?? "";
+  return new Date().toISOString().slice(0, 10);
 }
 
 export function AddExpenseDialog({
