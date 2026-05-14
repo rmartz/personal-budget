@@ -19,6 +19,7 @@ export function useAllSavingsGoals(uid: string) {
     if (!uid) {
       setGoals([]);
       setIsLoading(false);
+      setError(undefined);
       return;
     }
 

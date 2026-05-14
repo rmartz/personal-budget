@@ -5,7 +5,8 @@ export const GOALS_LIST_COPY = {
   etaFunded: "Funded",
   etaPlaceholder: "—",
   fullyFundedCount: (count: number) => `${String(count)} fully funded`,
-  goalCount: (count: number) => `${String(count)} goals`,
+  goalCount: (count: number) =>
+    count === 1 ? "1 goal" : `${String(count)} goals`,
   newGoalButton: "+ New goal",
   readyToPurchase: "Ready to purchase",
   sortByEta: "By ETA",

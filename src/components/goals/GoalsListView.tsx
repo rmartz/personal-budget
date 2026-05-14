@@ -42,16 +42,32 @@ export function GoalsListView({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button disabled className="text-sm text-muted-foreground">
+          <button
+            type="button"
+            disabled
+            className="text-sm text-muted-foreground"
+          >
             {GOALS_LIST_COPY.sortByPriority}
           </button>
-          <button disabled className="text-sm text-muted-foreground">
+          <button
+            type="button"
+            disabled
+            className="text-sm text-muted-foreground"
+          >
             {GOALS_LIST_COPY.sortByLedger}
           </button>
-          <button disabled className="text-sm text-muted-foreground">
+          <button
+            type="button"
+            disabled
+            className="text-sm text-muted-foreground"
+          >
             {GOALS_LIST_COPY.sortByEta}
           </button>
-          <button disabled className="text-sm font-medium text-primary">
+          <button
+            type="button"
+            disabled
+            className="text-sm font-medium text-primary"
+          >
             {GOALS_LIST_COPY.newGoalButton}
           </button>
         </div>
