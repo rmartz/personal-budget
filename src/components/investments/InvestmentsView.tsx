@@ -1,22 +1,23 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type {
-  InvestmentAccount,
   AllocationTarget,
+  InvestmentAccount,
 } from "@/lib/firebase/schema/investments";
 import { Posture } from "@/lib/firebase/schema/investments";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PostureCard } from "./PostureCard";
+
 import {
-  INVESTMENTS_VIEW_COPY,
-  RECOMMENDED_CARD_COPY,
   AGGREGATE_BUY_SELL_COPY,
-  TARGET_ALLOCATION_COPY,
-  MONTHLY_DISTRIBUTION_COPY,
+  INVESTMENTS_VIEW_COPY,
   LEDGER_INVESTMENT_TABLE_COPY,
+  MONTHLY_DISTRIBUTION_COPY,
+  RECOMMENDED_CARD_COPY,
+  TARGET_ALLOCATION_COPY,
 } from "./copy";
 import { INVESTMENTS_PLACEHOLDER_FIXTURE } from "./fixtures";
+import { PostureCard } from "./PostureCard";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

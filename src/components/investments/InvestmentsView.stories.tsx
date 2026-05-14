@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { InvestmentsView } from "./InvestmentsView";
+
 import { Posture } from "@/lib/firebase/schema/investments";
+
+import { InvestmentsView } from "./InvestmentsView";
 
 const meta: Meta<typeof InvestmentsView> = {
   component: InvestmentsView,

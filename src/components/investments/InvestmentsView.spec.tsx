@@ -1,12 +1,14 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { InvestmentsView } from "./InvestmentsView";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { Posture } from "@/lib/firebase/schema/investments";
+
 import {
   INVESTMENTS_VIEW_COPY,
   LEDGER_INVESTMENT_TABLE_COPY,
   POSTURE_CARD_COPY,
 } from "./copy";
+import { InvestmentsView } from "./InvestmentsView";
 
 afterEach(cleanup);
 

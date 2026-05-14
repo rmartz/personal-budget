@@ -1,9 +1,9 @@
 "use client";
 
+import { InvestmentsView } from "@/components/investments";
 import { useAuth } from "@/hooks/use-auth";
 import { useInvestmentAccounts } from "@/hooks/use-investment-accounts";
 import { useTargetAllocation } from "@/hooks/use-target-allocation";
-import { InvestmentsView } from "@/components/investments";
 
 export default function InvestmentsPage() {
   const { user, loading: authLoading } = useAuth();

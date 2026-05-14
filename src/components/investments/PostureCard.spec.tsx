@@ -1,8 +1,10 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { PostureCard } from "./PostureCard";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
 import { Posture } from "@/lib/firebase/schema/investments";
+
 import { POSTURE_CARD_COPY } from "./copy";
+import { PostureCard } from "./PostureCard";
 
 afterEach(cleanup);
 

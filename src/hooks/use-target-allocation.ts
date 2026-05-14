@@ -2,8 +2,8 @@
 
 // TODO: Implement real Firebase subscription in epic #11 (Investment Target Allocation)
 import {
-  Posture,
   type AllocationTarget,
+  Posture,
 } from "@/lib/firebase/schema/investments";
 
 export function useTargetAllocation(_uid: string): {

@@ -1,7 +1,8 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Posture } from "@/lib/firebase/schema/investments";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
 import { POSTURE_CARD_COPY } from "./copy";
 import { INVESTMENTS_PLACEHOLDER_FIXTURE } from "./fixtures";
 
