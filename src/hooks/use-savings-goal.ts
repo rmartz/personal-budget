@@ -30,6 +30,7 @@ export function useSavingsGoal(
     if (!uid || !goalId) {
       setGoal(undefined);
       setIsLoading(false);
+      setError(undefined);
       return;
     }
 

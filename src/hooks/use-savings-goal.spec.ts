@@ -71,6 +71,30 @@ describe("useSavingsGoal", () => {
       expect(result.current.isLoading).toBe(true);
     });
 
+    it("clears error when uid becomes empty after an error", async () => {
+      mockOnValue.mockImplementation(
+        (_ref: unknown, _cb: unknown, errCb: (err: Error) => void) => {
+          errCb(new Error("permission denied"));
+          return mockUnsubscribe;
+        },
+      );
+
+      const { result, rerender } = renderHook(
+        ({ uid }: { uid: string }) => useSavingsGoal(uid, "goal-1"),
+        { initialProps: { uid: "uid-1" } },
+      );
+
+      await waitFor(() => {
+        expect(result.current.error).toBeDefined();
+      });
+
+      act(() => {
+        rerender({ uid: "" });
+      });
+
+      expect(result.current.error).toBeUndefined();
+    });
+
     it("clears error when uid changes from empty to non-empty", async () => {
       mockOnValue.mockImplementation(
         (_ref: unknown, _cb: unknown, errCb: (err: Error) => void) => {
