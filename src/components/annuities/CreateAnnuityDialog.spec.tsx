@@ -302,10 +302,12 @@ describe("CreateAnnuityDialog integration", () => {
     const callArg = onSubmit.mock.calls[0]![0] as {
       name: string;
       monthlyAmount: number;
+      monthlyMode: AnnuityMonthlyMode;
       durationMonths: number;
     };
     expect(callArg.name).toBe("Car Loan");
     expect(Math.round(callArg.monthlyAmount * 100) / 100).toBe(856.07);
+    expect(callArg.monthlyMode).toBe(AnnuityMonthlyMode.PVDerived);
     expect(callArg.durationMonths).toBe(12);
   });
 
