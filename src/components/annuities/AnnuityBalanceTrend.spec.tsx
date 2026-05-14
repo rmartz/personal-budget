@@ -41,4 +41,27 @@ describe("AnnuityBalanceTrend", () => {
       ).toBeDefined();
     });
   });
+
+  describe("renders the Started / Now / Payoff summary row", () => {
+    it("renders the Started label", () => {
+      render(<AnnuityBalanceTrend annuity={makeAnnuity()} />);
+      expect(
+        screen.getByText(ANNUITY_CARD_COPY.balanceTrendStartedLabel),
+      ).toBeDefined();
+    });
+
+    it("renders the Now label", () => {
+      render(<AnnuityBalanceTrend annuity={makeAnnuity()} />);
+      expect(
+        screen.getByText(ANNUITY_CARD_COPY.balanceTrendNowLabel),
+      ).toBeDefined();
+    });
+
+    it("renders the Payoff label", () => {
+      render(<AnnuityBalanceTrend annuity={makeAnnuity()} />);
+      expect(
+        screen.getByText(ANNUITY_CARD_COPY.balanceTrendPayoffLabel),
+      ).toBeDefined();
+    });
+  });
 });

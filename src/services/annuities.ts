@@ -68,6 +68,9 @@ export async function updateAnnuity(
   if ("durationMonths" in data) {
     updates.durationMonths = data.durationMonths ?? null;
   }
+  if (data.monthlyMode !== undefined) {
+    updates.monthlyMode = data.monthlyMode;
+  }
   await update(annuityRef(uid, id), updates);
 }
 

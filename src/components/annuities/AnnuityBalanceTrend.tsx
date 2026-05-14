@@ -22,6 +22,32 @@ export function AnnuityBalanceTrend({ annuity }: AnnuityBalanceTrendProps) {
       >
         {ANNUITY_CARD_COPY.balanceTrendChartPlaceholder}
       </div>
+      <div className="grid grid-cols-3 divide-x text-center text-sm">
+        <div className="px-2">
+          <p className="text-xs text-muted-foreground">
+            {ANNUITY_CARD_COPY.balanceTrendStartedLabel}
+          </p>
+          <p className="font-medium">
+            {ANNUITY_CARD_COPY.balanceTrendPlaceholderValue}
+          </p>
+        </div>
+        <div className="px-2">
+          <p className="text-xs text-muted-foreground">
+            {ANNUITY_CARD_COPY.balanceTrendNowLabel}
+          </p>
+          <p className="font-medium">
+            {ANNUITY_CARD_COPY.balanceTrendPlaceholderValue}
+          </p>
+        </div>
+        <div className="px-2">
+          <p className="text-xs text-muted-foreground">
+            {ANNUITY_CARD_COPY.balanceTrendPayoffLabel}
+          </p>
+          <p className="font-medium">
+            {ANNUITY_CARD_COPY.balanceTrendPlaceholderValue}
+          </p>
+        </div>
+      </div>
     </Card>
   );
 }

@@ -23,14 +23,15 @@ export default function AnnuitiesPage() {
   const { user, loading: authLoading } = useAuth();
   const uid = user?.uid ?? "";
   const { annuities, isLoading } = useAnnuities(uid);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   if (authLoading || !user) {
     return null;
   }
 
-  const selectedAnnuity = annuities[selectedIndex] ?? annuities[0];
+  const selectedAnnuity =
+    annuities.find((a) => a.id === selectedId) ?? annuities[0];
   const totalMonthly = annuities.reduce((sum, a) => sum + a.monthlyAmount, 0);
 
   const handleSubmit = async (data: CreateAnnuityInput) => {
@@ -75,13 +76,13 @@ export default function AnnuitiesPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {annuities.map((annuity, index) => (
+            {annuities.map((annuity) => (
               <AnnuityCard
                 key={annuity.id}
                 annuity={annuity}
-                isSelected={index === selectedIndex}
+                isSelected={annuity.id === selectedAnnuity?.id}
                 onSelect={() => {
-                  setSelectedIndex(index);
+                  setSelectedId(annuity.id);
                 }}
               />
             ))}

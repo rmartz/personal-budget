@@ -139,6 +139,26 @@ describe("updateAnnuity", () => {
     >;
     expect("durationMonths" in calledWith).toBe(false);
   });
+
+  it("serializes monthlyMode when provided", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    await updateAnnuity("uid-1", "annuity-1", {
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+    });
+    expect(update).toHaveBeenCalledWith(mockRef, {
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+    });
+  });
+
+  it("omits monthlyMode from the update when not provided", async () => {
+    vi.mocked(update).mockResolvedValue(undefined);
+    await updateAnnuity("uid-1", "annuity-1", { monthlyAmount: 20 });
+    const calledWith = vi.mocked(update).mock.calls[0]![1] as Record<
+      string,
+      unknown
+    >;
+    expect("monthlyMode" in calledWith).toBe(false);
+  });
 });
 
 describe("deleteAnnuity", () => {
