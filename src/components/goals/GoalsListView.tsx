@@ -1,10 +1,11 @@
 "use client";
 
-import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { GoalCard } from "./GoalCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
 import { GOALS_LIST_COPY } from "./copy";
+import { GoalCard } from "./GoalCard";
 
 export interface GoalsListViewProps {
   goals: BudgetLedgerSavingsGoal[];
@@ -19,7 +20,9 @@ export function GoalsListView({
   isLoading,
   error,
 }: GoalsListViewProps) {
-  const fullyFunded = goals.filter((g) => g.fundedAmount >= g.targetAmount).length;
+  const fullyFunded = goals.filter(
+    (g) => g.fundedAmount >= g.targetAmount,
+  ).length;
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,28 +40,16 @@ export function GoalsListView({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            disabled
-            className="text-sm text-muted-foreground"
-          >
+          <button disabled className="text-sm text-muted-foreground">
             {GOALS_LIST_COPY.sortByPriority}
           </button>
-          <button
-            disabled
-            className="text-sm text-muted-foreground"
-          >
+          <button disabled className="text-sm text-muted-foreground">
             {GOALS_LIST_COPY.sortByLedger}
           </button>
-          <button
-            disabled
-            className="text-sm text-muted-foreground"
-          >
+          <button disabled className="text-sm text-muted-foreground">
             {GOALS_LIST_COPY.sortByEta}
           </button>
-          <button
-            disabled
-            className="text-sm font-medium text-primary"
-          >
+          <button disabled className="text-sm font-medium text-primary">
             {GOALS_LIST_COPY.newGoalButton}
           </button>
         </div>

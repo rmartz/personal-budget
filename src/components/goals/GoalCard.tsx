@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
-import { Card } from "@/components/ui/card";
+
 import { Bar } from "@/components/ui/bar";
+import { Card } from "@/components/ui/card";
+import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
 import { GOAL_CARD_COPY, GOALS_LIST_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {

@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { renderHook, waitFor, cleanup, act } from "@testing-library/react";
+import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { useAllSavingsGoals } from "./use-all-savings-goals";
 
 const mockUnsubscribe = vi.fn();
@@ -117,7 +118,9 @@ describe("useAllSavingsGoals", () => {
             exists: () => true,
             val: () => ({
               "ledger-1": { "goal-1": makeFirebaseGoal() },
-              "ledger-2": { "goal-2": { ...makeFirebaseGoal(), name: "Vacation" } },
+              "ledger-2": {
+                "goal-2": { ...makeFirebaseGoal(), name: "Vacation" },
+              },
             }),
           });
           return mockUnsubscribe;

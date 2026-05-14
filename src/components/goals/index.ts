@@ -1,4 +1,4 @@
-export { GoalCard } from "./GoalCard";
 export type { GoalCardProps } from "./GoalCard";
-export { GoalsListView } from "./GoalsListView";
+export { GoalCard } from "./GoalCard";
 export type { GoalsListViewProps } from "./GoalsListView";
+export { GoalsListView } from "./GoalsListView";

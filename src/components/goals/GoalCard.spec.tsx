@@ -1,8 +1,10 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { GoalCard } from "./GoalCard";
-import { GOAL_CARD_COPY, GOALS_LIST_COPY } from "./copy";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
+import { GOAL_CARD_COPY, GOALS_LIST_COPY } from "./copy";
+import { GoalCard } from "./GoalCard";
 
 afterEach(cleanup);
 

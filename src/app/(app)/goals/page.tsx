@@ -1,9 +1,9 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
-import { useAllSavingsGoals } from "@/hooks/use-all-savings-goals";
-import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 import { GoalsListView } from "@/components/goals";
+import { useAllSavingsGoals } from "@/hooks/use-all-savings-goals";
+import { useAuth } from "@/hooks/use-auth";
+import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 
 export default function GoalsPage() {
   const { user, loading: authLoading } = useAuth();
