@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { AppShellNavView } from "./AppShellNav";
@@ -139,14 +145,18 @@ describe("AppShellNavView — mobile bottom tab bar", () => {
 });
 
 describe("AppShellNavView — More overflow", () => {
+  it("does not expose a dialog before the More button is clicked", () => {
+    render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("exposes an Annuities link inside the More overflow once opened", () => {
     render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
     fireEvent.click(
       screen.getByRole("button", { name: APP_SHELL_COPY.moreLabel }),
     );
-    // When the dialog is open, base-ui-react makes background content inert,
-    // so role queries return only the dialog's content.
-    const annuitiesLink = screen
+    const dialog = screen.getByRole("dialog");
+    const annuitiesLink = within(dialog)
       .getAllByRole("link", { name: APP_SHELL_COPY.linkAnnuities })
       .find((el) => el.getAttribute("href") === "/annuities");
     expect(annuitiesLink).toBeDefined();
@@ -157,7 +167,8 @@ describe("AppShellNavView — More overflow", () => {
     fireEvent.click(
       screen.getByRole("button", { name: APP_SHELL_COPY.moreLabel }),
     );
-    const accountsLink = screen
+    const dialog = screen.getByRole("dialog");
+    const accountsLink = within(dialog)
       .getAllByRole("link", { name: APP_SHELL_COPY.linkAccounts })
       .find((el) => el.getAttribute("href") === "/accounts");
     expect(accountsLink).toBeDefined();
@@ -168,7 +179,8 @@ describe("AppShellNavView — More overflow", () => {
     fireEvent.click(
       screen.getByRole("button", { name: APP_SHELL_COPY.moreLabel }),
     );
-    const profileLink = screen
+    const dialog = screen.getByRole("dialog");
+    const profileLink = within(dialog)
       .getAllByRole("link", { name: APP_SHELL_COPY.linkProfile })
       .find((el) => el.getAttribute("href") === "/profile");
     expect(profileLink).toBeDefined();
@@ -179,8 +191,9 @@ describe("AppShellNavView — More overflow", () => {
     fireEvent.click(
       screen.getByRole("button", { name: APP_SHELL_COPY.moreLabel }),
     );
+    const dialog = screen.getByRole("dialog");
     expect(
-      screen.getAllByText(APP_SHELL_COPY.moreOverflowTitle).length,
+      within(dialog).getAllByText(APP_SHELL_COPY.moreOverflowTitle).length,
     ).toBeGreaterThan(0);
   });
 });
