@@ -1,4 +1,6 @@
 export { useAnnuities } from "./use-annuities";
+export { useInvestmentAccounts } from "./use-investment-accounts";
+export { useTargetAllocation } from "./use-target-allocation";
 export { useAuth } from "./use-auth";
 export { useDeleteSavingsGoal } from "./use-delete-savings-goal";
 export { useLedgersSubscription } from "./use-ledgers-subscription";
