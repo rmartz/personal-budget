@@ -19,22 +19,48 @@ export function GoalsListView({
   isLoading,
   error,
 }: GoalsListViewProps) {
+  const fullyFunded = goals.filter((g) => g.fundedAmount >= g.targetAmount).length;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {GOALS_LIST_COPY.title}
-        </h1>
-        <div className="flex gap-2">
-          <span className="text-sm text-muted-foreground">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {GOALS_LIST_COPY.title}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {GOALS_LIST_COPY.goalCount(goals.length)}
+            {" · "}
+            {GOALS_LIST_COPY.fullyFundedCount(fullyFunded)}
+            {" · "}
+            {GOALS_LIST_COPY.zipfProgress}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            disabled
+            className="text-sm text-muted-foreground"
+          >
             {GOALS_LIST_COPY.sortByPriority}
-          </span>
-          <span className="text-sm text-muted-foreground">
+          </button>
+          <button
+            disabled
+            className="text-sm text-muted-foreground"
+          >
             {GOALS_LIST_COPY.sortByLedger}
-          </span>
-          <span className="text-sm text-muted-foreground">
+          </button>
+          <button
+            disabled
+            className="text-sm text-muted-foreground"
+          >
             {GOALS_LIST_COPY.sortByEta}
-          </span>
+          </button>
+          <button
+            disabled
+            className="text-sm font-medium text-primary"
+          >
+            {GOALS_LIST_COPY.newGoalButton}
+          </button>
         </div>
       </div>
 

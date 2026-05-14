@@ -4,12 +4,15 @@ export const GOALS_LIST_COPY = {
   errorMessage: "Failed to load goals. Please try again later.",
   etaFunded: "Funded",
   etaPlaceholder: "—",
+  fullyFundedCount: (count: number) => `${String(count)} fully funded`,
+  goalCount: (count: number) => `${String(count)} goals`,
   newGoalButton: "+ New goal",
   readyToPurchase: "Ready to purchase",
   sortByEta: "By ETA",
   sortByLedger: "By ledger",
   sortByPriority: "By priority",
   title: "Goals",
+  zipfProgress: "—% weighted progress",
 } as const;
 
 export const GOAL_CARD_COPY = {
