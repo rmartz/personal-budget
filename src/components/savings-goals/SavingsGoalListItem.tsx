@@ -35,6 +35,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 export interface SavingsGoalListItemViewProps {
   goal: BudgetLedgerSavingsGoal;
   deleteDialogOpen: boolean;
+  dropdownOpen?: boolean;
   isFirst: boolean;
   isLast: boolean;
   prevGoalId: string | undefined;
@@ -52,6 +53,7 @@ export interface SavingsGoalListItemViewProps {
 export function SavingsGoalListItemView({
   goal,
   deleteDialogOpen,
+  dropdownOpen,
   isFirst,
   isLast,
   prevGoalId,
@@ -114,7 +116,7 @@ export function SavingsGoalListItemView({
             </Button>
           )}
           <EditSavingsGoalDialog goal={goal} onSave={onEdit} />
-          <DropdownMenuRoot>
+          <DropdownMenuRoot open={dropdownOpen}>
             <DropdownMenuTrigger
               aria-label={SAVINGS_GOAL_LIST_ITEM_COPY.overflowMenuLabel}
               className="inline-flex size-8 items-center justify-center rounded-md hover:bg-muted"
