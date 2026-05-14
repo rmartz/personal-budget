@@ -3,10 +3,10 @@ export const LEDGER_DETAIL_COPY = {
   addExpenseButton: "+ Expense",
   addGoalButton: "+ Goal",
   breadcrumbParent: "Ledgers",
-  editButton: "Edit",
   goalsSectionTitle: "Goals in this ledger",
-  headerGoalWord: (count: number) => (count === 1 ? "goal" : "goals"),
   headerNoCashCap: "No cash cap",
+  headerSummary: (cap: string, count: number) =>
+    `${cap} · ${String(count)} active ${count === 1 ? "goal" : "goals"}`,
   monthDepositsLabel: "Deposits",
   monthExpensesLabel: "Expenses",
   monthNetLabel: "Net",

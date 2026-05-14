@@ -56,7 +56,7 @@ export function LedgerDetailView({
   const totalBalance = cashBalance + investmentBalance;
   const cashPercent =
     totalBalance > 0 ? Math.round((cashBalance / totalBalance) * 100) : 0;
-  const investedPercent = 100 - cashPercent;
+  const investedPercent = totalBalance > 0 ? 100 - cashPercent : 0;
 
   const now = new Date();
   const thisMonthTx = transactions.filter(
@@ -76,7 +76,7 @@ export function LedgerDetailView({
       ? `Cash cap ${currencyFormatter.format(ledger.cashCap)}`
       : LEDGER_DETAIL_COPY.headerNoCashCap;
   const goalsCount = savingsGoals.length;
-  const summaryLine = `${capPart} · ${String(goalsCount)} active ${LEDGER_DETAIL_COPY.headerGoalWord(goalsCount)}`;
+  const summaryLine = LEDGER_DETAIL_COPY.headerSummary(capPart, goalsCount);
 
   return (
     <div className="flex flex-col gap-6 px-4 py-8">
