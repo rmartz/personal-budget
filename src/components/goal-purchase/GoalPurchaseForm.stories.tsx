@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { GoalPurchaseForm } from "./GoalPurchaseForm";
 
 const meta: Meta<typeof GoalPurchaseForm> = {

@@ -45,7 +45,7 @@ pnpm dev
 
 This project uses [Husky](https://typicode.github.io/husky/) with [lint-staged](https://github.com/lint-staged/lint-staged) to run checks on staged files before each commit:
 
-- **ESLint** — Lints and auto-fixes `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs` files
+- **ESLint** — Lints and auto-fixes `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs` files, including automatic import sorting (`simple-import-sort`)
 - **Prettier** — Formats `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.json`, `.md`, `.yml`, `.yaml` files
 
 If a pre-commit hook fails, fix the issues and try committing again.
@@ -59,6 +59,7 @@ See [AGENTS.md](AGENTS.md) for the full list of code conventions, including:
 - Co-located test files (`Component.spec.tsx`) and stories (`Component.stories.tsx`)
 - User-facing strings in co-located copy files for i18n readiness
 - File size limits (~200 lines for source, ~300 lines for tests)
+- Alphabetical ordering for imports (ESLint-enforced), enum members, and barrel re-exports
 
 ## Commit Messages
 

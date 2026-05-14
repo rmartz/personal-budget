@@ -1,1 +1,1 @@
-export type { Ledger, CreateLedgerInput, UpdateLedgerInput } from "./ledger";
+export type { CreateLedgerInput, Ledger, UpdateLedgerInput } from "./ledger";

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
 import { GOAL_PURCHASE_VIEW_COPY } from "./copy";
 import { GoalPurchaseForm } from "./GoalPurchaseForm";
 import { GoalPurchaseWarning } from "./GoalPurchaseWarning";

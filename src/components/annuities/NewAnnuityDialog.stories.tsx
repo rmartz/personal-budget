@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { NewAnnuityDialogView } from "./NewAnnuityDialog";
 
 const meta: Meta<typeof NewAnnuityDialogView> = {

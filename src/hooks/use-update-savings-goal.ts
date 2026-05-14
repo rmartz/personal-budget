@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { updateSavingsGoal, getSavingsGoals } from "@/services/savings-goals";
+
+import { getSavingsGoals, updateSavingsGoal } from "@/services/savings-goals";
 
 export function useUpdateSavingsGoal(uid: string, ledgerId: string) {
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useId } from "react";
-import type { CreateLedgerInput } from "@/lib/types";
+import { useId, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { CreateLedgerInput } from "@/lib/types";
+
 import { CREATE_LEDGER_DIALOG_COPY } from "./copy";
 
 export interface CreateLedgerDialogProps {
