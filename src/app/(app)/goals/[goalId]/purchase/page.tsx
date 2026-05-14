@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { use } from "react";
 
 import { GoalPurchaseView } from "@/components/goal-purchase";
+import { GOAL_PURCHASE_PAGE_COPY } from "@/components/goal-purchase/copy";
 import { useAuth } from "@/hooks/use-auth";
 import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 import { useSavingsGoal } from "@/hooks/use-savings-goal";
@@ -18,13 +19,27 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const uid = user?.uid ?? "";
-  const { goal, isLoading: goalLoading } = useSavingsGoal(uid, goalId);
+  const {
+    goal,
+    isLoading: goalLoading,
+    error: goalError,
+  } = useSavingsGoal(uid, goalId);
   const { ledgers } = useLedgersSubscription(uid);
   const ledgerId = goal?.ledgerId ?? "";
   const { savingsGoals: siblingGoals } = useSavingsGoals(uid, ledgerId);
 
   if (authLoading || goalLoading || !user) {
     return null;
+  }
+
+  if (goalError !== undefined) {
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
+        <p className="text-center text-destructive">
+          {GOAL_PURCHASE_PAGE_COPY.errorMessage}
+        </p>
+      </div>
+    );
   }
 
   if (!goal) {

@@ -10,25 +10,14 @@ import {
   firebaseToBudgetLedgerSavingsGoal,
 } from "@/lib/firebase/schema/savings-goals";
 
-interface UseSavingsGoalResult {
-  goal: BudgetLedgerSavingsGoal | undefined;
-  isLoading: boolean;
-  error: Error | undefined;
-}
-
-export function useSavingsGoal(
-  uid: string,
-  goalId: string,
-): UseSavingsGoalResult {
-  const [goal, setGoal] = useState<BudgetLedgerSavingsGoal | undefined>(
-    undefined,
-  );
+export function useAllSavingsGoals(uid: string) {
+  const [goals, setGoals] = useState<BudgetLedgerSavingsGoal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | undefined>(undefined);
 
   useEffect(() => {
-    if (!uid || !goalId) {
-      setGoal(undefined);
+    if (!uid) {
+      setGoals([]);
       setIsLoading(false);
       setError(undefined);
       return;
@@ -44,25 +33,20 @@ export function useSavingsGoal(
       allGoalsRef,
       (snapshot) => {
         if (!snapshot.exists()) {
-          setGoal(undefined);
+          setGoals([]);
         } else {
           const data = snapshot.val() as Record<
             string,
             Record<string, FirebaseBudgetLedgerSavingsGoal>
           >;
-          let found: BudgetLedgerSavingsGoal | undefined;
-          for (const [ledgerId, ledgerGoals] of Object.entries(data)) {
-            const entry = ledgerGoals[goalId];
-            if (entry !== undefined) {
-              found = firebaseToBudgetLedgerSavingsGoal(
-                goalId,
-                ledgerId,
-                entry,
-              );
-              break;
-            }
-          }
-          setGoal(found);
+          const flattened: BudgetLedgerSavingsGoal[] = Object.entries(
+            data,
+          ).flatMap(([ledgerId, ledgerGoals]) =>
+            Object.entries(ledgerGoals).map(([id, entry]) =>
+              firebaseToBudgetLedgerSavingsGoal(id, ledgerId, entry),
+            ),
+          );
+          setGoals(flattened);
         }
         setIsLoading(false);
       },
@@ -73,7 +57,7 @@ export function useSavingsGoal(
     );
 
     return unsubscribe;
-  }, [uid, goalId]);
+  }, [uid]);
 
-  return { goal, isLoading, error };
+  return { goals, isLoading, error };
 }
