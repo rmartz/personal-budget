@@ -1,4 +1,4 @@
-import { cleanup, renderHook } from "@testing-library/react";
+import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
@@ -29,10 +29,12 @@ describe("useCreateTransaction", () => {
         useCreateTransaction("uid-123", "ledger-abc"),
       );
 
-      await result.current.addExpense({
-        date: new Date("2024-03-15T00:00:00"),
-        amount: 42.5,
-        description: "Groceries",
+      await act(async () => {
+        await result.current.addExpense({
+          date: new Date("2024-03-15T00:00:00"),
+          amount: 42.5,
+          description: "Groceries",
+        });
       });
 
       expect(spy).toHaveBeenCalledWith("uid-123", "ledger-abc", {
@@ -44,30 +46,25 @@ describe("useCreateTransaction", () => {
     });
   });
 
-  describe("unreachable null-guard is removed (uid and ledgerId are string, not string | undefined)", () => {
-    it("does not throw and calls createTransaction even when uid is an empty string", async () => {
-      const spy = vi
-        .spyOn(transactionsService, "createTransaction")
-        .mockResolvedValue({
-          id: "tx-id",
-          ledgerId: "ledger-abc",
-          type: BudgetLedgerTransactionType.Expense,
-          date: new Date("2024-03-15T00:00:00"),
-          amount: 10,
-          description: "Test",
-        });
+  describe("throws when uid is empty", () => {
+    it("throws and does not call createTransaction when uid is an empty string", async () => {
+      const spy = vi.spyOn(transactionsService, "createTransaction");
 
       const { result } = renderHook(() =>
         useCreateTransaction("", "ledger-abc"),
       );
 
-      await result.current.addExpense({
-        date: new Date("2024-03-15T00:00:00"),
-        amount: 10,
-        description: "Test",
-      });
+      await expect(
+        act(async () => {
+          await result.current.addExpense({
+            date: new Date("2024-03-15T00:00:00"),
+            amount: 10,
+            description: "Test",
+          });
+        }),
+      ).rejects.toThrow("Cannot create transaction: missing uid or ledgerId");
 
-      expect(spy).toHaveBeenCalled();
+      expect(spy).not.toHaveBeenCalled();
     });
   });
 });
