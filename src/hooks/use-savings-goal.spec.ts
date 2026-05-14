@@ -95,7 +95,7 @@ describe("useSavingsGoal", () => {
       expect(result.current.error).toBeUndefined();
     });
 
-    it("clears error when uid changes from empty to non-empty", async () => {
+    it("clears error when uid changes to a new value", async () => {
       mockOnValue.mockImplementation(
         (_ref: unknown, _cb: unknown, errCb: (err: Error) => void) => {
           errCb(new Error("permission denied"));
