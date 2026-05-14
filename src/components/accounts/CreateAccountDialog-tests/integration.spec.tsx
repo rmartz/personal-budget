@@ -1,14 +1,16 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
-import { CreateAccountDialog } from "../CreateAccountDialog";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
+
 import { CREATE_ACCOUNT_DIALOG_COPY } from "../copy";
+import { CreateAccountDialog } from "../CreateAccountDialog";
 
 afterEach(cleanup);
 

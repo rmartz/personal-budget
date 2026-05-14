@@ -1,14 +1,16 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
-import { SavingsGoalListView } from "./SavingsGoalList";
-import { SAVINGS_GOAL_LIST_COPY } from "./copy";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
+import { SAVINGS_GOAL_LIST_COPY } from "./copy";
+import { SavingsGoalListView } from "./SavingsGoalList";
 
 afterEach(cleanup);
 

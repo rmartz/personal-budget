@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { AddDepositDialogView } from "./AddDepositDialog";
 import { ADD_DEPOSIT_DIALOG_COPY } from "./AddDepositDialog.copy";
 

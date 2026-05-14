@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("firebase/database", () => ({
   getDatabase: vi.fn(),
@@ -15,19 +15,20 @@ vi.mock("@/lib/firebase/client", () => ({
 }));
 
 import {
-  getDatabase,
-  ref,
   get,
+  getDatabase,
+  push,
+  ref,
+  remove,
   set,
   update,
-  push,
-  remove,
 } from "firebase/database";
+
 import {
-  getAnnuities,
   createAnnuity,
-  updateAnnuity,
   deleteAnnuity,
+  getAnnuities,
+  updateAnnuity,
 } from "./annuities";
 
 const mockDb = { type: "mock-db" };

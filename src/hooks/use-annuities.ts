@@ -1,12 +1,13 @@
 "use client";
 
+import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
-import { getDatabase, ref, onValue } from "firebase/database";
+
 import { getClientApp } from "@/lib/firebase/client";
 import {
-  firebaseToAnnuity,
-  type FirebaseAnnuity,
   type Annuity,
+  type FirebaseAnnuity,
+  firebaseToAnnuity,
 } from "@/lib/firebase/schema/annuities";
 
 export function useAnnuities(uid: string) {

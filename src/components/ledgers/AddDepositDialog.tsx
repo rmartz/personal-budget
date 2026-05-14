@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useId } from "react";
-import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
+import { useId, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
+
 import { ADD_DEPOSIT_DIALOG_COPY } from "./AddDepositDialog.copy";
 
 type DepositInput = Omit<BudgetLedgerTransaction, "id" | "ledgerId" | "type">;

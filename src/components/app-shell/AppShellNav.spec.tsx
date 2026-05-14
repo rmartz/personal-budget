@@ -1,5 +1,6 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
 import { AppShellNavView } from "./AppShellNav";
 import { APP_SHELL_COPY } from "./copy";
 

@@ -1,9 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import type { Annuity } from "@/lib/firebase/schema/annuities";
+
 import { ANNUITY_LIST_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {

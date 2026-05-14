@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { ForgotPasswordFormView } from "@/components/auth/ForgotPasswordForm";
 import { FORGOT_PASSWORD_FORM_COPY } from "@/components/auth/ForgotPasswordForm.copy";
 import { sendPasswordReset } from "@/services/auth";
