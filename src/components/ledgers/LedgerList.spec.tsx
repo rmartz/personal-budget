@@ -120,10 +120,10 @@ describe("LedgerList", () => {
           onDeleteLedger={onDeleteLedger}
         />,
       );
-      expect(screen.getByText(/2 ledgers ·/)).toBeDefined();
+      expect(screen.getByText(/2 active ·/)).toBeDefined();
     });
 
-    it("uses singular 'ledger' when there is exactly one", () => {
+    it("uses 'active' when there is exactly one ledger", () => {
       render(
         <LedgerList
           ledgers={[makeLedger({ id: "1" })]}
@@ -133,13 +133,13 @@ describe("LedgerList", () => {
           onDeleteLedger={onDeleteLedger}
         />,
       );
-      expect(screen.getByText(/1 ledger ·/)).toBeDefined();
+      expect(screen.getByText(/1 active ·/)).toBeDefined();
     });
 
-    it("shows the total cash balance in the summary", () => {
+    it("shows the combined cash and investment total in the summary", () => {
       const ledgers = [
-        makeLedger({ id: "1", cashBalance: 1000, investmentBalance: 0 }),
-        makeLedger({ id: "2", cashBalance: 500, investmentBalance: 0 }),
+        makeLedger({ id: "1", cashBalance: 1000, investmentBalance: 200 }),
+        makeLedger({ id: "2", cashBalance: 500, investmentBalance: 300 }),
       ];
       render(
         <LedgerList
@@ -150,24 +150,7 @@ describe("LedgerList", () => {
           onDeleteLedger={onDeleteLedger}
         />,
       );
-      expect(screen.getByText(/\$1,500\.00 cash/)).toBeDefined();
-    });
-
-    it("shows the total invested balance in the summary", () => {
-      const ledgers = [
-        makeLedger({ id: "1", cashBalance: 0, investmentBalance: 750 }),
-        makeLedger({ id: "2", cashBalance: 0, investmentBalance: 250 }),
-      ];
-      render(
-        <LedgerList
-          ledgers={ledgers}
-          isLoading={false}
-          onNewLedger={onNewLedger}
-          onEditLedger={onEditLedger}
-          onDeleteLedger={onDeleteLedger}
-        />,
-      );
-      expect(screen.getByText(/\$1,000\.00 invested/)).toBeDefined();
+      expect(screen.getByText(/\$2,000\.00 total/)).toBeDefined();
     });
   });
 });
