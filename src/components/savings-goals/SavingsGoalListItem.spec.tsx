@@ -1,11 +1,13 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
+import { SAVINGS_GOAL_LIST_ITEM_COPY } from "./copy";
 import {
   SavingsGoalListItem,
   SavingsGoalListItemView,
 } from "./SavingsGoalListItem";
-import { SAVINGS_GOAL_LIST_ITEM_COPY } from "./copy";
-import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
 afterEach(cleanup);
 

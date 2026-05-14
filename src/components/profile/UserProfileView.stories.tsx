@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { UserProfileView } from "./UserProfileView";
 
 const meta: Meta<typeof UserProfileView> = {

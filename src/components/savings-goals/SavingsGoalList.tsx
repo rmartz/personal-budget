@@ -1,9 +1,10 @@
 "use client";
 
-import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 import { Card } from "@/components/ui/card";
-import { SavingsGoalListItem } from "./SavingsGoalListItem";
+import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
 import { SAVINGS_GOAL_LIST_COPY } from "./copy";
+import { SavingsGoalListItem } from "./SavingsGoalListItem";
 
 export interface SavingsGoalListViewProps {
   goals: BudgetLedgerSavingsGoal[];

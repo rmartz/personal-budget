@@ -1,7 +1,8 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { ProfileSettingsView } from "./ProfileSettingsView";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { PROFILE_SETTINGS_COPY } from "./copy";
+import { ProfileSettingsView } from "./ProfileSettingsView";
 
 afterEach(cleanup);
 

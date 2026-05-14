@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { AnnuityListView } from "./AnnuityListView";
+
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
+
+import { AnnuityListView } from "./AnnuityListView";
 
 const meta: Meta<typeof AnnuityListView> = {
   component: AnnuityListView,

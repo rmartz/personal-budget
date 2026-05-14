@@ -1,14 +1,16 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
-import { CreateAnnuityDialogView } from "./CreateAnnuityDialog";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
+
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
+import { CreateAnnuityDialogView } from "./CreateAnnuityDialog";
 
 afterEach(cleanup);
 

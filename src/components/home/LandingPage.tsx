@@ -1,7 +1,9 @@
 import Link from "next/link";
+
 import { buttonVariants } from "@/components/ui";
-import { PublicHeader } from "./PublicHeader";
+
 import { LANDING_PAGE_COPY } from "./LandingPage.copy";
+import { PublicHeader } from "./PublicHeader";
 
 export function LandingPage() {
   return (

@@ -1,9 +1,8 @@
 "use client";
 
+import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import { ChevronUp, ChevronDown, MoreHorizontal } from "lucide-react";
-import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
-import { Button } from "@/components/ui/button";
+
 import {
   AlertDialogBackdrop,
   AlertDialogClose,
@@ -13,17 +12,20 @@ import {
   AlertDialogRoot,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Bar } from "@/components/ui/bar";
+import { Button } from "@/components/ui/button";
 import {
-  DropdownMenuRoot,
-  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuPopup,
   DropdownMenuPortal,
   DropdownMenuPositioner,
-  DropdownMenuPopup,
-  DropdownMenuItem,
+  DropdownMenuRoot,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bar } from "@/components/ui/bar";
-import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
+import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
 import { SAVINGS_GOAL_LIST_COPY, SAVINGS_GOAL_LIST_ITEM_COPY } from "./copy";
+import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

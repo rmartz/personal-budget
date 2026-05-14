@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { renderHook, waitFor, cleanup, act } from "@testing-library/react";
+import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { useSavingsGoals } from "./use-savings-goals";
 
 const mockUnsubscribe = vi.fn();

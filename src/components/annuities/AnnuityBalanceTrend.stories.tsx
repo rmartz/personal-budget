@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { AnnuityBalanceTrend } from "./AnnuityBalanceTrend";
+
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
+
+import { AnnuityBalanceTrend } from "./AnnuityBalanceTrend";
 
 const meta: Meta<typeof AnnuityBalanceTrend> = {
   component: AnnuityBalanceTrend,

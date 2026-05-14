@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
+  AnnuityMonthlyMode,
   annuityToFirebase,
   firebaseToAnnuity,
-  AnnuityMonthlyMode,
 } from "./annuities";
 
 describe("annuityToFirebase", () => {

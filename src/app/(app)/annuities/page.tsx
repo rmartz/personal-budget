@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { useAnnuities } from "@/hooks/use-annuities";
-import { Button } from "@/components/ui/button";
+
+import type { CreateAnnuityInput } from "@/components/annuities";
 import {
+  AnnuityBalanceTrend,
   AnnuityCard,
   AnnuityPaymentHistoryTable,
-  AnnuityBalanceTrend,
   CreateAnnuityDialog,
 } from "@/components/annuities";
 import { ANNUITY_LIST_COPY } from "@/components/annuities/copy";
+import { Button } from "@/components/ui/button";
+import { useAnnuities } from "@/hooks/use-annuities";
+import { useAuth } from "@/hooks/use-auth";
 import { createAnnuity } from "@/services/annuities";
-import type { CreateAnnuityInput } from "@/components/annuities";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

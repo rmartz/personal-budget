@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { PUBLIC_HEADER_COPY } from "./PublicHeader.copy";
 
 export function PublicHeader() {

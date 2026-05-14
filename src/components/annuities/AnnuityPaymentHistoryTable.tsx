@@ -1,7 +1,8 @@
 "use client";
 
-import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { Card } from "@/components/ui/card";
+import type { Annuity } from "@/lib/firebase/schema/annuities";
+
 import { ANNUITY_CARD_COPY } from "./copy";
 
 export interface AnnuityPaymentHistoryTableProps {

@@ -1,8 +1,9 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
 import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
-import { Card } from "@/components/ui/card";
+
 import { ANNUITY_CARD_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {

@@ -1,9 +1,11 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { AnnuityCard } from "./AnnuityCard";
-import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
-import { ANNUITY_CARD_COPY } from "./copy";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { Annuity } from "@/lib/firebase/schema/annuities";
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
+
+import { AnnuityCard } from "./AnnuityCard";
+import { ANNUITY_CARD_COPY } from "./copy";
 
 afterEach(cleanup);
 

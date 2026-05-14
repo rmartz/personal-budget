@@ -1,13 +1,14 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
 import {
+  cleanup,
+  fireEvent,
   render,
   screen,
-  fireEvent,
-  cleanup,
   waitFor,
 } from "@testing-library/react";
-import { UserProfileView } from "./UserProfileView";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { USER_PROFILE_COPY } from "./copy";
+import { UserProfileView } from "./UserProfileView";
 
 afterEach(cleanup);
 

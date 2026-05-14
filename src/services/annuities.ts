@@ -1,18 +1,19 @@
 import {
-  getDatabase,
-  ref,
   get,
+  getDatabase,
+  push,
+  ref,
+  remove,
   set,
   update,
-  push,
-  remove,
 } from "firebase/database";
+
 import { getClientApp } from "@/lib/firebase/client";
 import {
-  annuityToFirebase,
-  firebaseToAnnuity,
-  type FirebaseAnnuity,
   type Annuity,
+  annuityToFirebase,
+  type FirebaseAnnuity,
+  firebaseToAnnuity,
 } from "@/lib/firebase/schema/annuities";
 
 function db() {

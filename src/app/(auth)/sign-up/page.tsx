@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { SignUpFormView } from "@/components/auth/SignUpForm";
 import { SIGN_UP_FORM_COPY } from "@/components/auth/SignUpForm.copy";
 import { signUp } from "@/services/auth";

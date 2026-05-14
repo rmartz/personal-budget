@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
 
 const FIREBASE_JWKS_URL =
