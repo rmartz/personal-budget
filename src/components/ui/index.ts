@@ -7,6 +7,9 @@ export type { InputProps } from "./input";
 export { Label } from "./label";
 export type { LabelProps } from "./label";
 
+export { Select } from "./select";
+export type { SelectProps } from "./select";
+
 export {
   Card,
   CardContent,

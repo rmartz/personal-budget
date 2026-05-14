@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import { PROFILE_SETTINGS_COPY } from "./copy";
@@ -19,17 +20,18 @@ interface SettingsRowProps {
 
 function SettingsRow({ label, value, onClick }: SettingsRowProps) {
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={onClick}
-      className="flex w-full items-center justify-between px-4 py-3 text-sm hover:bg-muted/50"
+      className="flex w-full items-center justify-between px-4 py-3 text-sm"
     >
       <span>{label}</span>
       <span className="flex items-center gap-2 text-muted-foreground">
         {value !== undefined && <span>{value}</span>}
         <span aria-hidden="true">›</span>
       </span>
-    </button>
+    </Button>
   );
 }
 

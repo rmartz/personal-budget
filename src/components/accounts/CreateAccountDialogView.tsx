@@ -3,12 +3,14 @@
 import { Button } from "@/components/ui/button";
 import {
   DialogBackdrop,
-  DialogClose,
   DialogPopup,
   DialogPortal,
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
 
 import { CREATE_ACCOUNT_DIALOG_COPY } from "./copy";
@@ -73,13 +75,10 @@ export function CreateAccountDialogView({
           >
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor="create-account-name"
-                >
+                <Label htmlFor="create-account-name">
                   {CREATE_ACCOUNT_DIALOG_COPY.nameLabel}
-                </label>
-                <input
+                </Label>
+                <Input
                   id="create-account-name"
                   type="text"
                   value={name}
@@ -93,7 +92,6 @@ export function CreateAccountDialogView({
                       ? "create-account-name-error"
                       : undefined
                   }
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
                 />
                 {nameError !== undefined && (
                   <p
@@ -106,13 +104,10 @@ export function CreateAccountDialogView({
                 )}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor="create-account-type"
-                >
+                <Label htmlFor="create-account-type">
                   {CREATE_ACCOUNT_DIALOG_COPY.typeLabel}
-                </label>
-                <select
+                </Label>
+                <Select
                   id="create-account-type"
                   value={accountType ?? ""}
                   onChange={(e) => {
@@ -126,7 +121,6 @@ export function CreateAccountDialogView({
                       ? "create-account-type-error"
                       : undefined
                   }
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
                 >
                   <option value="" disabled>
                     {CREATE_ACCOUNT_DIALOG_COPY.typePlaceholder}
@@ -159,7 +153,7 @@ export function CreateAccountDialogView({
                       ]
                     }
                   </option>
-                </select>
+                </Select>
                 {accountTypeError !== undefined && (
                   <p
                     id="create-account-type-error"
@@ -172,13 +166,10 @@ export function CreateAccountDialogView({
               </div>
               {showTargetFloat && (
                 <div className="flex flex-col gap-1.5">
-                  <label
-                    className="text-sm font-medium"
-                    htmlFor="create-account-target-float"
-                  >
+                  <Label htmlFor="create-account-target-float">
                     {CREATE_ACCOUNT_DIALOG_COPY.targetFloatLabel}
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="create-account-target-float"
                     type="number"
                     min="0.01"
@@ -196,7 +187,6 @@ export function CreateAccountDialogView({
                         ? "create-account-target-float-error"
                         : undefined
                     }
-                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
                   />
                   {targetFloatError !== undefined && (
                     <p
@@ -216,13 +206,16 @@ export function CreateAccountDialogView({
               </p>
             )}
             <div className="mt-6 flex justify-end gap-3">
-              <DialogClose
+              <Button
                 type="button"
-                className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted"
+                variant="outline"
                 disabled={isSubmitting}
+                onClick={() => {
+                  onOpenChange(false);
+                }}
               >
                 {CREATE_ACCOUNT_DIALOG_COPY.cancelButton}
-              </DialogClose>
+              </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {CREATE_ACCOUNT_DIALOG_COPY.submitButton}
               </Button>

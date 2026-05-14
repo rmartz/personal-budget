@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { buttonVariants } from "@/components/ui";
+import { Button, buttonVariants } from "@/components/ui";
 
 import { LANDING_PAGE_COPY } from "./LandingPage.copy";
 import { PublicHeader } from "./PublicHeader";
@@ -24,9 +24,9 @@ export function LandingPage() {
             <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
               {LANDING_PAGE_COPY.primaryCta}
             </Link>
-            <button type="button" className="text-sm text-muted-foreground">
+            <Button type="button" variant="ghost" size="sm">
               {LANDING_PAGE_COPY.secondaryCta}
-            </button>
+            </Button>
           </div>
         </div>
         <div className="mt-16 flex w-full max-w-4xl items-center justify-center rounded-xl border bg-muted px-6 py-20 text-sm text-muted-foreground">
