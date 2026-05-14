@@ -33,7 +33,9 @@ export function GoalCard({ goal, ledgerName }: GoalCardProps) {
             {String(goal.priority)}
           </span>
           <span className="shrink-0 text-xs text-muted-foreground">
-            {isFullyFunded ? GOALS_LIST_COPY.etaFunded : GOALS_LIST_COPY.etaPlaceholder}
+            {isFullyFunded
+              ? GOALS_LIST_COPY.etaFunded
+              : GOALS_LIST_COPY.etaPlaceholder}
           </span>
         </div>
 
