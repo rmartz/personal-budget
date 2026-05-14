@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
 
 const meta: Meta<typeof EditSavingsGoalDialog> = {

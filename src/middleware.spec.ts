@@ -1,7 +1,9 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import type { NextRequest } from "next/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
-import { middleware, config } from "./middleware";
+
+import { config, middleware } from "./middleware";
 
 function makeSessionCookie(): string {
   const now = Math.floor(Date.now() / 1000);

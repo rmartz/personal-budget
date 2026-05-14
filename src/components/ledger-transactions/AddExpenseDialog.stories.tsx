@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { AddExpenseDialog } from "./AddExpenseDialog";
 
 const meta: Meta<typeof AddExpenseDialog> = {

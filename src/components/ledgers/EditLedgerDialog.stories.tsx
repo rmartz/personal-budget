@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { EditLedgerDialog } from "./EditLedgerDialog";
 
 const meta: Meta<typeof EditLedgerDialog> = {

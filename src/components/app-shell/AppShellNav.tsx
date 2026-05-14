@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+
 import {
   Dialog,
   DialogBackdrop,
@@ -12,6 +12,8 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+
 import { APP_SHELL_COPY } from "./copy";
 
 interface NavLink {

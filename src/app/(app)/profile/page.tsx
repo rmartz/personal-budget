@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+
 import { ProfileSettingsView } from "@/components/profile";
 import { useAuth } from "@/hooks/use-auth";
 import { signOut } from "@/services/auth";

@@ -1,5 +1,6 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { SignInFormView } from "./SignInForm";
 import { SIGN_IN_FORM_COPY } from "./SignInForm.copy";
 

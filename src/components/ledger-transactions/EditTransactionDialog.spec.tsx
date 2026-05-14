@@ -1,13 +1,14 @@
 "use client";
 
-import { describe, it, expect, afterEach, vi } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import {
   EditTransactionDialog,
   EditTransactionDialogView,
