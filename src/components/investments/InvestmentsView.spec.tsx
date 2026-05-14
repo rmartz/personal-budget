@@ -2,7 +2,11 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { InvestmentsView } from "./InvestmentsView";
 import { Posture } from "@/lib/firebase/schema/investments";
-import { INVESTMENTS_VIEW_COPY, POSTURE_CARD_COPY } from "./copy";
+import {
+  INVESTMENTS_VIEW_COPY,
+  LEDGER_INVESTMENT_TABLE_COPY,
+  POSTURE_CARD_COPY,
+} from "./copy";
 
 afterEach(cleanup);
 
@@ -61,5 +65,30 @@ describe("InvestmentsView — no runtime errors with empty data", () => {
   it("renders without crashing when all data arrays are empty", () => {
     render(<InvestmentsView {...baseProps} />);
     expect(screen.getByText(INVESTMENTS_VIEW_COPY.title)).toBeDefined();
+  });
+});
+
+describe("InvestmentsView — loading state", () => {
+  it("does not render the title when isLoading is true", () => {
+    render(<InvestmentsView {...baseProps} isLoading={true} />);
+    expect(screen.queryByText(INVESTMENTS_VIEW_COPY.title)).toBeNull();
+  });
+
+  it("renders skeleton placeholders when isLoading is true", () => {
+    const { container } = render(
+      <InvestmentsView {...baseProps} isLoading={true} />,
+    );
+    expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(
+      0,
+    );
+  });
+});
+
+describe("InvestmentsView — ledger view all link", () => {
+  it("renders the View all link in the ledger table", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(
+      screen.getByText(LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(2)),
+    ).toBeDefined();
   });
 });

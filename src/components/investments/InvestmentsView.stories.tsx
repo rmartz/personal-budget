@@ -10,6 +10,17 @@ const meta: Meta<typeof InvestmentsView> = {
 export default meta;
 type Story = StoryObj<typeof InvestmentsView>;
 
+export const Loading: Story = {
+  args: {
+    accounts: [],
+    allocation: [],
+    posture: Posture.Balanced,
+    isLoading: true,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onApplyRebalance: () => {},
+  },
+};
+
 export const Empty: Story = {
   args: {
     accounts: [],

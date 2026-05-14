@@ -30,8 +30,27 @@ export function InvestmentsView({
   accounts,
   allocation,
   posture,
+  isLoading,
   onApplyRebalance,
 }: InvestmentsViewProps) {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="h-8 w-48 animate-pulse rounded bg-muted" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="h-32 animate-pulse rounded bg-muted" />
+          <div className="h-32 animate-pulse rounded bg-muted" />
+          <div className="h-32 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="h-48 animate-pulse rounded bg-muted" />
+          <div className="h-48 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="h-48 animate-pulse rounded bg-muted" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -231,6 +250,13 @@ export function InvestmentsView({
               ))}
             </tbody>
           </table>
+          <div className="border-t px-4 py-2 text-right">
+            <span className="cursor-pointer text-xs text-primary hover:underline">
+              {LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(
+                INVESTMENTS_PLACEHOLDER_FIXTURE.ledgerRows.length,
+              )}
+            </span>
+          </div>
         </CardContent>
       </Card>
     </div>
