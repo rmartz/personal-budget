@@ -1,3 +1,4 @@
+export { useAccounts } from "./use-accounts";
 export { useAllSavingsGoals } from "./use-all-savings-goals";
 export { useAnnuities } from "./use-annuities";
 export { useAuth } from "./use-auth";
