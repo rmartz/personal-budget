@@ -12,8 +12,8 @@ export const ANNUITY_CARD_COPY = {
   paymentHistoryEmpty: "No payment history yet.",
   paymentHistoryTitle: (annuityName: string) =>
     `${annuityName} · payment history`,
-  termRemainingLabel: "Term remaining",
   termRemainingIndefinite: "Ongoing",
+  termRemainingLabel: "Term remaining",
   termRemainingMonths: (months: number) => `${String(months)} mo left`,
 } as const;
 

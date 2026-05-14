@@ -39,6 +39,17 @@ describe("annuityToFirebase", () => {
     });
     expect(result.durationMonths).toBe(60);
   });
+
+  it("serializes PVDerived monthlyMode correctly", () => {
+    const result = annuityToFirebase({
+      name: "Mortgage",
+      monthlyAmount: 978.63,
+      startDate: new Date(),
+      durationMonths: 360,
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+    });
+    expect(result.monthlyMode).toBe(AnnuityMonthlyMode.PVDerived);
+  });
 });
 
 describe("firebaseToAnnuity", () => {
@@ -95,5 +106,15 @@ describe("firebaseToAnnuity", () => {
     });
     const result = firebaseToAnnuity("a-1", firebase);
     expect(result.startDate.toISOString()).toBe(startDate.toISOString());
+  });
+
+  it("defaults monthlyMode to Flat when field is absent from Firebase record", () => {
+    const result = firebaseToAnnuity("a-1", {
+      name: "Legacy",
+      monthlyAmount: 200,
+      startDate: "2020-01-01T00:00:00.000Z",
+      durationMonths: null,
+    });
+    expect(result.monthlyMode).toBe(AnnuityMonthlyMode.Flat);
   });
 });
