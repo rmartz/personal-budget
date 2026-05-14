@@ -1,7 +1,9 @@
 export const LANDING_PAGE_COPY = {
-  createAccountButton: "Create account",
-  description:
-    "Track spending across ledgers, manage your cash and investment split, and work toward your financial goals — all in one place.",
-  heading: "Take control of your finances",
-  signInButton: "Sign in",
+  bodyCopy:
+    "Track balances across accounts you keep at any bank. Split each ledger between cash and investments, set goals, and run a monthly reconciliation that tells you exactly what to move where.",
+  eyebrow: "PERSONAL BUDGET · THE CALM KIND",
+  headline: "Money you already have, organized.",
+  placeholderCaption: "placeholder · screenshot of reconciliation home",
+  primaryCta: "Start free",
+  secondaryCta: "How it works",
 } as const;
