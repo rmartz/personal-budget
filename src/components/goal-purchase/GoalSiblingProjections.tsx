@@ -24,7 +24,9 @@ export function GoalSiblingProjections({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left text-xs text-muted-foreground">
-                <th className="px-4 py-2 font-medium">Goal</th>
+                <th className="px-4 py-2 font-medium">
+                  {GOAL_SIBLING_PROJECTIONS_COPY.columnGoal}
+                </th>
                 <th className="px-4 py-2 font-medium">
                   {GOAL_SIBLING_PROJECTIONS_COPY.columnPriorEta}
                 </th>

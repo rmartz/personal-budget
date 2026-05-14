@@ -24,6 +24,7 @@ export const GOAL_PURCHASE_WARNING_COPY = {
 } as const;
 
 export const GOAL_SIBLING_PROJECTIONS_COPY = {
+  columnGoal: "Goal",
   columnNewEta: "New ETA",
   columnPriorEta: "Was",
   etaPlaceholder: "—",
