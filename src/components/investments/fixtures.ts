@@ -2,7 +2,6 @@
 // to remove when real data is wired up in epics #10, #11.
 export const INVESTMENTS_PLACEHOLDER_FIXTURE = {
   aggregateNet: "$2,840.00",
-  availableMargin: "18%",
   buysTotal: "$3,200.00",
   investedTotal: "$48,200.00",
   ledgerRows: [
@@ -20,7 +19,6 @@ export const INVESTMENTS_PLACEHOLDER_FIXTURE = {
     },
   ],
   marginAvailable: "18%",
-  numAccounts: 4,
   recommendedAmount: "$3,200.00",
   recommendedSublabel: "$560.00",
   sellsTotal: "$360.00",

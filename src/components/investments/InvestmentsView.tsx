@@ -18,6 +18,11 @@ import {
 } from "./copy";
 import { INVESTMENTS_PLACEHOLDER_FIXTURE } from "./fixtures";
 
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
+
 export interface InvestmentsViewProps {
   accounts: InvestmentAccount[];
   allocation: AllocationTarget[];
@@ -60,11 +65,13 @@ export function InvestmentsView({
             {INVESTMENTS_VIEW_COPY.title}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {INVESTMENTS_VIEW_COPY.titleSummary(
-              INVESTMENTS_PLACEHOLDER_FIXTURE.investedTotal,
-              INVESTMENTS_PLACEHOLDER_FIXTURE.numAccounts,
-              INVESTMENTS_PLACEHOLDER_FIXTURE.marginAvailable,
-            )}
+            {accounts.length === 0
+              ? INVESTMENTS_VIEW_COPY.titleSummary("$0.00", 0, "—")
+              : INVESTMENTS_VIEW_COPY.titleSummary(
+                  INVESTMENTS_PLACEHOLDER_FIXTURE.investedTotal,
+                  accounts.length,
+                  INVESTMENTS_PLACEHOLDER_FIXTURE.marginAvailable,
+                )}
           </p>
         </div>
         <Button onClick={onApplyRebalance}>
@@ -197,7 +204,7 @@ export function InvestmentsView({
                         {row.action}
                       </td>
                       <td className="px-4 py-2 text-right font-mono">
-                        ${row.amount.toFixed(2)}
+                        {currencyFormatter.format(row.amount)}
                       </td>
                     </tr>
                   ))}
@@ -251,11 +258,14 @@ export function InvestmentsView({
             </tbody>
           </table>
           <div className="border-t px-4 py-2 text-right">
-            <span className="cursor-pointer text-xs text-primary hover:underline">
+            <button
+              type="button"
+              className="text-xs text-primary hover:underline"
+            >
               {LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(
                 INVESTMENTS_PLACEHOLDER_FIXTURE.ledgerRows.length,
               )}
-            </span>
+            </button>
           </div>
         </CardContent>
       </Card>

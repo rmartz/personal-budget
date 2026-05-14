@@ -60,7 +60,7 @@ export function PostureCard({ posture }: PostureCardProps) {
               {POSTURE_CARD_COPY.availableMargin}
             </dt>
             <dd className="font-mono font-medium">
-              {INVESTMENTS_PLACEHOLDER_FIXTURE.availableMargin}
+              {INVESTMENTS_PLACEHOLDER_FIXTURE.marginAvailable}
             </dd>
           </div>
           <div className="flex justify-between">
