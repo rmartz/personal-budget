@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { GoalCard } from "./GoalCard";
-import { GOAL_CARD_COPY } from "./copy";
+import { GOAL_CARD_COPY, GOALS_LIST_COPY } from "./copy";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
 afterEach(cleanup);
@@ -90,7 +90,7 @@ describe("GoalCard — content", () => {
           ledgerName="Primary"
         />,
       );
-      expect(screen.getByText(/Ready to purchase/)).toBeDefined();
+      expect(screen.getByText(GOALS_LIST_COPY.readyToPurchase)).toBeDefined();
     });
 
     it("does not show 'to go' label when fully funded", () => {

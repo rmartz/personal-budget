@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 import { Card } from "@/components/ui/card";
 import { Bar } from "@/components/ui/bar";
-import { GOAL_CARD_COPY } from "./copy";
+import { GOAL_CARD_COPY, GOALS_LIST_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -33,7 +33,7 @@ export function GoalCard({ goal, ledgerName }: GoalCardProps) {
             {String(goal.priority)}
           </span>
           <span className="shrink-0 text-xs text-muted-foreground">
-            {isFullyFunded ? "Funded" : GOAL_CARD_COPY.eyebrowSeparator}
+            {isFullyFunded ? GOALS_LIST_COPY.etaFunded : GOALS_LIST_COPY.etaPlaceholder}
           </span>
         </div>
 
@@ -64,7 +64,7 @@ export function GoalCard({ goal, ledgerName }: GoalCardProps) {
             }
           >
             {isFullyFunded
-              ? "Ready to purchase"
+              ? GOALS_LIST_COPY.readyToPurchase
               : GOAL_CARD_COPY.toGoLabel(currencyFormatter.format(amountToGo))}
           </span>
         </div>

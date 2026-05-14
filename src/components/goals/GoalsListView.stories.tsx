@@ -14,6 +14,15 @@ const ledgerNames = {
   "ledger-2": "Travel Fund",
 };
 
+export const ErrorState: Story = {
+  args: {
+    goals: [],
+    ledgerNames,
+    isLoading: false,
+    error: new Error("Firebase permission denied"),
+  },
+};
+
 export const Empty: Story = {
   args: {
     goals: [],

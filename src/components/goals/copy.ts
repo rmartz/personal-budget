@@ -1,6 +1,7 @@
 export const GOALS_LIST_COPY = {
   emptyStateMessage:
     "No savings goals yet. Add a goal inside any ledger to get started.",
+  errorMessage: "Failed to load goals. Please try again later.",
   etaFunded: "Funded",
   etaPlaceholder: "—",
   newGoalButton: "+ New goal",

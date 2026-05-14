@@ -10,12 +10,14 @@ export interface GoalsListViewProps {
   goals: BudgetLedgerSavingsGoal[];
   ledgerNames: Record<string, string>;
   isLoading: boolean;
+  error?: Error;
 }
 
 export function GoalsListView({
   goals,
   ledgerNames,
   isLoading,
+  error,
 }: GoalsListViewProps) {
   return (
     <div className="flex flex-col gap-6">
@@ -36,7 +38,11 @@ export function GoalsListView({
         </div>
       </div>
 
-      {isLoading ? (
+      {error !== undefined ? (
+        <p className="py-12 text-center text-destructive">
+          {GOALS_LIST_COPY.errorMessage}
+        </p>
+      ) : isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Card className="h-40 p-4">
             <Skeleton className="h-full w-full" />

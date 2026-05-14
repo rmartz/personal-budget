@@ -8,7 +8,7 @@ import { GoalsListView } from "@/components/goals";
 export default function GoalsPage() {
   const { user, loading: authLoading } = useAuth();
   const uid = user?.uid ?? "";
-  const { goals, isLoading: goalsLoading } = useAllSavingsGoals(uid);
+  const { goals, isLoading: goalsLoading, error: goalsError } = useAllSavingsGoals(uid);
   const { ledgers } = useLedgersSubscription(uid);
 
   if (authLoading || !user) {
@@ -25,6 +25,7 @@ export default function GoalsPage() {
         goals={goals}
         ledgerNames={ledgerNames}
         isLoading={goalsLoading}
+        error={goalsError}
       />
     </div>
   );

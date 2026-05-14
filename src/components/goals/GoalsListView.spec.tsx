@@ -66,6 +66,34 @@ describe("GoalsListView — empty state", () => {
   });
 });
 
+describe("GoalsListView — error state", () => {
+  describe("shows error message when error is present", () => {
+    it("renders the error message when error is provided", () => {
+      render(
+        <GoalsListView
+          goals={[]}
+          ledgerNames={ledgerNames}
+          isLoading={false}
+          error={new Error("Firebase permission denied")}
+        />,
+      );
+      expect(screen.getByText(GOALS_LIST_COPY.errorMessage)).toBeDefined();
+    });
+
+    it("does not render the empty state when error is present", () => {
+      render(
+        <GoalsListView
+          goals={[]}
+          ledgerNames={ledgerNames}
+          isLoading={false}
+          error={new Error("Firebase permission denied")}
+        />,
+      );
+      expect(screen.queryByText(GOALS_LIST_COPY.emptyStateMessage)).toBeNull();
+    });
+  });
+});
+
 describe("GoalsListView — populated state", () => {
   describe("renders a card for each goal", () => {
     it("renders goal names for all goals", () => {
