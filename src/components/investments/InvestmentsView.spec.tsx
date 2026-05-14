@@ -8,6 +8,7 @@ import {
   LEDGER_INVESTMENT_TABLE_COPY,
   POSTURE_CARD_COPY,
 } from "./copy";
+import { INVESTMENTS_PLACEHOLDER_FIXTURE } from "./fixtures";
 import { InvestmentsView } from "./InvestmentsView";
 
 afterEach(cleanup);
@@ -90,7 +91,11 @@ describe("InvestmentsView — ledger view all link", () => {
   it("renders the View all link in the ledger table", () => {
     render(<InvestmentsView {...baseProps} />);
     expect(
-      screen.getByText(LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(2)),
+      screen.getByText(
+        LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(
+          INVESTMENTS_PLACEHOLDER_FIXTURE.totalLedgerCount,
+        ),
+      ),
     ).toBeDefined();
   });
 });

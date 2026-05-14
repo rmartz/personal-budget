@@ -67,7 +67,11 @@ export function InvestmentsView({
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {accounts.length === 0
-              ? INVESTMENTS_VIEW_COPY.titleSummary("$0.00", 0, "—")
+              ? INVESTMENTS_VIEW_COPY.titleSummary(
+                  INVESTMENTS_PLACEHOLDER_FIXTURE.emptyTotalInvested,
+                  0,
+                  INVESTMENTS_PLACEHOLDER_FIXTURE.emptyMargin,
+                )
               : INVESTMENTS_VIEW_COPY.titleSummary(
                   INVESTMENTS_PLACEHOLDER_FIXTURE.investedTotal,
                   accounts.length,
@@ -141,7 +145,7 @@ export function InvestmentsView({
           <CardContent className="flex flex-col gap-3">
             {accounts.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No investment accounts configured.
+                {TARGET_ALLOCATION_COPY.noAccountsConfigured}
               </p>
             ) : (
               accounts.map((account) => (
@@ -175,7 +179,7 @@ export function InvestmentsView({
           <CardContent className="p-0">
             {allocation.length === 0 ? (
               <p className="px-4 pb-4 text-sm text-muted-foreground">
-                No distribution calculated yet.
+                {MONTHLY_DISTRIBUTION_COPY.noDistributionCalculated}
               </p>
             ) : (
               <table className="w-full text-sm">
@@ -264,7 +268,7 @@ export function InvestmentsView({
               className="text-xs text-primary hover:underline"
             >
               {LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(
-                INVESTMENTS_PLACEHOLDER_FIXTURE.ledgerRows.length,
+                INVESTMENTS_PLACEHOLDER_FIXTURE.totalLedgerCount,
               )}
             </button>
           </div>

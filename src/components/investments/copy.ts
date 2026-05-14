@@ -31,6 +31,7 @@ export const AGGREGATE_BUY_SELL_COPY = {
 export const TARGET_ALLOCATION_COPY = {
   footerNote:
     "Vertical line = target. Bar = current. Deviation drives this month's rebalance.",
+  noAccountsConfigured: "No investment accounts configured.",
   title: "Target allocation · must sum to 100%",
 } as const;
 
@@ -38,6 +39,7 @@ export const MONTHLY_DISTRIBUTION_COPY = {
   columnAction: "Action",
   columnAmount: "Amount",
   columnAccount: "Account",
+  noDistributionCalculated: "No distribution calculated yet.",
   title: (total: string) => `This month's distribution · ${total}`,
 } as const;
 

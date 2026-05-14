@@ -3,6 +3,8 @@
 export const INVESTMENTS_PLACEHOLDER_FIXTURE = {
   aggregateNet: "$2,840.00",
   buysTotal: "$3,200.00",
+  emptyMargin: "—",
+  emptyTotalInvested: "$0.00",
   investedTotal: "$48,200.00",
   ledgerRows: [
     {
@@ -23,4 +25,5 @@ export const INVESTMENTS_PLACEHOLDER_FIXTURE = {
   recommendedSublabel: "$560.00",
   sellsTotal: "$360.00",
   targetMargin: "20%",
+  totalLedgerCount: 14,
 } as const;
