@@ -52,3 +52,13 @@ export const Mobile: Story = {
     viewport: { defaultViewport: "mobile1" },
   },
 };
+
+export const MobileMoreActive: Story = {
+  args: {
+    pathname: "/profile",
+    children: placeholderChild,
+  },
+  parameters: {
+    viewport: { defaultViewport: "mobile1" },
+  },
+};
