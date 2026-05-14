@@ -28,6 +28,7 @@ export const EDIT_LEDGER_DIALOG_COPY = {
 
 export const LEDGER_LIST_ITEM_COPY = {
   activityNone: "—",
+  activityNoneAriaLabel: "No activity",
   deleteCancelButton: "Cancel",
   deleteConfirmButton: "Delete",
   deleteConfirmDescription:

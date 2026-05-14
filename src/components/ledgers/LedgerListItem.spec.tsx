@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  cleanup,
+  fireEvent,
+  within,
+} from "@testing-library/react";
 import { LedgerListItem, LedgerListItemView } from "./LedgerListItem";
 import { LEDGER_LIST_ITEM_COPY, LEDGERS_PAGE_COPY } from "./copy";
 import type { Ledger } from "@/lib/types";
@@ -233,9 +239,10 @@ describe("LedgerListItemView", () => {
           </tbody>
         </table>,
       );
+      const goalsCell = screen.getByTestId("goals-cell");
       expect(
-        screen.getAllByText(LEDGER_LIST_ITEM_COPY.goalsNone).length,
-      ).toBeGreaterThan(0);
+        within(goalsCell).getByText(LEDGER_LIST_ITEM_COPY.goalsNone),
+      ).toBeDefined();
     });
 
     it("renders the goals count when goalsCount is non-zero", () => {
@@ -255,6 +262,32 @@ describe("LedgerListItemView", () => {
         </table>,
       );
       expect(screen.getByText("3")).toBeDefined();
+    });
+  });
+
+  describe("activity column", () => {
+    it("renders the activityNone placeholder", () => {
+      const ledger = makeLedger();
+      render(
+        <table>
+          <tbody>
+            <LedgerListItemView
+              ledger={ledger}
+              onEdit={onEdit}
+              deleteDialogOpen={false}
+              onDeleteDialogOpenChange={vi.fn()}
+              onDeleteMenuClick={vi.fn()}
+              onDeleteConfirm={vi.fn()}
+            />
+          </tbody>
+        </table>,
+      );
+      const activityCell = screen.getByRole("cell", {
+        name: LEDGER_LIST_ITEM_COPY.activityNoneAriaLabel,
+      });
+      expect(
+        within(activityCell).getByText(LEDGER_LIST_ITEM_COPY.activityNone),
+      ).toBeDefined();
     });
   });
 });

@@ -84,13 +84,16 @@ export function LedgerListItemView({
       <td className="px-4 py-3 text-right font-mono text-sm">
         {currencyFormatter.format(totalBalance)}
       </td>
-      <td className="px-4 py-3 text-right text-sm">
+      <td className="px-4 py-3 text-right text-sm" data-testid="goals-cell">
         {(ledger.goalsCount ?? 0) > 0
           ? ledger.goalsCount
           : LEDGER_LIST_ITEM_COPY.goalsNone}
       </td>
       {/* TODO: Replace placeholder with real activity data (epic #18) */}
-      <td className="px-4 py-3 text-right text-sm text-muted-foreground">
+      <td
+        className="px-4 py-3 text-right text-sm text-muted-foreground"
+        aria-label={LEDGER_LIST_ITEM_COPY.activityNoneAriaLabel}
+      >
         {LEDGER_LIST_ITEM_COPY.activityNone}
       </td>
       <td className="px-4 py-3">
