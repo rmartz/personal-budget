@@ -2,43 +2,73 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { LandingPage } from "./LandingPage";
 import { LANDING_PAGE_COPY } from "./LandingPage.copy";
+import { PUBLIC_HEADER_COPY } from "./PublicHeader.copy";
 
 afterEach(cleanup);
 
-describe("LandingPage", () => {
-  describe("service description", () => {
-    it("renders the main heading", () => {
-      render(<LandingPage />);
-      expect(
-        screen.getByRole("heading", { name: LANDING_PAGE_COPY.heading }),
-      ).toBeDefined();
-    });
-
-    it("renders the service description text", () => {
-      render(<LandingPage />);
-      expect(screen.getByText(LANDING_PAGE_COPY.description)).toBeDefined();
-    });
+describe("LandingPage — hero block", () => {
+  it("renders the eyebrow text", () => {
+    render(<LandingPage />);
+    expect(screen.getByText(LANDING_PAGE_COPY.eyebrow)).toBeDefined();
   });
 
-  describe("Sign in CTA", () => {
-    it("renders a Sign in link pointing to /sign-in", () => {
-      render(<LandingPage />);
-      const link = screen.getByRole("link", {
-        name: LANDING_PAGE_COPY.signInButton,
-      });
-      expect(link).toBeDefined();
-      expect((link as HTMLAnchorElement).getAttribute("href")).toBe("/sign-in");
-    });
+  it("renders the headline", () => {
+    render(<LandingPage />);
+    expect(
+      screen.getByRole("heading", { name: LANDING_PAGE_COPY.headline }),
+    ).toBeDefined();
   });
 
-  describe("Create account CTA", () => {
-    it("renders a Create account link pointing to /sign-up", () => {
-      render(<LandingPage />);
-      const link = screen.getByRole("link", {
-        name: LANDING_PAGE_COPY.createAccountButton,
-      });
-      expect(link).toBeDefined();
-      expect((link as HTMLAnchorElement).getAttribute("href")).toBe("/sign-up");
+  it("renders the body copy", () => {
+    render(<LandingPage />);
+    expect(screen.getByText(LANDING_PAGE_COPY.bodyCopy)).toBeDefined();
+  });
+
+  it("renders the placeholder block caption", () => {
+    render(<LandingPage />);
+    expect(
+      screen.getByText(LANDING_PAGE_COPY.placeholderCaption),
+    ).toBeDefined();
+  });
+});
+
+describe("LandingPage — CTAs", () => {
+  it("renders a Start free link pointing to /sign-up", () => {
+    render(<LandingPage />);
+    const link = screen.getByRole("link", {
+      name: LANDING_PAGE_COPY.primaryCta,
     });
+    expect(link).toBeDefined();
+    expect((link as HTMLAnchorElement).getAttribute("href")).toBe("/sign-up");
+  });
+
+  it("renders a How it works button", () => {
+    render(<LandingPage />);
+    expect(
+      screen.getByRole("button", { name: LANDING_PAGE_COPY.secondaryCta }),
+    ).toBeDefined();
+  });
+});
+
+describe("LandingPage — public header", () => {
+  it("renders the Ledgerly wordmark in the header", () => {
+    render(<LandingPage />);
+    expect(screen.getByText(PUBLIC_HEADER_COPY.brand)).toBeDefined();
+  });
+
+  it("renders a Sign in link pointing to /sign-in", () => {
+    render(<LandingPage />);
+    const link = screen
+      .getAllByRole("link", { name: PUBLIC_HEADER_COPY.navSignIn })
+      .find((el) => el.getAttribute("href") === "/sign-in");
+    expect(link).toBeDefined();
+  });
+
+  it("renders a Get started link pointing to /sign-up", () => {
+    render(<LandingPage />);
+    const link = screen
+      .getAllByRole("link", { name: PUBLIC_HEADER_COPY.navGetStarted })
+      .find((el) => el.getAttribute("href") === "/sign-up");
+    expect(link).toBeDefined();
   });
 });

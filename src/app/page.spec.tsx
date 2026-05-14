@@ -9,7 +9,7 @@ describe("Home", () => {
   it("renders the landing page heading", () => {
     render(<Home />);
     expect(
-      screen.getByRole("heading", { name: LANDING_PAGE_COPY.heading }),
+      screen.getByRole("heading", { name: LANDING_PAGE_COPY.headline }),
     ).toBeDefined();
   });
 });
