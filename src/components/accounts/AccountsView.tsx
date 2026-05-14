@@ -8,14 +8,12 @@ import { SetupSummaryRow } from "./SetupSummaryRow";
 export interface AccountsViewProps {
   accounts: Account[];
   recurringExpenses: RecurringExpense[];
-  isLoading: boolean;
   onAddAccount: () => void;
 }
 
 export function AccountsView({
   accounts,
   recurringExpenses,
-  isLoading: _isLoading,
   onAddAccount,
 }: AccountsViewProps) {
   const missingCount = 0; // TODO: compute from recurringExpenses in epic #17
@@ -32,7 +30,7 @@ export function AccountsView({
           onClick={onAddAccount}
           aria-label={ACCOUNTS_PAGE_COPY.addAccountButton}
         >
-          +
+          {ACCOUNTS_PAGE_COPY.headerAddButton}
         </Button>
       </div>
 
@@ -56,9 +54,27 @@ export function AccountsView({
           />
         </div>
 
-        <Button variant="outline" className="w-full" onClick={onAddAccount}>
-          {ACCOUNTS_PAGE_COPY.addAccountButton}
-        </Button>
+        {accounts.length === 0 && (
+          <div className="rounded-lg border border-border bg-muted/40 px-4 py-6 text-center">
+            <p className="text-sm font-medium">{ACCOUNTS_PAGE_COPY.emptyStateHeading}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {ACCOUNTS_PAGE_COPY.emptyStateBody}
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={onAddAccount}
+            >
+              {ACCOUNTS_PAGE_COPY.addAccountButton}
+            </Button>
+          </div>
+        )}
+
+        {accounts.length > 0 && (
+          <Button variant="outline" className="w-full" onClick={onAddAccount}>
+            {ACCOUNTS_PAGE_COPY.addAccountButton}
+          </Button>
+        )}
       </section>
     </div>
   );

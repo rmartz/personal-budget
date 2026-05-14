@@ -1,14 +1,10 @@
-export enum AccountTier {
-  Investment = "investment",
-  LongTerm = "long-term",
-  Reserve = "reserve",
-  ShortTerm = "short-term",
-}
+import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
+export { ReconciliationAccountTier as AccountTier };
 
 export interface Account {
   id: string;
   name: string;
-  tier: AccountTier;
+  tier: ReconciliationAccountTier;
   targetFloat?: number;
 }
 

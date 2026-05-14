@@ -14,7 +14,6 @@ export const Empty: Story = {
   args: {
     accounts: [],
     recurringExpenses: [],
-    isLoading: false,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onAddAccount: () => {},
   },
@@ -33,17 +32,6 @@ export const Populated: Story = {
       { id: "2", name: "Internet", amount: 60 },
       { id: "3", name: "Phone", amount: 45 },
     ],
-    isLoading: false,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onAddAccount: () => {},
-  },
-};
-
-export const Loading: Story = {
-  args: {
-    accounts: [],
-    recurringExpenses: [],
-    isLoading: true,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onAddAccount: () => {},
   },

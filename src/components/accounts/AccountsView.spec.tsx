@@ -34,7 +34,6 @@ describe("AccountsView", () => {
         <AccountsView
           accounts={[]}
           recurringExpenses={[]}
-          isLoading={false}
           onAddAccount={() => undefined}
         />,
       );
@@ -53,7 +52,6 @@ describe("AccountsView", () => {
         <AccountsView
           accounts={[]}
           recurringExpenses={[]}
-          isLoading={false}
           onAddAccount={() => undefined}
         />,
       );
@@ -69,7 +67,6 @@ describe("AccountsView", () => {
         <AccountsView
           accounts={[]}
           recurringExpenses={[]}
-          isLoading={false}
           onAddAccount={() => undefined}
         />,
       );
@@ -89,7 +86,6 @@ describe("AccountsView", () => {
         <AccountsView
           accounts={accounts}
           recurringExpenses={[]}
-          isLoading={false}
           onAddAccount={() => undefined}
         />,
       );
@@ -105,7 +101,6 @@ describe("AccountsView", () => {
         <AccountsView
           accounts={[]}
           recurringExpenses={[]}
-          isLoading={false}
           onAddAccount={() => undefined}
         />,
       );
@@ -123,7 +118,6 @@ describe("AccountsView", () => {
         <AccountsView
           accounts={[]}
           recurringExpenses={expenses}
-          isLoading={false}
           onAddAccount={() => undefined}
         />,
       );
@@ -139,13 +133,53 @@ describe("AccountsView", () => {
         <AccountsView
           accounts={[]}
           recurringExpenses={[]}
-          isLoading={false}
           onAddAccount={() => undefined}
         />,
       );
       expect(
         screen.getByText(ACCOUNTS_PAGE_COPY.addAccountButton),
       ).toBeDefined();
+    });
+  });
+
+  describe("renders the empty state", () => {
+    it("shows the empty state heading when there are no accounts", () => {
+      render(
+        <AccountsView
+          accounts={[]}
+          recurringExpenses={[]}
+          onAddAccount={() => undefined}
+        />,
+      );
+      expect(
+        screen.getByText(ACCOUNTS_PAGE_COPY.emptyStateHeading),
+      ).toBeDefined();
+    });
+
+    it("shows the empty state body describing account tiers when there are no accounts", () => {
+      render(
+        <AccountsView
+          accounts={[]}
+          recurringExpenses={[]}
+          onAddAccount={() => undefined}
+        />,
+      );
+      expect(
+        screen.getByText(ACCOUNTS_PAGE_COPY.emptyStateBody),
+      ).toBeDefined();
+    });
+
+    it("hides the empty state when accounts are populated", () => {
+      render(
+        <AccountsView
+          accounts={[makeAccount()]}
+          recurringExpenses={[]}
+          onAddAccount={() => undefined}
+        />,
+      );
+      expect(
+        screen.queryByText(ACCOUNTS_PAGE_COPY.emptyStateHeading),
+      ).toBeNull();
     });
   });
 });
