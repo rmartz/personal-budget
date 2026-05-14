@@ -1,11 +1,14 @@
 export { useAccounts } from "./use-accounts";
+export { useAllSavingsGoals } from "./use-all-savings-goals";
 export { useAnnuities } from "./use-annuities";
 export { useAuth } from "./use-auth";
 export { useDeleteSavingsGoal } from "./use-delete-savings-goal";
+export { useInvestmentAccounts } from "./use-investment-accounts";
 export { useLedgersSubscription } from "./use-ledgers-subscription";
 export { useReconciliationAccounts } from "./use-reconciliation-accounts";
 export { useReconciliationExpenses } from "./use-reconciliation-expenses";
 export { useSavingsGoal } from "./use-savings-goal";
 export { useSavingsGoals } from "./use-savings-goals";
+export { useTargetAllocation } from "./use-target-allocation";
 export { useTransactions } from "./use-transactions";
 export { useUpdateSavingsGoal } from "./use-update-savings-goal";

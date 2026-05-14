@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Annuity } from "@/lib/firebase/schema/annuities";
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { AnnuityListView } from "./AnnuityListView";
 import { ANNUITY_LIST_COPY } from "./copy";
@@ -15,6 +16,7 @@ function makeAnnuity(overrides: Partial<Annuity> = {}): Annuity {
     monthlyAmount: 100,
     startDate: new Date("2024-01-01T00:00:00.000Z"),
     durationMonths: 12,
+    monthlyMode: AnnuityMonthlyMode.Flat,
     ...overrides,
   };
 }

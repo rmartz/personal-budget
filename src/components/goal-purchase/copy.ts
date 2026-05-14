@@ -1,3 +1,7 @@
+export const GOAL_PURCHASE_PAGE_COPY = {
+  errorMessage: "Failed to load goal. Please try again later.",
+} as const;
+
 export const GOAL_PURCHASE_VIEW_COPY = {
   breadcrumbParent: "Goals",
   headerPrefix: "Mark purchased",

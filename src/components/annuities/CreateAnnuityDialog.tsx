@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { calculateMonthlyPayment } from "@/lib/annuity-math";
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
 
@@ -24,6 +25,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 export interface CreateAnnuityInput {
   name: string;
   monthlyAmount: number;
+  monthlyMode: AnnuityMonthlyMode;
   durationMonths: number | undefined;
 }
 
@@ -508,6 +510,10 @@ export function CreateAnnuityDialog({
       await onSubmit({
         name: name.trim(),
         monthlyAmount: resolvedMonthlyAmount,
+        monthlyMode:
+          mode === "pv"
+            ? AnnuityMonthlyMode.PVDerived
+            : AnnuityMonthlyMode.Flat,
         durationMonths: resolvedDuration,
       });
       handleOpenChange(false);
