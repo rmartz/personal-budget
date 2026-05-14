@@ -7,6 +7,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { CreateAnnuityDialogView } from "./CreateAnnuityDialog";
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
 
 afterEach(cleanup);
@@ -333,6 +334,7 @@ describe("CreateAnnuityDialog integration", () => {
       expect(onSubmit).toHaveBeenCalledWith({
         name: "Netflix",
         monthlyAmount: 15.99,
+        monthlyMode: AnnuityMonthlyMode.Flat,
         durationMonths: undefined,
       });
     });

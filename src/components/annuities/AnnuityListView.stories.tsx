@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { AnnuityListView } from "./AnnuityListView";
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 const meta: Meta<typeof AnnuityListView> = {
   component: AnnuityListView,
@@ -39,6 +40,7 @@ export const PopulatedFlatRate: Story = {
         monthlyAmount: 15.99,
         startDate: new Date("2024-01-01"),
         durationMonths: undefined,
+        monthlyMode: AnnuityMonthlyMode.Flat,
       },
       {
         id: "2",
@@ -46,6 +48,7 @@ export const PopulatedFlatRate: Story = {
         monthlyAmount: 9.99,
         startDate: new Date("2024-03-01"),
         durationMonths: undefined,
+        monthlyMode: AnnuityMonthlyMode.Flat,
       },
     ],
   },
@@ -63,6 +66,7 @@ export const PopulatedFixedTerm: Story = {
         monthlyAmount: 425.5,
         startDate: new Date("2023-06-01"),
         durationMonths: 48,
+        monthlyMode: AnnuityMonthlyMode.PVDerived,
       },
       {
         id: "2",
@@ -70,6 +74,7 @@ export const PopulatedFixedTerm: Story = {
         monthlyAmount: 210.0,
         startDate: new Date("2024-01-01"),
         durationMonths: 24,
+        monthlyMode: AnnuityMonthlyMode.PVDerived,
       },
     ],
   },
@@ -87,6 +92,7 @@ export const PopulatedMixed: Story = {
         monthlyAmount: 15.99,
         startDate: new Date("2024-01-01"),
         durationMonths: undefined,
+        monthlyMode: AnnuityMonthlyMode.Flat,
       },
       {
         id: "2",
@@ -94,6 +100,7 @@ export const PopulatedMixed: Story = {
         monthlyAmount: 425.5,
         startDate: new Date("2023-06-01"),
         durationMonths: 48,
+        monthlyMode: AnnuityMonthlyMode.PVDerived,
       },
       {
         id: "3",
@@ -101,6 +108,7 @@ export const PopulatedMixed: Story = {
         monthlyAmount: 1800.0,
         startDate: new Date("2025-01-01"),
         durationMonths: undefined,
+        monthlyMode: AnnuityMonthlyMode.Flat,
       },
       {
         id: "4",
@@ -108,6 +116,7 @@ export const PopulatedMixed: Story = {
         monthlyAmount: 210.0,
         startDate: new Date("2024-01-01"),
         durationMonths: 24,
+        monthlyMode: AnnuityMonthlyMode.PVDerived,
       },
     ],
   },

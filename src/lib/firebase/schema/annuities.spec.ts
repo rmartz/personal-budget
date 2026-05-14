@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { annuityToFirebase, firebaseToAnnuity } from "./annuities";
+import {
+  annuityToFirebase,
+  firebaseToAnnuity,
+  AnnuityMonthlyMode,
+} from "./annuities";
 
 describe("annuityToFirebase", () => {
   it("serializes date to ISO string", () => {
@@ -9,6 +13,7 @@ describe("annuityToFirebase", () => {
       monthlyAmount: 15,
       startDate,
       durationMonths: 12,
+      monthlyMode: AnnuityMonthlyMode.Flat,
     });
     expect(result.startDate).toBe("2024-01-01T00:00:00.000Z");
   });
@@ -19,6 +24,7 @@ describe("annuityToFirebase", () => {
       monthlyAmount: 1500,
       startDate: new Date(),
       durationMonths: undefined,
+      monthlyMode: AnnuityMonthlyMode.Flat,
     });
     expect(result.durationMonths).toBeNull();
   });
@@ -29,6 +35,7 @@ describe("annuityToFirebase", () => {
       monthlyAmount: 350,
       startDate: new Date(),
       durationMonths: 60,
+      monthlyMode: AnnuityMonthlyMode.Flat,
     });
     expect(result.durationMonths).toBe(60);
   });
@@ -71,6 +78,7 @@ describe("firebaseToAnnuity", () => {
       monthlyAmount: 100,
       startDate: new Date(),
       durationMonths: undefined,
+      monthlyMode: AnnuityMonthlyMode.Flat,
     });
     const result = firebaseToAnnuity("a-1", firebase);
     expect(result.durationMonths).toBeUndefined();
@@ -83,6 +91,7 @@ describe("firebaseToAnnuity", () => {
       monthlyAmount: 50,
       startDate,
       durationMonths: 24,
+      monthlyMode: AnnuityMonthlyMode.Flat,
     });
     const result = firebaseToAnnuity("a-1", firebase);
     expect(result.startDate.toISOString()).toBe(startDate.toISOString());

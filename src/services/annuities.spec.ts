@@ -29,6 +29,7 @@ import {
   updateAnnuity,
   deleteAnnuity,
 } from "./annuities";
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 const mockDb = { type: "mock-db" };
 const mockRef = { type: "mock-ref" };
@@ -85,6 +86,7 @@ describe("createAnnuity", () => {
       monthlyAmount: 10,
       startDate: new Date("2024-01-01T00:00:00.000Z"),
       durationMonths: undefined,
+      monthlyMode: AnnuityMonthlyMode.Flat,
     });
 
     expect(push).toHaveBeenCalledWith(mockRef);
@@ -100,6 +102,7 @@ describe("createAnnuity", () => {
         monthlyAmount: 50,
         startDate: new Date(),
         durationMonths: 12,
+        monthlyMode: AnnuityMonthlyMode.Flat,
       }),
     ).rejects.toThrow("Failed to generate annuity key");
   });
