@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
-  signIn,
-  signUp,
   sendPasswordReset,
+  signIn,
   signOut,
+  signUp,
   updateDisplayName,
   updateEmail as serviceUpdateEmail,
   updatePassword as serviceUpdatePassword,
@@ -28,15 +29,16 @@ vi.mock("@/lib/firebase/client", () => ({
 }));
 
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  reauthenticateWithCredential,
   sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   signOut as firebaseSignOut,
-  updateProfile as firebaseUpdateProfile,
   updateEmail as firebaseUpdateEmail,
   updatePassword as firebaseUpdatePassword,
-  reauthenticateWithCredential,
+  updateProfile as firebaseUpdateProfile,
 } from "firebase/auth";
+
 import { getClientAuth } from "@/lib/firebase/client";
 
 describe("auth service", () => {

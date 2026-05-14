@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { renderHook, waitFor, cleanup } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createElement } from "react";
+import { cleanup, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { useUpdateTransaction } from "./use-update-transaction";
+import { createElement } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import * as transactionsService from "@/services/transactions";
+
+import { useUpdateTransaction } from "./use-update-transaction";
 
 afterEach(() => {
   cleanup();

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { AuthProviderView } from "./AuthProvider";
 import type { User } from "firebase/auth";
+
+import { AuthProviderView } from "./AuthProvider";
 
 const meta: Meta<typeof AuthProviderView> = {
   component: AuthProviderView,

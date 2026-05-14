@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { SavingsGoalListItemView } from "./SavingsGoalListItem";
 
 const meta: Meta<typeof SavingsGoalListItemView> = {

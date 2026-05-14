@@ -1,8 +1,9 @@
 import js from "@eslint/js";
+import reactHooks from "eslint-plugin-react-hooks";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import storybook from "eslint-plugin-storybook";
 import globals from "globals";
 import tseslint from "typescript-eslint";
-import reactHooks from "eslint-plugin-react-hooks";
-import storybook from "eslint-plugin-storybook";
 
 export default tseslint.config(
   {
@@ -34,6 +35,16 @@ export default tseslint.config(
         project: ["./tsconfig.json"],
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+  },
+  {
+    files: ["**/*.{ts,tsx,js,mjs,cjs}"],
+    plugins: {
+      "simple-import-sort": simpleImportSort,
+    },
+    rules: {
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
     },
   },
   {

@@ -1,7 +1,7 @@
-export { GoalPurchaseForm } from "./GoalPurchaseForm";
 export type { GoalPurchaseFormProps } from "./GoalPurchaseForm";
-export { GoalPurchaseView } from "./GoalPurchaseView";
+export { GoalPurchaseForm } from "./GoalPurchaseForm";
 export type { GoalPurchaseViewProps } from "./GoalPurchaseView";
+export { GoalPurchaseView } from "./GoalPurchaseView";
 export { GoalPurchaseWarning } from "./GoalPurchaseWarning";
-export { GoalSiblingProjections } from "./GoalSiblingProjections";
 export type { GoalSiblingProjectionsProps } from "./GoalSiblingProjections";
+export { GoalSiblingProjections } from "./GoalSiblingProjections";

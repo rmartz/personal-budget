@@ -1,13 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import type { User } from "firebase/auth";
+import { useRouter } from "next/navigation";
+
 import {
+  signOut,
   updateDisplayName,
   updateEmail,
   updatePassword,
-  signOut,
 } from "@/services/auth";
+
 import { UserProfileView } from "./UserProfileView";
 
 interface UserProfileProps {

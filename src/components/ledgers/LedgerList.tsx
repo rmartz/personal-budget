@@ -1,12 +1,13 @@
 "use client";
 
-import type { Ledger, UpdateLedgerInput } from "@/lib/types";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card } from "@/components/ui/card";
 import { Bar } from "@/components/ui/bar";
-import { LedgerListItem } from "./LedgerListItem";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Ledger, UpdateLedgerInput } from "@/lib/types";
+
 import { LEDGERS_PAGE_COPY } from "./copy";
+import { LedgerListItem } from "./LedgerListItem";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

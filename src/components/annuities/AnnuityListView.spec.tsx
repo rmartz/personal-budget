@@ -1,8 +1,10 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import type { Annuity } from "@/lib/firebase/schema/annuities";
+
 import { AnnuityListView } from "./AnnuityListView";
 import { ANNUITY_LIST_COPY } from "./copy";
-import type { Annuity } from "@/lib/firebase/schema/annuities";
 
 afterEach(cleanup);
 

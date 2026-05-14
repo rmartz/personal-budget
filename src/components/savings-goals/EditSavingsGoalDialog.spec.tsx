@@ -1,14 +1,16 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
-import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
-import { EDIT_SAVINGS_GOAL_DIALOG_COPY } from "./copy";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
+import { EDIT_SAVINGS_GOAL_DIALOG_COPY } from "./copy";
+import { EditSavingsGoalDialog } from "./EditSavingsGoalDialog";
 
 afterEach(cleanup);
 

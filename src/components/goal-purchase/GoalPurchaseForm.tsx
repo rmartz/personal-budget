@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import { GOAL_PURCHASE_FORM_COPY } from "./copy";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {

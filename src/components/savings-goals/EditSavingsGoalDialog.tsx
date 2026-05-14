@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Pencil } from "lucide-react";
-import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+import { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,6 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
 import { EDIT_SAVINGS_GOAL_DIALOG_COPY } from "./copy";
 
 export interface EditSavingsGoalDialogProps {

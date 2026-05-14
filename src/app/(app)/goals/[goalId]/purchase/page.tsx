@@ -1,12 +1,13 @@
 "use client";
 
-import { use } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
-import { useSavingsGoal } from "@/hooks/use-savings-goal";
-import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
-import { useSavingsGoals } from "@/hooks/use-savings-goals";
+import { use } from "react";
+
 import { GoalPurchaseView } from "@/components/goal-purchase";
+import { useAuth } from "@/hooks/use-auth";
+import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
+import { useSavingsGoal } from "@/hooks/use-savings-goal";
+import { useSavingsGoals } from "@/hooks/use-savings-goals";
 
 interface GoalPurchasePageProps {
   params: Promise<{ goalId: string }>;

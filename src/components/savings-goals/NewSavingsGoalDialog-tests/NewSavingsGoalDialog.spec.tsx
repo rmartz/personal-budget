@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { NewSavingsGoalDialog } from "../NewSavingsGoalDialog";
 import { NEW_SAVINGS_GOAL_DIALOG_COPY } from "../NewSavingsGoalDialog.copy";
 

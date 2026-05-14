@@ -1,7 +1,8 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
 import { GOAL_SIBLING_PROJECTIONS_COPY } from "./copy";
 
 export interface GoalSiblingProjectionsProps {

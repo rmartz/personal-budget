@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   DialogBackdrop,
@@ -10,6 +11,7 @@ import {
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 import { NEW_SAVINGS_GOAL_DIALOG_COPY } from "./NewSavingsGoalDialog.copy";
 
 export interface NewSavingsGoalDialogViewProps {

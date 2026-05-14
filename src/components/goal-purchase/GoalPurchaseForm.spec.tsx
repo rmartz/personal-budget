@@ -1,7 +1,8 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { GoalPurchaseForm } from "./GoalPurchaseForm";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { GOAL_PURCHASE_FORM_COPY } from "./copy";
+import { GoalPurchaseForm } from "./GoalPurchaseForm";
 
 afterEach(cleanup);
 

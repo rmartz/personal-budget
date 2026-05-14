@@ -1,15 +1,12 @@
-export { AuthProvider, AuthProviderView, AuthContext } from "./AuthProvider";
 export type {
   AuthContextValue,
   AuthProviderProps,
   AuthProviderViewProps,
 } from "./AuthProvider";
-
-export { SignInFormView } from "./SignInForm";
-export type { SignInFormViewProps } from "./SignInForm";
-
-export { SignUpFormView } from "./SignUpForm";
-export type { SignUpFormViewProps } from "./SignUpForm";
-
-export { ForgotPasswordFormView } from "./ForgotPasswordForm";
+export { AuthContext, AuthProvider, AuthProviderView } from "./AuthProvider";
 export type { ForgotPasswordFormViewProps } from "./ForgotPasswordForm";
+export { ForgotPasswordFormView } from "./ForgotPasswordForm";
+export type { SignInFormViewProps } from "./SignInForm";
+export { SignInFormView } from "./SignInForm";
+export type { SignUpFormViewProps } from "./SignUpForm";
+export { SignUpFormView } from "./SignUpForm";

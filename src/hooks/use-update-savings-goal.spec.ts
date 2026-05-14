@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { renderHook, act, cleanup } from "@testing-library/react";
+import { act, cleanup, renderHook } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { useUpdateSavingsGoal } from "./use-update-savings-goal";
 
 const mockUpdateSavingsGoal = vi.fn();
