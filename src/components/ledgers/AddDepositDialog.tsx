@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 
 import { ADD_DEPOSIT_DIALOG_COPY } from "./AddDepositDialog.copy";
@@ -75,30 +77,23 @@ export function AddDepositDialogView({
         >
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={dateInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={dateInputId}>
                 {ADD_DEPOSIT_DIALOG_COPY.dateLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={dateInputId}
                 type="date"
                 value={date}
                 onChange={(e) => {
                   onDateChange(e.target.value);
                 }}
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={amountInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={amountInputId}>
                 {ADD_DEPOSIT_DIALOG_COPY.amountLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={amountInputId}
                 type="number"
                 min="0.01"
@@ -110,7 +105,6 @@ export function AddDepositDialogView({
                 placeholder={ADD_DEPOSIT_DIALOG_COPY.amountPlaceholder}
                 aria-invalid={amountError !== undefined}
                 aria-describedby={amountError ? amountErrorId : undefined}
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {amountError !== undefined && (
                 <p
@@ -123,13 +117,10 @@ export function AddDepositDialogView({
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={descriptionInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={descriptionInputId}>
                 {ADD_DEPOSIT_DIALOG_COPY.descriptionLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={descriptionInputId}
                 type="text"
                 value={description}
@@ -141,7 +132,6 @@ export function AddDepositDialogView({
                 aria-describedby={
                   descriptionError ? descriptionErrorId : undefined
                 }
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {descriptionError !== undefined && (
                 <p

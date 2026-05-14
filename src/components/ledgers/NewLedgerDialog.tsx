@@ -5,12 +5,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DialogBackdrop,
-  DialogClose,
   DialogPopup,
   DialogPortal,
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import { NEW_LEDGER_DIALOG_COPY } from "./copy";
 
@@ -56,13 +57,10 @@ export function NewLedgerDialogView({
           >
             <div className="mt-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor="new-ledger-name"
-                >
+                <Label htmlFor="new-ledger-name">
                   {NEW_LEDGER_DIALOG_COPY.nameLabel}
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-ledger-name"
                   type="text"
                   value={name}
@@ -76,7 +74,6 @@ export function NewLedgerDialogView({
                       ? "new-ledger-name-error"
                       : undefined
                   }
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
                 />
                 {nameError !== undefined && (
                   <p
@@ -89,13 +86,10 @@ export function NewLedgerDialogView({
                 )}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label
-                  className="text-sm font-medium"
-                  htmlFor="new-ledger-cash-cap"
-                >
+                <Label htmlFor="new-ledger-cash-cap">
                   {NEW_LEDGER_DIALOG_COPY.cashCapLabel}
-                </label>
-                <input
+                </Label>
+                <Input
                   id="new-ledger-cash-cap"
                   type="number"
                   min="0.01"
@@ -111,7 +105,6 @@ export function NewLedgerDialogView({
                       ? "new-ledger-cash-cap-error"
                       : undefined
                   }
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 aria-invalid:border-destructive"
                 />
                 {cashCapError !== undefined && (
                   <p
@@ -130,13 +123,16 @@ export function NewLedgerDialogView({
               </p>
             )}
             <div className="mt-6 flex justify-end gap-3">
-              <DialogClose
+              <Button
                 type="button"
-                className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted"
+                variant="outline"
                 disabled={isSubmitting}
+                onClick={() => {
+                  onOpenChange(false);
+                }}
               >
                 {NEW_LEDGER_DIALOG_COPY.cancelButton}
-              </DialogClose>
+              </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {NEW_LEDGER_DIALOG_COPY.submitButton}
               </Button>

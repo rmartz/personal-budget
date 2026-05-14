@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 import { RECONCILE_VIEW_COPY } from "./ReconcileView.copy";
 
 // TODO: Replace placeholder data with useReconciliation(uid, month) — see epic #18 (Monthly Reconciliation)
@@ -50,24 +52,15 @@ export function ReconcileView() {
           </p>
         </div>
         <div className="flex gap-2 text-sm">
-          <button
-            type="button"
-            className="rounded-md border px-3 py-1.5 text-muted-foreground hover:bg-muted"
-          >
+          <Button type="button" variant="outline" size="sm">
             {RECONCILE_VIEW_COPY.actionConfirmed}
-          </button>
-          <button
-            type="button"
-            className="rounded-md border px-3 py-1.5 text-muted-foreground hover:bg-muted"
-          >
+          </Button>
+          <Button type="button" variant="outline" size="sm">
             {RECONCILE_VIEW_COPY.actionProjected}
-          </button>
-          <button
-            type="button"
-            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-          >
+          </Button>
+          <Button type="button" size="sm">
             {RECONCILE_VIEW_COPY.actionApply}
-          </button>
+          </Button>
         </div>
       </div>
 

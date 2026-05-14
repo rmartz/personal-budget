@@ -10,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { CreateLedgerInput } from "@/lib/types";
 
 import { CREATE_LEDGER_DIALOG_COPY } from "./copy";
@@ -115,13 +117,10 @@ export function CreateLedgerDialog({
         >
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={nameInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={nameInputId}>
                 {CREATE_LEDGER_DIALOG_COPY.nameLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={nameInputId}
                 type="text"
                 value={name}
@@ -129,7 +128,6 @@ export function CreateLedgerDialog({
                 placeholder={CREATE_LEDGER_DIALOG_COPY.namePlaceholder}
                 aria-invalid={nameError !== undefined}
                 aria-describedby={nameError ? nameErrorId : undefined}
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {nameError !== undefined && (
                 <p
@@ -142,13 +140,10 @@ export function CreateLedgerDialog({
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={cashCapInputId}
-                className="text-sm font-medium leading-none"
-              >
+              <Label htmlFor={cashCapInputId}>
                 {CREATE_LEDGER_DIALOG_COPY.cashCapLabel}
-              </label>
-              <input
+              </Label>
+              <Input
                 id={cashCapInputId}
                 type="number"
                 min="0.01"
@@ -158,7 +153,6 @@ export function CreateLedgerDialog({
                 placeholder={CREATE_LEDGER_DIALOG_COPY.cashCapPlaceholder}
                 aria-invalid={cashCapError !== undefined}
                 aria-describedby={cashCapError ? cashCapErrorId : undefined}
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               />
               {cashCapError !== undefined && (
                 <p
