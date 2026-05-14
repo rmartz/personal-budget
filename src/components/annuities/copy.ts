@@ -18,7 +18,17 @@ export const ANNUITY_CARD_COPY = {
     `${annuityName} · payment history`,
   termRemainingIndefinite: "Ongoing",
   termRemainingLabel: "Term remaining",
-  termRemainingMonths: (months: number) => `${String(months)} mo left`,
+  termRemainingMonths: (months: number) => {
+    const years = Math.floor(months / 12);
+    const remainingMonths = months % 12;
+    if (years > 0 && remainingMonths > 0) {
+      return `${String(years)} yr ${String(remainingMonths)} mo left`;
+    } else if (years > 0) {
+      return `${String(years)} yr left`;
+    } else {
+      return `${String(remainingMonths)} mo left`;
+    }
+  },
 } as const;
 
 export const ANNUITY_LIST_COPY = {

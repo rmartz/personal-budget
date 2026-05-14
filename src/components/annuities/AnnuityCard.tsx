@@ -1,6 +1,5 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
@@ -48,34 +47,30 @@ export function AnnuityCard({
     <button
       type="button"
       onClick={onSelect}
-      className="w-full text-left"
+      className={`w-full rounded-lg border bg-card text-card-foreground shadow-sm flex flex-col gap-3 p-4 text-left transition-colors hover:bg-muted/50 ${
+        isSelected ? "ring-2 ring-primary" : ""
+      }`}
       aria-pressed={isSelected}
     >
-      <Card
-        className={`flex flex-col gap-3 p-4 transition-colors hover:bg-muted/50 ${
-          isSelected ? "ring-2 ring-primary" : ""
-        }`}
-      >
-        <p className="text-xs font-semibold tracking-widest text-muted-foreground">
-          {annuity.name.toUpperCase()}
+      <p className="text-xs font-semibold tracking-widest text-muted-foreground">
+        {annuity.name.toUpperCase()}
+      </p>
+
+      <div>
+        <p className="text-3xl font-bold tabular-nums">
+          {currencyFormatter.format(annuity.monthlyAmount)}
         </p>
+        <p className="text-xs text-muted-foreground">{sublabel}</p>
+      </div>
 
-        <div>
-          <p className="text-3xl font-bold tabular-nums">
-            {currencyFormatter.format(annuity.monthlyAmount)}
-          </p>
-          <p className="text-xs text-muted-foreground">{sublabel}</p>
+      <dl className="flex flex-col gap-1 text-sm">
+        <div className="flex justify-between">
+          <dt className="text-muted-foreground">
+            {ANNUITY_CARD_COPY.termRemainingLabel}
+          </dt>
+          <dd className="font-mono font-medium">{termDisplay}</dd>
         </div>
-
-        <dl className="flex flex-col gap-1 text-sm">
-          <div className="flex justify-between">
-            <dt className="text-muted-foreground">
-              {ANNUITY_CARD_COPY.termRemainingLabel}
-            </dt>
-            <dd className="font-mono font-medium">{termDisplay}</dd>
-          </div>
-        </dl>
-      </Card>
+      </dl>
     </button>
   );
 }
