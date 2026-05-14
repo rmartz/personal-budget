@@ -1,0 +1,101 @@
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { Posture } from "@/lib/firebase/schema/investments";
+
+import {
+  INVESTMENTS_VIEW_COPY,
+  LEDGER_INVESTMENT_TABLE_COPY,
+  POSTURE_CARD_COPY,
+} from "./copy";
+import { INVESTMENTS_PLACEHOLDER_FIXTURE } from "./fixtures";
+import { InvestmentsView } from "./InvestmentsView";
+
+afterEach(cleanup);
+
+const baseProps = {
+  accounts: [],
+  allocation: [],
+  posture: Posture.Balanced,
+  isLoading: false,
+  onApplyRebalance: vi.fn(),
+};
+
+describe("InvestmentsView — title", () => {
+  it("renders the Investments heading", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(INVESTMENTS_VIEW_COPY.title)).toBeDefined();
+  });
+});
+
+describe("InvestmentsView — top cards", () => {
+  it("renders the Recommended this month card", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(/Recommended this month/)).toBeDefined();
+  });
+
+  it("renders the Posture card", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(POSTURE_CARD_COPY.title)).toBeDefined();
+  });
+
+  it("renders the Aggregate buy / sell card", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(/Aggregate buy \/ sell/)).toBeDefined();
+  });
+});
+
+describe("InvestmentsView — middle section", () => {
+  it("renders the Target allocation section", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(/Target allocation/)).toBeDefined();
+  });
+
+  it("renders the monthly distribution section", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(/This month's distribution/)).toBeDefined();
+  });
+});
+
+describe("InvestmentsView — ledger table", () => {
+  it("renders the per-ledger investment portion section", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(/Per-ledger investment portion/)).toBeDefined();
+  });
+});
+
+describe("InvestmentsView — no runtime errors with empty data", () => {
+  it("renders without crashing when all data arrays are empty", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(screen.getByText(INVESTMENTS_VIEW_COPY.title)).toBeDefined();
+  });
+});
+
+describe("InvestmentsView — loading state", () => {
+  it("does not render the title when isLoading is true", () => {
+    render(<InvestmentsView {...baseProps} isLoading={true} />);
+    expect(screen.queryByText(INVESTMENTS_VIEW_COPY.title)).toBeNull();
+  });
+
+  it("renders skeleton placeholders when isLoading is true", () => {
+    const { container } = render(
+      <InvestmentsView {...baseProps} isLoading={true} />,
+    );
+    expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(
+      0,
+    );
+  });
+});
+
+describe("InvestmentsView — ledger view all link", () => {
+  it("renders the View all link in the ledger table", () => {
+    render(<InvestmentsView {...baseProps} />);
+    expect(
+      screen.getByText(
+        LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(
+          INVESTMENTS_PLACEHOLDER_FIXTURE.totalLedgerCount,
+        ),
+      ),
+    ).toBeDefined();
+  });
+});

@@ -7,6 +7,8 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
+
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
 import { CreateAnnuityDialogView } from "./CreateAnnuityDialog";
 
@@ -300,10 +302,12 @@ describe("CreateAnnuityDialog integration", () => {
     const callArg = onSubmit.mock.calls[0]![0] as {
       name: string;
       monthlyAmount: number;
+      monthlyMode: AnnuityMonthlyMode;
       durationMonths: number;
     };
     expect(callArg.name).toBe("Car Loan");
     expect(Math.round(callArg.monthlyAmount * 100) / 100).toBe(856.07);
+    expect(callArg.monthlyMode).toBe(AnnuityMonthlyMode.PVDerived);
     expect(callArg.durationMonths).toBe(12);
   });
 
@@ -334,6 +338,7 @@ describe("CreateAnnuityDialog integration", () => {
       expect(onSubmit).toHaveBeenCalledWith({
         name: "Netflix",
         monthlyAmount: 15.99,
+        monthlyMode: AnnuityMonthlyMode.Flat,
         durationMonths: undefined,
       });
     });
