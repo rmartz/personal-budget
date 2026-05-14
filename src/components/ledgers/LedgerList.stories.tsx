@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { LedgerList } from "./LedgerList";
 
 const meta: Meta<typeof LedgerList> = {

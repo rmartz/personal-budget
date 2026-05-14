@@ -1,14 +1,16 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   within,
 } from "@testing-library/react";
-import { LedgerListItem, LedgerListItemView } from "./LedgerListItem";
-import { LEDGER_LIST_ITEM_COPY, LEDGERS_PAGE_COPY } from "./copy";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { Ledger } from "@/lib/types";
+
+import { LEDGER_LIST_ITEM_COPY, LEDGERS_PAGE_COPY } from "./copy";
+import { LedgerListItem, LedgerListItemView } from "./LedgerListItem";
 
 afterEach(cleanup);
 

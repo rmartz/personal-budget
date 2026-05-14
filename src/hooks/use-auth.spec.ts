@@ -1,9 +1,11 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { renderHook, cleanup } from "@testing-library/react";
+import { cleanup, renderHook } from "@testing-library/react";
 import { createElement } from "react";
-import { AuthContext } from "@/components/auth";
-import { useAuth } from "./use-auth";
+import { afterEach, describe, expect, it } from "vitest";
+
 import type { AuthContextValue } from "@/components/auth";
+import { AuthContext } from "@/components/auth";
+
+import { useAuth } from "./use-auth";
 
 afterEach(cleanup);
 

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
+
 import { USER_PROFILE_COPY } from "./copy";
 import { DisplayNameForm } from "./DisplayNameForm";
 import { EmailForm } from "./EmailForm";

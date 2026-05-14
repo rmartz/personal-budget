@@ -1,13 +1,14 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
-import { NewAnnuityDialog, NewAnnuityDialogView } from "./NewAnnuityDialog";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { NEW_ANNUITY_DIALOG_COPY } from "./copy";
+import { NewAnnuityDialog, NewAnnuityDialogView } from "./NewAnnuityDialog";
 
 afterEach(cleanup);
 

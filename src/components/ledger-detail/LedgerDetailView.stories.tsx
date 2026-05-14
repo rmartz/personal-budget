@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
 import { LedgerDetailView } from "./LedgerDetailView";
 
 const mockLedger = {

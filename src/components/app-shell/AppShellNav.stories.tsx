@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { AppShellNavView } from "./AppShellNav";
 
 const meta: Meta<typeof AppShellNavView> = {

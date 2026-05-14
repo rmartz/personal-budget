@@ -1,9 +1,11 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { LedgerDetailView } from "./LedgerDetailView";
-import { LEDGER_DETAIL_COPY } from "./copy";
-import type { Ledger } from "@/lib/types";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+import type { Ledger } from "@/lib/types";
+
+import { LEDGER_DETAIL_COPY } from "./copy";
+import { LedgerDetailView } from "./LedgerDetailView";
 
 afterEach(cleanup);
 

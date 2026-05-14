@@ -1,7 +1,9 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import Home from "./page";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
 import { LANDING_PAGE_COPY } from "@/components/home/LandingPage.copy";
+
+import Home from "./page";
 
 afterEach(cleanup);
 

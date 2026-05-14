@@ -1,13 +1,14 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
 import {
-  render,
-  screen,
   cleanup,
   fireEvent,
+  render,
+  screen,
   waitFor,
 } from "@testing-library/react";
-import { NewLedgerDialog, NewLedgerDialogView } from "./NewLedgerDialog";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { NEW_LEDGER_DIALOG_COPY } from "./copy";
+import { NewLedgerDialog, NewLedgerDialogView } from "./NewLedgerDialog";
 
 afterEach(cleanup);
 
