@@ -20,5 +20,6 @@ export const GOAL_CARD_COPY = {
   eyebrowSeparator: "·",
   fundedLabel: (percent: number) => `${String(percent)}% funded`,
   ofTarget: (target: string) => `of ${target}`,
+  priorityLabel: (n: number) => `P${String(n)}`,
   toGoLabel: (amount: string) => `${amount} to go`,
 } as const;

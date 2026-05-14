@@ -93,6 +93,18 @@ describe("GoalsListView — error state", () => {
       );
       expect(screen.queryByText(GOALS_LIST_COPY.emptyStateMessage)).toBeNull();
     });
+
+    it("does not render the summary line when error is present", () => {
+      render(
+        <GoalsListView
+          goals={[makeGoal({ id: "g1", name: "Emergency Fund" })]}
+          ledgerNames={ledgerNames}
+          isLoading={false}
+          error={new Error("Firebase permission denied")}
+        />,
+      );
+      expect(screen.queryByText(GOALS_LIST_COPY.goalCount(1))).toBeNull();
+    });
   });
 });
 

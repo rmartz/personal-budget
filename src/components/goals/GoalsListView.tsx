@@ -31,7 +31,7 @@ export function GoalsListView({
           <h1 className="text-2xl font-semibold tracking-tight">
             {GOALS_LIST_COPY.title}
           </h1>
-          {!isLoading && (
+          {!isLoading && error === undefined && (
             <p className="text-sm text-muted-foreground">
               {GOALS_LIST_COPY.goalCount(goals.length)}
               {" · "}

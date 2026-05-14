@@ -32,8 +32,8 @@ export function GoalCard({ goal, ledgerName }: GoalCardProps) {
       <Card className="flex h-full flex-col gap-3 p-4 transition-colors hover:bg-muted/50">
         <div className="flex items-start justify-between gap-2">
           <span className="text-xs font-semibold tracking-widest text-muted-foreground">
-            {ledgerName.toUpperCase()} {GOAL_CARD_COPY.eyebrowSeparator} P
-            {String(goal.priority)}
+            {ledgerName.toUpperCase()} {GOAL_CARD_COPY.eyebrowSeparator}{" "}
+            {GOAL_CARD_COPY.priorityLabel(goal.priority)}
           </span>
           <span className="shrink-0 text-xs text-muted-foreground">
             {isFullyFunded

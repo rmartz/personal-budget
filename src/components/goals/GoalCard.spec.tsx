@@ -40,11 +40,13 @@ describe("GoalCard — content", () => {
   });
 
   describe("renders the priority in the eyebrow", () => {
-    it("shows P{n} for the priority number", () => {
+    it("shows the formatted priority label in the eyebrow", () => {
       render(
         <GoalCard goal={makeGoal({ priority: 3 })} ledgerName="Primary" />,
       );
-      expect(screen.getByText(/P3/)).toBeDefined();
+      expect(
+        screen.getByText(GOAL_CARD_COPY.priorityLabel(3), { exact: false }),
+      ).toBeDefined();
     });
   });
 
