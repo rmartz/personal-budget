@@ -7,6 +7,7 @@ import ts from "typescript";
 
 const DEFAULT_OUTPUT_PATH = ".github/screenshots.dynamic.yml";
 const STORYBOOK_BASE_URL = "http://127.0.0.1:6006";
+const UNKNOWN_COMPONENT_NAME = "UnknownComponent";
 
 function parseArgs(argv) {
   const args = {
@@ -40,6 +41,7 @@ function parseArgs(argv) {
 
 function toKebabCase(value) {
   return value
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
     .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
@@ -170,7 +172,8 @@ function parseStoryFile(storyFilePath) {
 
   const metaId = getNamedStringProperty(defaultExportObjectLiteral, "id");
   const metaTitle = getNamedStringProperty(defaultExportObjectLiteral, "title");
-  const componentName = metaTitle?.split("/").at(-1) ?? "Story";
+  const componentName =
+    metaTitle?.split("/").at(-1) ?? metaId ?? UNKNOWN_COMPONENT_NAME;
 
   if (!metaId && !metaTitle) {
     return [];
@@ -265,11 +268,9 @@ function appendGithubOutput(githubOutputPath, screenshotCount) {
     return;
   }
 
-  const output = [
-    `story_count=${String(screenshotCount)}`,
-    `has_stories=${String(screenshotCount > 0)}`,
-  ].join("\n");
-  writeFileSync(githubOutputPath, `${output}\n`, { flag: "a" });
+  const hasStories = screenshotCount > 0 ? "true" : "false";
+  const output = `story_count=${screenshotCount}\nhas_stories=${hasStories}\n`;
+  writeFileSync(githubOutputPath, output, { flag: "a" });
 }
 
 function main() {
