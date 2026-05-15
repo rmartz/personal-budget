@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { AppShellNavView } from "./AppShellNav";
+import { AppShellNavView, deriveInitials } from "./AppShellNav";
 import { APP_SHELL_COPY } from "./copy";
 
 afterEach(cleanup);
@@ -223,6 +223,28 @@ describe("AppShellNavView — More tab active-route styling", () => {
       name: APP_SHELL_COPY.moreLabel,
     });
     expect(moreBtn.getAttribute("aria-current")).not.toBe("page");
+  });
+});
+
+describe("deriveInitials", () => {
+  it("extracts first and last initials from a two-part display name", () => {
+    expect(deriveInitials("Reed Martz", null)).toBe("RM");
+  });
+
+  it("extracts a single initial from a one-word display name", () => {
+    expect(deriveInitials("Reed", null)).toBe("R");
+  });
+
+  it("returns undefined for a whitespace-only display name", () => {
+    expect(deriveInitials("  ", null)).toBeUndefined();
+  });
+
+  it("falls back to the first letter of email when displayName is null", () => {
+    expect(deriveInitials(null, "reed@example.com")).toBe("R");
+  });
+
+  it("returns undefined when both displayName and email are null", () => {
+    expect(deriveInitials(null, null)).toBeUndefined();
   });
 });
 

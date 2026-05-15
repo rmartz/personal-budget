@@ -203,7 +203,7 @@ export interface AppShellNavProps {
   children: React.ReactNode;
 }
 
-function deriveInitials(
+export function deriveInitials(
   displayName: string | null,
   email: string | null,
 ): string | undefined {
@@ -212,11 +212,11 @@ function deriveInitials(
     const first = parts[0]?.charAt(0) ?? "";
     const last = parts[parts.length - 1]?.charAt(0) ?? "";
     return parts.length >= 2
-      ? `${first}${last}`.toUpperCase()
-      : first.toUpperCase();
+      ? `${first}${last}`.toUpperCase() || undefined
+      : first.toUpperCase() || undefined;
   }
   if (email) {
-    return email.charAt(0).toUpperCase();
+    return email.charAt(0).toUpperCase() || undefined;
   }
   return undefined;
 }
