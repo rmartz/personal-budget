@@ -236,3 +236,53 @@ describe("AppShellNavView — children render", () => {
     expect(screen.getByTestId("shell-child").textContent).toBe("hello shell");
   });
 });
+
+describe("AppShellNavView — avatar initials", () => {
+  it("renders the provided avatarInitials in the desktop avatar button", () => {
+    render(
+      <AppShellNavView pathname="/reconcile" avatarInitials="JD">
+        content
+      </AppShellNavView>,
+    );
+    const buttons = screen
+      .getAllByRole("button", { name: APP_SHELL_COPY.userMenuLabel })
+      .filter((el) => el.textContent === "JD");
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it("renders the provided avatarInitials in the mobile avatar button", () => {
+    render(
+      <AppShellNavView pathname="/reconcile" avatarInitials="AB">
+        content
+      </AppShellNavView>,
+    );
+    const buttons = screen
+      .getAllByRole("button", { name: APP_SHELL_COPY.userMenuLabel })
+      .filter((el) => el.textContent === "AB");
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it("renders the fallback placeholder when no avatarInitials prop is given", () => {
+    render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
+    const buttons = screen.getAllByRole("button", {
+      name: APP_SHELL_COPY.userMenuLabel,
+    });
+    buttons.forEach((btn) => {
+      expect(btn.textContent).toBe(APP_SHELL_COPY.avatarFallback);
+    });
+  });
+
+  it("does not render the hardcoded RM string", () => {
+    render(
+      <AppShellNavView pathname="/reconcile" avatarInitials="JD">
+        content
+      </AppShellNavView>,
+    );
+    const buttons = screen.getAllByRole("button", {
+      name: APP_SHELL_COPY.userMenuLabel,
+    });
+    buttons.forEach((btn) => {
+      expect(btn.textContent).not.toBe("RM");
+    });
+  });
+});
