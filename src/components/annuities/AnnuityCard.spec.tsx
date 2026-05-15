@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Annuity } from "@/lib/firebase/schema/annuities";
@@ -95,7 +95,9 @@ describe("AnnuityCard — selection state", () => {
         onSelect={vi.fn()}
       />,
     );
-    const button = screen.getByRole("button");
+    const button = screen.getByRole("button", {
+      name: ANNUITY_CARD_COPY.selectAriaLabel,
+    });
     expect(button.getAttribute("aria-pressed")).toBe("true");
   });
 
@@ -107,7 +109,69 @@ describe("AnnuityCard — selection state", () => {
         onSelect={vi.fn()}
       />,
     );
-    const button = screen.getByRole("button");
+    const button = screen.getByRole("button", {
+      name: ANNUITY_CARD_COPY.selectAriaLabel,
+    });
     expect(button.getAttribute("aria-pressed")).toBe("false");
+  });
+});
+
+describe("AnnuityCard — edit action", () => {
+  it("renders an edit button when onEdit is provided", () => {
+    render(
+      <AnnuityCard
+        annuity={makeAnnuity()}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: ANNUITY_CARD_COPY.editAriaLabel }),
+    ).toBeDefined();
+  });
+
+  it("calls onEdit when the edit button is clicked", () => {
+    const onEdit = vi.fn();
+    render(
+      <AnnuityCard
+        annuity={makeAnnuity()}
+        onEdit={onEdit}
+        onDelete={vi.fn()}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: ANNUITY_CARD_COPY.editAriaLabel }),
+    );
+    expect(onEdit).toHaveBeenCalled();
+  });
+});
+
+describe("AnnuityCard — delete action", () => {
+  it("renders a delete button when onDelete is provided", () => {
+    render(
+      <AnnuityCard
+        annuity={makeAnnuity()}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: ANNUITY_CARD_COPY.deleteAriaLabel }),
+    ).toBeDefined();
+  });
+
+  it("calls onDelete when the delete button is clicked", () => {
+    const onDelete = vi.fn();
+    render(
+      <AnnuityCard
+        annuity={makeAnnuity()}
+        onEdit={vi.fn()}
+        onDelete={onDelete}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: ANNUITY_CARD_COPY.deleteAriaLabel }),
+    );
+    expect(onDelete).toHaveBeenCalled();
   });
 });

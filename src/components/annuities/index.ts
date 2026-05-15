@@ -10,4 +10,11 @@ export {
   CreateAnnuityDialog,
   CreateAnnuityDialogView,
 } from "./CreateAnnuityDialog";
+export type { DeleteAnnuityDialogProps } from "./DeleteAnnuityDialog";
+export { DeleteAnnuityDialog } from "./DeleteAnnuityDialog";
+export type {
+  EditAnnuityDialogProps,
+  EditAnnuityInput,
+} from "./EditAnnuityDialog";
+export { EditAnnuityDialog, EditAnnuityDialogView } from "./EditAnnuityDialog";
 export { NewAnnuityDialog } from "./NewAnnuityDialog";

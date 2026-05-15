@@ -2,17 +2,25 @@
 
 import { useState } from "react";
 
-import type { CreateAnnuityInput } from "@/components/annuities";
+import type {
+  CreateAnnuityInput,
+  EditAnnuityInput,
+} from "@/components/annuities";
 import {
   AnnuityBalanceTrend,
   AnnuityCard,
   AnnuityPaymentHistoryTable,
   CreateAnnuityDialog,
+  DeleteAnnuityDialog,
+  EditAnnuityDialog,
 } from "@/components/annuities";
 import { ANNUITY_LIST_COPY } from "@/components/annuities/copy";
 import { Button } from "@/components/ui/button";
 import { useAnnuities } from "@/hooks/use-annuities";
 import { useAuth } from "@/hooks/use-auth";
+import { useDeleteAnnuity } from "@/hooks/use-delete-annuity";
+import { useUpdateAnnuity } from "@/hooks/use-update-annuity";
+import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { createAnnuity } from "@/services/annuities";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -24,8 +32,17 @@ export default function AnnuitiesPage() {
   const { user, loading: authLoading } = useAuth();
   const uid = user?.uid ?? "";
   const { annuities, isLoading } = useAnnuities(uid);
+  const { updateOne, isSubmitting: isUpdating } = useUpdateAnnuity(uid);
+  const { deleteOne, isDeleting } = useDeleteAnnuity(uid);
+
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editingAnnuity, setEditingAnnuity] = useState<Annuity | undefined>(
+    undefined,
+  );
+  const [deletingAnnuity, setDeletingAnnuity] = useState<Annuity | undefined>(
+    undefined,
+  );
 
   if (authLoading || !user) {
     return null;
@@ -35,7 +52,7 @@ export default function AnnuitiesPage() {
     annuities.find((a) => a.id === selectedId) ?? annuities[0];
   const totalMonthly = annuities.reduce((sum, a) => sum + a.monthlyAmount, 0);
 
-  const handleSubmit = async (data: CreateAnnuityInput) => {
+  const handleCreate = async (data: CreateAnnuityInput) => {
     await createAnnuity(uid, {
       name: data.name,
       monthlyAmount: data.monthlyAmount,
@@ -43,6 +60,21 @@ export default function AnnuitiesPage() {
       startDate: new Date(),
       durationMonths: data.durationMonths,
     });
+  };
+
+  const handleSaveEdit = async (data: EditAnnuityInput) => {
+    if (!editingAnnuity) return;
+    await updateOne(editingAnnuity.id, data);
+    setEditingAnnuity(undefined);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingAnnuity) return;
+    await deleteOne(deletingAnnuity.id);
+    if (selectedId === deletingAnnuity.id) {
+      setSelectedId(undefined);
+    }
+    setDeletingAnnuity(undefined);
   };
 
   return (
@@ -63,7 +95,7 @@ export default function AnnuitiesPage() {
         </div>
         <Button
           onClick={() => {
-            setDialogOpen(true);
+            setCreateDialogOpen(true);
           }}
         >
           {ANNUITY_LIST_COPY.newAnnuityButton}
@@ -85,6 +117,12 @@ export default function AnnuitiesPage() {
                 onSelect={() => {
                   setSelectedId(annuity.id);
                 }}
+                onEdit={() => {
+                  setEditingAnnuity(annuity);
+                }}
+                onDelete={() => {
+                  setDeletingAnnuity(annuity);
+                }}
               />
             ))}
           </div>
@@ -99,10 +137,35 @@ export default function AnnuitiesPage() {
       )}
 
       <CreateAnnuityDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSubmit={handleSubmit}
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSubmit={handleCreate}
       />
+
+      {editingAnnuity !== undefined && (
+        <EditAnnuityDialog
+          open={true}
+          onOpenChange={(open) => {
+            if (!open && !isUpdating) setEditingAnnuity(undefined);
+          }}
+          annuity={editingAnnuity}
+          onSave={handleSaveEdit}
+        />
+      )}
+
+      {deletingAnnuity !== undefined && (
+        <DeleteAnnuityDialog
+          open={true}
+          onOpenChange={(open) => {
+            if (!open && !isDeleting) setDeletingAnnuity(undefined);
+          }}
+          annuity={deletingAnnuity}
+          onConfirm={() => {
+            void handleConfirmDelete();
+          }}
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 }
