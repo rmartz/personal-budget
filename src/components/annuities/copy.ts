@@ -68,6 +68,7 @@ export const DELETE_ANNUITY_DIALOG_COPY = {
   confirmButton: "Delete",
   confirmMessage: (name: string) =>
     `Are you sure you want to permanently delete "${name}"? This cannot be undone.`,
+  deleteError: "Failed to delete annuity. Please try again.",
   deletingButton: "Deleting…",
   title: "Delete Annuity",
 } as const;

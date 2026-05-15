@@ -14,7 +14,10 @@ import {
   DeleteAnnuityDialog,
   EditAnnuityDialog,
 } from "@/components/annuities";
-import { ANNUITY_LIST_COPY } from "@/components/annuities/copy";
+import {
+  ANNUITY_LIST_COPY,
+  DELETE_ANNUITY_DIALOG_COPY,
+} from "@/components/annuities/copy";
 import { Button } from "@/components/ui/button";
 import { useAnnuities } from "@/hooks/use-annuities";
 import { useAuth } from "@/hooks/use-auth";
@@ -43,6 +46,7 @@ export default function AnnuitiesPage() {
   const [deletingAnnuity, setDeletingAnnuity] = useState<Annuity | undefined>(
     undefined,
   );
+  const [deleteError, setDeleteError] = useState<string | undefined>(undefined);
 
   if (authLoading || !user) {
     return null;
@@ -70,11 +74,16 @@ export default function AnnuitiesPage() {
 
   const handleConfirmDelete = async () => {
     if (!deletingAnnuity) return;
-    await deleteOne(deletingAnnuity.id);
-    if (selectedId === deletingAnnuity.id) {
-      setSelectedId(undefined);
+    setDeleteError(undefined);
+    try {
+      await deleteOne(deletingAnnuity.id);
+      if (selectedId === deletingAnnuity.id) {
+        setSelectedId(undefined);
+      }
+      setDeletingAnnuity(undefined);
+    } catch {
+      setDeleteError(DELETE_ANNUITY_DIALOG_COPY.deleteError);
     }
-    setDeletingAnnuity(undefined);
   };
 
   return (
@@ -157,13 +166,17 @@ export default function AnnuitiesPage() {
         <DeleteAnnuityDialog
           open={true}
           onOpenChange={(open) => {
-            if (!open && !isDeleting) setDeletingAnnuity(undefined);
+            if (!open && !isDeleting) {
+              setDeletingAnnuity(undefined);
+              setDeleteError(undefined);
+            }
           }}
           annuity={deletingAnnuity}
           onConfirm={() => {
             void handleConfirmDelete();
           }}
           isDeleting={isDeleting}
+          deleteError={deleteError}
         />
       )}
     </div>

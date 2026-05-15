@@ -18,6 +18,7 @@ export interface DeleteAnnuityDialogProps {
   annuity: Annuity;
   onConfirm: () => void;
   isDeleting: boolean;
+  deleteError?: string;
 }
 
 export function DeleteAnnuityDialog({
@@ -26,6 +27,7 @@ export function DeleteAnnuityDialog({
   annuity,
   onConfirm,
   isDeleting,
+  deleteError,
 }: DeleteAnnuityDialogProps) {
   return (
     <Dialog
@@ -42,6 +44,11 @@ export function DeleteAnnuityDialog({
         <p className="text-sm text-muted-foreground">
           {DELETE_ANNUITY_DIALOG_COPY.confirmMessage(annuity.name)}
         </p>
+        {deleteError !== undefined && (
+          <p role="alert" className="text-xs text-destructive">
+            {deleteError}
+          </p>
+        )}
         <DialogFooter className="mt-2">
           <Button
             type="button"

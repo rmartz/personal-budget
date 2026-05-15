@@ -5,7 +5,7 @@ import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { EDIT_ANNUITY_DIALOG_COPY } from "./copy";
-import { EditAnnuityDialogView } from "./EditAnnuityDialog";
+import { EditAnnuityDialogView } from "./EditAnnuityDialogView";
 
 afterEach(cleanup);
 
