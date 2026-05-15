@@ -1,0 +1,16 @@
+export const CREATE_EXPENSE_DIALOG_COPY = {
+  amountInvalidError: "Monthly amount must be a positive number.",
+  amountLabel: "Typical monthly amount",
+  amountPlaceholder: "e.g. 450.00",
+  cancelButton: "Cancel",
+  creatingButton: "Creating…",
+  nameLabel: "Name",
+  namePlaceholder: "e.g. Credit card",
+  nameRequiredError: "Name is required.",
+  submitButton: "Create",
+  submitError: "Failed to create expense. Please try again.",
+  title: "New Expense",
+  typeLabel: "Type",
+  typeRunningBalance: "Running balance",
+  typeStatementBalance: "Statement",
+} as const;

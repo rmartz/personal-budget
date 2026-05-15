@@ -1,5 +1,6 @@
 export const RECONCILE_VIEW_COPY = {
   actionApply: "Apply",
+  actionNewExpense: "New expense",
   actionConfirmed: "Confirmed",
   actionProjected: "Projected",
   cashFlowAccountBalancesLabel: "Account balances",
