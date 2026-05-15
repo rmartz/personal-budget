@@ -3,9 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { LedgerList, NewLedgerDialog } from "@/components/ledgers";
+import { CreateLedgerDialogContainer, LedgerList } from "@/components/ledgers";
 import { useAuth } from "@/hooks/use-auth";
-import { useCreateLedger } from "@/hooks/use-create-ledger";
 import { useDeleteLedger } from "@/hooks/use-delete-ledger";
 import { useLedgers } from "@/hooks/use-ledgers";
 import type { UpdateLedgerInput } from "@/lib/types";
@@ -17,7 +16,6 @@ export default function LedgersPage() {
   const { ledgers, isLoading } = useLedgers(uid);
   const queryClient = useQueryClient();
   const { mutate: deleteLedger } = useDeleteLedger(uid);
-  const { mutateAsync: createLedger } = useCreateLedger(uid);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const editMutation = useMutation({
@@ -48,10 +46,11 @@ export default function LedgersPage() {
         onEditLedger={handleEditLedger}
         onDeleteLedger={deleteLedger}
       />
-      <NewLedgerDialog
+      <CreateLedgerDialogContainer
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSubmit={(name, cashCap) => createLedger({ name, cashCap })}
+        onClose={() => {
+          setDialogOpen(false);
+        }}
       />
     </div>
   );

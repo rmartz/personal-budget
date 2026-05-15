@@ -9,15 +9,11 @@ export {
   EDIT_LEDGER_DIALOG_COPY,
   LEDGER_LIST_ITEM_COPY,
   LEDGERS_PAGE_COPY,
-  NEW_LEDGER_DIALOG_COPY,
 } from "./copy";
 export { CreateLedgerDialog } from "./CreateLedgerDialog";
+export type { CreateLedgerDialogContainerProps } from "./CreateLedgerDialogContainer";
+export { CreateLedgerDialogContainer } from "./CreateLedgerDialogContainer";
 export { EditLedgerDialog } from "./EditLedgerDialog";
 export { LedgerList } from "./LedgerList";
 export type { LedgerListItemViewProps } from "./LedgerListItem";
 export { LedgerListItem, LedgerListItemView } from "./LedgerListItem";
-export type {
-  NewLedgerDialogProps,
-  NewLedgerDialogViewProps,
-} from "./NewLedgerDialog";
-export { NewLedgerDialog, NewLedgerDialogView } from "./NewLedgerDialog";
