@@ -7,7 +7,6 @@ import ts from "typescript";
 
 const DEFAULT_OUTPUT_PATH = ".github/screenshots.dynamic.yml";
 const STORYBOOK_BASE_URL = "http://127.0.0.1:6006";
-const UNKNOWN_COMPONENT_NAME = "UnknownComponent";
 
 function parseArgs(argv) {
   const args = {
@@ -172,19 +171,16 @@ function parseStoryFile(storyFilePath) {
 
   const metaId = getNamedStringProperty(defaultExportObjectLiteral, "id");
   const metaTitle = getNamedStringProperty(defaultExportObjectLiteral, "title");
-  const componentName =
-    metaTitle?.split("/").at(-1) ?? metaId ?? UNKNOWN_COMPONENT_NAME;
-
   if (!metaId && !metaTitle) {
     return [];
   }
 
+  const componentName = metaTitle?.split("/").filter(Boolean).at(-1) || metaId;
+  const titleBase = metaId ?? metaTitle;
   const storyExports = extractStoryExports(sourceFile);
 
   return storyExports.map((storyExportName) => {
-    const titlePart = metaId
-      ? toKebabCase(metaId)
-      : toKebabCase(metaTitle ?? "");
+    const titlePart = toKebabCase(titleBase);
     const storyPart = toKebabCase(storyExportName);
 
     return {
@@ -270,7 +266,28 @@ function appendGithubOutput(githubOutputPath, screenshotCount) {
 
   const hasStories = screenshotCount > 0 ? "true" : "false";
   const output = `story_count=${screenshotCount}\nhas_stories=${hasStories}\n`;
-  writeFileSync(githubOutputPath, output, { flag: "a" });
+  try {
+    writeFileSync(githubOutputPath, output, { flag: "a" });
+  } catch (error) {
+    throw new Error(
+      `Failed to write GitHub Action outputs to ${githubOutputPath}. Check that the output file path exists and is writable.`,
+      { cause: error },
+    );
+  }
+}
+
+function readChangedFiles(repoRoot, changedFilesPath) {
+  try {
+    return readFileSync(join(repoRoot, changedFilesPath), "utf8")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+  } catch (error) {
+    throw new Error(
+      `Failed to read changed files list from ${changedFilesPath}. Ensure the file exists and contains one file path per line.`,
+      { cause: error },
+    );
+  }
 }
 
 function main() {
@@ -279,10 +296,7 @@ function main() {
     process.argv.slice(2),
   );
 
-  const changedFiles = readFileSync(join(repoRoot, changedFilesPath), "utf8")
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
+  const changedFiles = readChangedFiles(repoRoot, changedFilesPath);
 
   const storyFiles = new Set();
   for (const changedFilePath of changedFiles) {
@@ -292,10 +306,19 @@ function main() {
     }
   }
 
-  const screenshots = Array.from(storyFiles)
+  const screenshotConfigs = Array.from(storyFiles)
     .sort((a, b) => a.localeCompare(b))
     .flatMap((storyFile) => {
-      const details = parseStoryFile(join(repoRoot, storyFile));
+      const storyFilePath = join(repoRoot, storyFile);
+      let details;
+      try {
+        details = parseStoryFile(storyFilePath);
+      } catch (error) {
+        throw new Error(
+          `Failed to parse Storybook story file at ${storyFile}. Check the file syntax and Storybook metadata exports.`,
+          { cause: error },
+        );
+      }
       return details.map((detail) => ({
         ...detail,
         storyFile,
@@ -312,13 +335,13 @@ function main() {
 
   const outputAbsolutePath = join(repoRoot, outputPath);
   mkdirSync(dirname(outputAbsolutePath), { recursive: true });
-  writeFileSync(outputAbsolutePath, buildConfigYaml(screenshots));
+  writeFileSync(outputAbsolutePath, buildConfigYaml(screenshotConfigs));
 
-  appendGithubOutput(githubOutputPath, screenshots.length);
+  appendGithubOutput(githubOutputPath, screenshotConfigs.length);
 
   const configPathForLog = relative(repoRoot, outputAbsolutePath);
   console.log(
-    `Generated ${configPathForLog} with ${screenshots.length} screenshot(s).`,
+    `Generated ${configPathForLog} with ${screenshotConfigs.length} screenshot(s).`,
   );
 }
 
