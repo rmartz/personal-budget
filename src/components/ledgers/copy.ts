@@ -58,16 +58,3 @@ export const LEDGERS_PAGE_COPY = {
   noCashCapLabel: "no cash cap",
   title: "Ledgers",
 } as const;
-
-export const NEW_LEDGER_DIALOG_COPY = {
-  cancelButton: "Cancel",
-  cashCapError: "Cash cap must be a positive number.",
-  cashCapLabel: "Cash Cap (optional)",
-  cashCapPlaceholder: "0.00",
-  nameError: "Name is required.",
-  nameLabel: "Name",
-  namePlaceholder: "e.g. Everyday Spending",
-  submitButton: "Create Ledger",
-  submitError: "Something went wrong. Please try again.",
-  title: "New Ledger",
-} as const;
