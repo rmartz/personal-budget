@@ -12,6 +12,7 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
 import { APP_SHELL_COPY } from "./copy";
@@ -49,12 +50,18 @@ function isActiveRoute(pathname: string, href: string): boolean {
 }
 
 export interface AppShellNavViewProps {
-  pathname: string;
+  avatarInitials?: string;
   children: React.ReactNode;
+  pathname: string;
 }
 
-export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
+export function AppShellNavView({
+  avatarInitials,
+  children,
+  pathname,
+}: AppShellNavViewProps) {
   const [overflowOpen, setOverflowOpen] = useState(false);
+  const displayInitials = avatarInitials ?? APP_SHELL_COPY.avatarFallback;
   const moreActive = OVERFLOW_LINKS.some((link) =>
     isActiveRoute(pathname, link.href),
   );
@@ -93,7 +100,7 @@ export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
             aria-label={APP_SHELL_COPY.userMenuLabel}
             className="grid size-8 place-items-center rounded-full bg-muted text-xs font-medium"
           >
-            RM
+            {displayInitials}
           </button>
         </nav>
       </header>
@@ -117,7 +124,7 @@ export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
           aria-label={APP_SHELL_COPY.userMenuLabel}
           className="grid size-8 place-items-center rounded-full bg-muted text-xs font-medium"
         >
-          RM
+          {displayInitials}
         </button>
       </header>
 
@@ -192,7 +199,37 @@ export function AppShellNavView({ pathname, children }: AppShellNavViewProps) {
   );
 }
 
-export function AppShellNav({ children }: { children: React.ReactNode }) {
+export interface AppShellNavProps {
+  children: React.ReactNode;
+}
+
+export function deriveInitials(
+  displayName: string | null,
+  email: string | null,
+): string | undefined {
+  if (displayName) {
+    const parts = displayName.trim().split(/\s+/);
+    const first = parts[0]?.charAt(0) ?? "";
+    const last = parts[parts.length - 1]?.charAt(0) ?? "";
+    return parts.length >= 2
+      ? `${first}${last}`.toUpperCase() || undefined
+      : first.toUpperCase() || undefined;
+  }
+  if (email) {
+    return email.charAt(0).toUpperCase() || undefined;
+  }
+  return undefined;
+}
+
+export function AppShellNav({ children }: AppShellNavProps) {
   const pathname = usePathname();
-  return <AppShellNavView pathname={pathname}>{children}</AppShellNavView>;
+  const { user } = useAuth();
+  const avatarInitials = user
+    ? deriveInitials(user.displayName, user.email)
+    : undefined;
+  return (
+    <AppShellNavView pathname={pathname} avatarInitials={avatarInitials}>
+      {children}
+    </AppShellNavView>
+  );
 }

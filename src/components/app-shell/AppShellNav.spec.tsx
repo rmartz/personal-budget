@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { AppShellNavView } from "./AppShellNav";
+import { AppShellNavView, deriveInitials } from "./AppShellNav";
 import { APP_SHELL_COPY } from "./copy";
 
 afterEach(cleanup);
@@ -226,6 +226,28 @@ describe("AppShellNavView — More tab active-route styling", () => {
   });
 });
 
+describe("deriveInitials", () => {
+  it("extracts first and last initials from a two-part display name", () => {
+    expect(deriveInitials("Reed Martz", null)).toBe("RM");
+  });
+
+  it("extracts a single initial from a one-word display name", () => {
+    expect(deriveInitials("Reed", null)).toBe("R");
+  });
+
+  it("returns undefined for a whitespace-only display name", () => {
+    expect(deriveInitials("  ", null)).toBeUndefined();
+  });
+
+  it("falls back to the first letter of email when displayName is null", () => {
+    expect(deriveInitials(null, "reed@example.com")).toBe("R");
+  });
+
+  it("returns undefined when both displayName and email are null", () => {
+    expect(deriveInitials(null, null)).toBeUndefined();
+  });
+});
+
 describe("AppShellNavView — children render", () => {
   it("renders the child content inside the shell", () => {
     render(
@@ -234,5 +256,55 @@ describe("AppShellNavView — children render", () => {
       </AppShellNavView>,
     );
     expect(screen.getByTestId("shell-child").textContent).toBe("hello shell");
+  });
+});
+
+describe("AppShellNavView — avatar initials", () => {
+  it("renders the provided avatarInitials in the desktop avatar button", () => {
+    render(
+      <AppShellNavView pathname="/reconcile" avatarInitials="JD">
+        content
+      </AppShellNavView>,
+    );
+    const buttons = screen
+      .getAllByRole("button", { name: APP_SHELL_COPY.userMenuLabel })
+      .filter((el) => el.textContent === "JD");
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it("renders the provided avatarInitials in the mobile avatar button", () => {
+    render(
+      <AppShellNavView pathname="/reconcile" avatarInitials="AB">
+        content
+      </AppShellNavView>,
+    );
+    const buttons = screen
+      .getAllByRole("button", { name: APP_SHELL_COPY.userMenuLabel })
+      .filter((el) => el.textContent === "AB");
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it("renders the fallback placeholder when no avatarInitials prop is given", () => {
+    render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
+    const buttons = screen.getAllByRole("button", {
+      name: APP_SHELL_COPY.userMenuLabel,
+    });
+    buttons.forEach((btn) => {
+      expect(btn.textContent).toBe(APP_SHELL_COPY.avatarFallback);
+    });
+  });
+
+  it("does not render the hardcoded RM string", () => {
+    render(
+      <AppShellNavView pathname="/reconcile" avatarInitials="JD">
+        content
+      </AppShellNavView>,
+    );
+    const buttons = screen.getAllByRole("button", {
+      name: APP_SHELL_COPY.userMenuLabel,
+    });
+    buttons.forEach((btn) => {
+      expect(btn.textContent).not.toBe("RM");
+    });
   });
 });
