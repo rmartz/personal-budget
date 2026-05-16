@@ -96,7 +96,7 @@ describe("AnnuityCard — selection state", () => {
       />,
     );
     const button = screen.getByRole("button", {
-      name: ANNUITY_CARD_COPY.selectAriaLabel,
+      name: ANNUITY_CARD_COPY.selectAriaLabel("Mortgage"),
     });
     expect(button.getAttribute("aria-pressed")).toBe("true");
   });
@@ -110,7 +110,7 @@ describe("AnnuityCard — selection state", () => {
       />,
     );
     const button = screen.getByRole("button", {
-      name: ANNUITY_CARD_COPY.selectAriaLabel,
+      name: ANNUITY_CARD_COPY.selectAriaLabel("Mortgage"),
     });
     expect(button.getAttribute("aria-pressed")).toBe("false");
   });

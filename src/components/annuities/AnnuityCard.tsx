@@ -56,7 +56,7 @@ export function AnnuityCard({
       <button
         type="button"
         onClick={onSelect}
-        aria-label={ANNUITY_CARD_COPY.selectAriaLabel}
+        aria-label={ANNUITY_CARD_COPY.selectAriaLabel(annuity.name)}
         aria-pressed={isSelected}
         className="flex w-full flex-col gap-3 p-4 text-left transition-colors hover:bg-muted/50"
       >

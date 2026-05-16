@@ -7,9 +7,6 @@ import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { EDIT_ANNUITY_DIALOG_COPY } from "./copy";
 import { EditAnnuityDialogView } from "./EditAnnuityDialogView";
 
-export type { EditAnnuityDialogViewProps } from "./EditAnnuityDialogView";
-export { EditAnnuityDialogView } from "./EditAnnuityDialogView";
-
 export interface EditAnnuityInput {
   name: string;
   monthlyAmount: number;
