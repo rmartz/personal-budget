@@ -210,9 +210,7 @@ describe("ReconcileSetupView — accounts section", () => {
 
   it("renders edit aria-label including the account name for cash accounts", () => {
     const account = makeAccount({ name: "Chase Checking" });
-    render(
-      <ReconcileSetupView {...baseProps} accounts={[account]} />,
-    );
+    render(<ReconcileSetupView {...baseProps} accounts={[account]} />);
     expect(
       screen.getByRole("button", {
         name: RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel("Chase Checking"),
@@ -222,9 +220,7 @@ describe("ReconcileSetupView — accounts section", () => {
 
   it("renders delete aria-label including the account name for cash accounts", () => {
     const account = makeAccount({ name: "Chase Checking" });
-    render(
-      <ReconcileSetupView {...baseProps} accounts={[account]} />,
-    );
+    render(<ReconcileSetupView {...baseProps} accounts={[account]} />);
     expect(
       screen.getByRole("button", {
         name: RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(
@@ -240,9 +236,7 @@ describe("ReconcileSetupView — accounts section", () => {
       tier: ReconciliationAccountTier.Investment,
       targetFloat: undefined,
     });
-    render(
-      <ReconcileSetupView {...baseProps} accounts={[account]} />,
-    );
+    render(<ReconcileSetupView {...baseProps} accounts={[account]} />);
     expect(
       screen.getByRole("button", {
         name: RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(
@@ -258,9 +252,7 @@ describe("ReconcileSetupView — accounts section", () => {
       tier: ReconciliationAccountTier.Investment,
       targetFloat: undefined,
     });
-    render(
-      <ReconcileSetupView {...baseProps} accounts={[account]} />,
-    );
+    render(<ReconcileSetupView {...baseProps} accounts={[account]} />);
     expect(
       screen.getByRole("button", {
         name: RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(
@@ -375,9 +367,7 @@ describe("ReconcileSetupView — expenses section", () => {
 
   it("renders edit aria-label including the expense name", () => {
     const expense = makeExpense({ name: "Electric bill" });
-    render(
-      <ReconcileSetupView {...baseProps} expenses={[expense]} />,
-    );
+    render(<ReconcileSetupView {...baseProps} expenses={[expense]} />);
     expect(
       screen.getByRole("button", {
         name: RECONCILE_SETUP_VIEW_COPY.editExpenseAriaLabel("Electric bill"),
@@ -387,9 +377,7 @@ describe("ReconcileSetupView — expenses section", () => {
 
   it("renders delete aria-label including the expense name", () => {
     const expense = makeExpense({ name: "Electric bill" });
-    render(
-      <ReconcileSetupView {...baseProps} expenses={[expense]} />,
-    );
+    render(<ReconcileSetupView {...baseProps} expenses={[expense]} />);
     expect(
       screen.getByRole("button", {
         name: RECONCILE_SETUP_VIEW_COPY.deleteExpenseAriaLabel("Electric bill"),

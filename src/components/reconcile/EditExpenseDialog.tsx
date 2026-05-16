@@ -111,6 +111,9 @@ export function EditExpenseDialogView({
                         : "outline"
                     }
                     size="sm"
+                    aria-pressed={
+                      type === ReconciliationExpenseType.StatementBalance
+                    }
                     onClick={() => {
                       onTypeChange(ReconciliationExpenseType.StatementBalance);
                     }}
@@ -125,6 +128,9 @@ export function EditExpenseDialogView({
                         : "outline"
                     }
                     size="sm"
+                    aria-pressed={
+                      type === ReconciliationExpenseType.RunningBalance
+                    }
                     onClick={() => {
                       onTypeChange(ReconciliationExpenseType.RunningBalance);
                     }}

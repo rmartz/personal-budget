@@ -26,7 +26,7 @@ import {
 } from "@/services/reconciliation-expenses";
 
 export default function ReconcileSetupPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const uid = user?.uid ?? "";
   const { reconciliationAccounts } = useReconciliationAccounts(uid);
   const { reconciliationExpenses } = useReconciliationExpenses(uid);
@@ -52,6 +52,8 @@ export default function ReconcileSetupPage() {
     string | undefined
   >(undefined);
   const [isDeletingExpense, setIsDeletingExpense] = useState(false);
+
+  if (authLoading || !user) return null;
 
   async function handleUpdateAccount(
     id: string,
@@ -126,7 +128,7 @@ export default function ReconcileSetupPage() {
       <DeleteAccountDialog
         open={deletingAccount !== undefined}
         onOpenChange={(open) => {
-          if (!open) {
+          if (!open && !isDeletingAccount) {
             setDeletingAccount(undefined);
             setAccountDeleteError(undefined);
           }
@@ -150,7 +152,7 @@ export default function ReconcileSetupPage() {
       <DeleteExpenseDialog
         open={deletingExpense !== undefined}
         onOpenChange={(open) => {
-          if (!open) {
+          if (!open && !isDeletingExpense) {
             setDeletingExpense(undefined);
             setExpenseDeleteError(undefined);
           }

@@ -90,7 +90,9 @@ export function ReconcileSetupView({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          aria-label={RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(account.name)}
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(
+                            account.name,
+                          )}
                           onClick={() => {
                             onEditAccount(account);
                           }}
@@ -101,7 +103,9 @@ export function ReconcileSetupView({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          aria-label={RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(account.name)}
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(
+                            account.name,
+                          )}
                           onClick={() => {
                             onDeleteAccount(account);
                           }}
@@ -132,7 +136,9 @@ export function ReconcileSetupView({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          aria-label={RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(account.name)}
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(
+                            account.name,
+                          )}
                           onClick={() => {
                             onEditAccount(account);
                           }}
@@ -143,7 +149,9 @@ export function ReconcileSetupView({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          aria-label={RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(account.name)}
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(
+                            account.name,
+                          )}
                           onClick={() => {
                             onDeleteAccount(account);
                           }}
@@ -189,7 +197,9 @@ export function ReconcileSetupView({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    aria-label={RECONCILE_SETUP_VIEW_COPY.editExpenseAriaLabel(expense.name)}
+                    aria-label={RECONCILE_SETUP_VIEW_COPY.editExpenseAriaLabel(
+                      expense.name,
+                    )}
                     onClick={() => {
                       onEditExpense(expense);
                     }}
@@ -200,7 +210,9 @@ export function ReconcileSetupView({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    aria-label={RECONCILE_SETUP_VIEW_COPY.deleteExpenseAriaLabel(expense.name)}
+                    aria-label={RECONCILE_SETUP_VIEW_COPY.deleteExpenseAriaLabel(
+                      expense.name,
+                    )}
                     onClick={() => {
                       onDeleteExpense(expense);
                     }}
