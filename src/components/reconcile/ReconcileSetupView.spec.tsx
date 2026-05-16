@@ -97,7 +97,7 @@ describe("ReconcileSetupView — accounts section", () => {
         accounts={[makeAccount({ targetFloat: 2000 })]}
       />,
     );
-    expect(screen.getByText("$2,000.00")).toBeDefined();
+    expect(screen.getByText("$2,000.00", { exact: false })).toBeDefined();
   });
 
   it("does not render target float for investment accounts", () => {
@@ -155,6 +155,119 @@ describe("ReconcileSetupView — accounts section", () => {
     );
     fireEvent.click(screen.getByText(RECONCILE_SETUP_VIEW_COPY.deleteButton));
     expect(onDeleteAccount).toHaveBeenCalledWith(account);
+  });
+
+  it("renders the Short-term tier label for short-term cash accounts", () => {
+    render(
+      <ReconcileSetupView
+        {...baseProps}
+        accounts={[makeAccount({ tier: ReconciliationAccountTier.ShortTerm })]}
+      />,
+    );
+    expect(
+      screen.getByText(
+        RECONCILE_SETUP_VIEW_COPY.cashTierLabels[
+          ReconciliationAccountTier.ShortTerm
+        ],
+        { exact: false },
+      ),
+    ).toBeDefined();
+  });
+
+  it("renders the Reserve tier label for reserve cash accounts", () => {
+    render(
+      <ReconcileSetupView
+        {...baseProps}
+        accounts={[makeAccount({ tier: ReconciliationAccountTier.Reserve })]}
+      />,
+    );
+    expect(
+      screen.getByText(
+        RECONCILE_SETUP_VIEW_COPY.cashTierLabels[
+          ReconciliationAccountTier.Reserve
+        ],
+        { exact: false },
+      ),
+    ).toBeDefined();
+  });
+
+  it("renders the Long-term tier label for long-term cash accounts", () => {
+    render(
+      <ReconcileSetupView
+        {...baseProps}
+        accounts={[makeAccount({ tier: ReconciliationAccountTier.LongTerm })]}
+      />,
+    );
+    expect(
+      screen.getByText(
+        RECONCILE_SETUP_VIEW_COPY.cashTierLabels[
+          ReconciliationAccountTier.LongTerm
+        ],
+        { exact: false },
+      ),
+    ).toBeDefined();
+  });
+
+  it("renders edit aria-label including the account name for cash accounts", () => {
+    const account = makeAccount({ name: "Chase Checking" });
+    render(
+      <ReconcileSetupView {...baseProps} accounts={[account]} />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel("Chase Checking"),
+      }),
+    ).toBeDefined();
+  });
+
+  it("renders delete aria-label including the account name for cash accounts", () => {
+    const account = makeAccount({ name: "Chase Checking" });
+    render(
+      <ReconcileSetupView {...baseProps} accounts={[account]} />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(
+          "Chase Checking",
+        ),
+      }),
+    ).toBeDefined();
+  });
+
+  it("renders edit aria-label including the account name for investment accounts", () => {
+    const account = makeAccount({
+      name: "Fidelity Brokerage",
+      tier: ReconciliationAccountTier.Investment,
+      targetFloat: undefined,
+    });
+    render(
+      <ReconcileSetupView {...baseProps} accounts={[account]} />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(
+          "Fidelity Brokerage",
+        ),
+      }),
+    ).toBeDefined();
+  });
+
+  it("renders delete aria-label including the account name for investment accounts", () => {
+    const account = makeAccount({
+      name: "Fidelity Brokerage",
+      tier: ReconciliationAccountTier.Investment,
+      targetFloat: undefined,
+    });
+    render(
+      <ReconcileSetupView {...baseProps} accounts={[account]} />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(
+          "Fidelity Brokerage",
+        ),
+      }),
+    ).toBeDefined();
   });
 });
 
@@ -258,5 +371,29 @@ describe("ReconcileSetupView — expenses section", () => {
     );
     fireEvent.click(screen.getByText(RECONCILE_SETUP_VIEW_COPY.deleteButton));
     expect(onDeleteExpense).toHaveBeenCalledWith(expense);
+  });
+
+  it("renders edit aria-label including the expense name", () => {
+    const expense = makeExpense({ name: "Electric bill" });
+    render(
+      <ReconcileSetupView {...baseProps} expenses={[expense]} />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: RECONCILE_SETUP_VIEW_COPY.editExpenseAriaLabel("Electric bill"),
+      }),
+    ).toBeDefined();
+  });
+
+  it("renders delete aria-label including the expense name", () => {
+    const expense = makeExpense({ name: "Electric bill" });
+    render(
+      <ReconcileSetupView {...baseProps} expenses={[expense]} />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: RECONCILE_SETUP_VIEW_COPY.deleteExpenseAriaLabel("Electric bill"),
+      }),
+    ).toBeDefined();
   });
 });

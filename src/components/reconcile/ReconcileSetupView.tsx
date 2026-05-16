@@ -14,6 +14,10 @@ function isCashAccount(account: ReconciliationAccount): boolean {
   return CASH_TIERS.has(account.tier);
 }
 
+function cashTierLabel(account: ReconciliationAccount): string {
+  return RECONCILE_SETUP_VIEW_COPY.cashTierLabels[account.tier];
+}
+
 function expenseTypeLabel(type: ReconciliationExpenseType): string {
   return type === ReconciliationExpenseType.StatementBalance
     ? RECONCILE_SETUP_VIEW_COPY.expenseTypeStatementBalance
@@ -75,17 +79,18 @@ export function ReconcileSetupView({
                     >
                       <div className="flex flex-col gap-0.5">
                         <span className="font-medium">{account.name}</span>
-                        {account.targetFloat !== undefined && (
-                          <span className="text-xs text-muted-foreground">
-                            {formatCurrency(account.targetFloat)}
-                          </span>
-                        )}
+                        <span className="text-xs text-muted-foreground">
+                          {cashTierLabel(account)}
+                          {account.targetFloat !== undefined &&
+                            ` · ${formatCurrency(account.targetFloat)}`}
+                        </span>
                       </div>
                       <div className="flex gap-2">
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(account.name)}
                           onClick={() => {
                             onEditAccount(account);
                           }}
@@ -96,6 +101,7 @@ export function ReconcileSetupView({
                           type="button"
                           variant="ghost"
                           size="sm"
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(account.name)}
                           onClick={() => {
                             onDeleteAccount(account);
                           }}
@@ -126,6 +132,7 @@ export function ReconcileSetupView({
                           type="button"
                           variant="ghost"
                           size="sm"
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.editAccountAriaLabel(account.name)}
                           onClick={() => {
                             onEditAccount(account);
                           }}
@@ -136,6 +143,7 @@ export function ReconcileSetupView({
                           type="button"
                           variant="ghost"
                           size="sm"
+                          aria-label={RECONCILE_SETUP_VIEW_COPY.deleteAccountAriaLabel(account.name)}
                           onClick={() => {
                             onDeleteAccount(account);
                           }}
@@ -181,6 +189,7 @@ export function ReconcileSetupView({
                     type="button"
                     variant="ghost"
                     size="sm"
+                    aria-label={RECONCILE_SETUP_VIEW_COPY.editExpenseAriaLabel(expense.name)}
                     onClick={() => {
                       onEditExpense(expense);
                     }}
@@ -191,6 +200,7 @@ export function ReconcileSetupView({
                     type="button"
                     variant="ghost"
                     size="sm"
+                    aria-label={RECONCILE_SETUP_VIEW_COPY.deleteExpenseAriaLabel(expense.name)}
                     onClick={() => {
                       onDeleteExpense(expense);
                     }}
