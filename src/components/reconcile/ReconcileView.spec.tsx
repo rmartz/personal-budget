@@ -74,9 +74,7 @@ describe("ReconcileView — New expense button", () => {
 
   it("does not render the New expense button when onNewExpense is undefined", () => {
     render(<ReconcileView />);
-    expect(
-      screen.queryByText(RECONCILE_VIEW_COPY.actionNewExpense),
-    ).toBeNull();
+    expect(screen.queryByText(RECONCILE_VIEW_COPY.actionNewExpense)).toBeNull();
   });
 
   it("calls onNewExpense when the New expense button is clicked", () => {
