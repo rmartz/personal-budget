@@ -98,7 +98,7 @@ jobs:
           exit 1
       - name: Capture Storybook screenshots
         if: steps.screenshot-config.outputs.has_stories == 'true'
-        uses: yoavf/auto-pr-screenshots-action@v1
+        uses: yoavf/auto-pr-screenshots-action@v1.4.0-beta
         with:
           config-file: .github/screenshots.dynamic.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
