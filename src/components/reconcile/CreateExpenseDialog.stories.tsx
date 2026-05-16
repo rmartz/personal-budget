@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ReconciliationExpenseType } from "@/lib/firebase/schema/reconciliation-expenses";
 
 import { CreateExpenseDialogView } from "./CreateExpenseDialog";
+import { CREATE_EXPENSE_DIALOG_COPY } from "./CreateExpenseDialog.copy";
 
 const meta: Meta<typeof CreateExpenseDialogView> = {
   component: CreateExpenseDialogView,
@@ -47,8 +48,8 @@ export const WithValidationErrors: Story = {
     ...baseProps,
     type: ReconciliationExpenseType.StatementBalance,
     onTypeChange: () => undefined,
-    nameError: "Name is required.",
-    typicalAmountError: "Monthly amount must be a positive number.",
+    nameError: CREATE_EXPENSE_DIALOG_COPY.nameRequiredError,
+    typicalAmountError: CREATE_EXPENSE_DIALOG_COPY.amountInvalidError,
   },
 };
 

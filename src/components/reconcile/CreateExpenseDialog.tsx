@@ -116,6 +116,9 @@ export function CreateExpenseDialogView({
               <div className="flex gap-2">
                 <button
                   type="button"
+                  aria-pressed={
+                    type === ReconciliationExpenseType.StatementBalance
+                  }
                   onClick={() => {
                     onTypeChange(ReconciliationExpenseType.StatementBalance);
                   }}
@@ -129,6 +132,9 @@ export function CreateExpenseDialogView({
                 </button>
                 <button
                   type="button"
+                  aria-pressed={
+                    type === ReconciliationExpenseType.RunningBalance
+                  }
                   onClick={() => {
                     onTypeChange(ReconciliationExpenseType.RunningBalance);
                   }}
@@ -258,7 +264,7 @@ export function CreateExpenseDialog({
     }
 
     const parsed = parseFloat(typicalAmount);
-    if (isNaN(parsed) || parsed <= 0) {
+    if (isNaN(parsed) || parsed <= 0 || !isFinite(parsed)) {
       setTypicalAmountError(CREATE_EXPENSE_DIALOG_COPY.amountInvalidError);
       valid = false;
     } else {

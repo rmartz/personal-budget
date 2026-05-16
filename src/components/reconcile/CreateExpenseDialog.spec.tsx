@@ -180,7 +180,7 @@ describe("CreateExpenseDialogView — submit", () => {
     ).toBeDefined();
   });
 
-  it("disables submit and cancel while isSubmitting", () => {
+  it("disables the submit button while isSubmitting", () => {
     render(<CreateExpenseDialogView {...baseProps} isSubmitting={true} />);
     const creatingBtn = screen
       .getByText(CREATE_EXPENSE_DIALOG_COPY.creatingButton)
@@ -189,8 +189,8 @@ describe("CreateExpenseDialogView — submit", () => {
   });
 });
 
-describe("CreateExpenseDialog integration — submitting persists via service layer", () => {
-  it("calls onSubmit with name, type, and typicalAmount", async () => {
+describe("CreateExpenseDialog — container integration", () => {
+  it("calls onSubmit prop with name, type, and typicalAmount when form is valid", async () => {
     const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
     const onSubmit = vi.fn().mockResolvedValue(undefined);
 
@@ -222,5 +222,53 @@ describe("CreateExpenseDialog integration — submitting persists via service la
         typicalAmount: 120,
       });
     });
+  });
+
+  it("shows name required error and does not call onSubmit when name is empty", async () => {
+    const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
+    const onSubmit = vi.fn();
+
+    render(
+      <CreateExpenseDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.amountLabel),
+      { target: { value: "100" } },
+    );
+    fireEvent.click(screen.getByText(CREATE_EXPENSE_DIALOG_COPY.submitButton));
+
+    expect(
+      screen.getByText(CREATE_EXPENSE_DIALOG_COPY.nameRequiredError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("shows amount invalid error and does not call onSubmit when amount is invalid", async () => {
+    const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
+    const onSubmit = vi.fn();
+
+    render(
+      <CreateExpenseDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.nameLabel),
+      { target: { value: "Electric bill" } },
+    );
+    fireEvent.click(screen.getByText(CREATE_EXPENSE_DIALOG_COPY.submitButton));
+
+    expect(
+      screen.getByText(CREATE_EXPENSE_DIALOG_COPY.amountInvalidError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

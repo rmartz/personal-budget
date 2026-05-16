@@ -9,12 +9,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { createReconciliationExpense } from "@/services/reconciliation-expenses";
 
 export default function ReconcilePage() {
-  const { user } = useAuth();
-  const uid = user?.uid ?? "";
+  const { user, loading: authLoading } = useAuth();
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 
   const handleCreateExpense = async (data: CreateExpenseInput) => {
-    await createReconciliationExpense(uid, {
+    if (authLoading || !user) return;
+    await createReconciliationExpense(user.uid, {
       name: data.name,
       type: data.type,
       typicalAmount: data.typicalAmount,
@@ -24,9 +24,13 @@ export default function ReconcilePage() {
   return (
     <>
       <ReconcileView
-        onNewExpense={() => {
-          setExpenseDialogOpen(true);
-        }}
+        onNewExpense={
+          authLoading || !user
+            ? undefined
+            : () => {
+                setExpenseDialogOpen(true);
+              }
+        }
       />
       <CreateExpenseDialog
         open={expenseDialogOpen}
