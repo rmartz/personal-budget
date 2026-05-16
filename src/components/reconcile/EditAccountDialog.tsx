@@ -16,14 +16,9 @@ import {
   type ReconciliationAccount,
   ReconciliationAccountTier,
 } from "@/lib/firebase/schema/reconciliation-accounts";
+import { CASH_TIERS } from "@/lib/reconciliation/cash-tiers";
 
 import { EDIT_ACCOUNT_DIALOG_COPY } from "./EditAccountDialog.copy";
-
-const CASH_TIERS = new Set<ReconciliationAccountTier>([
-  ReconciliationAccountTier.LongTerm,
-  ReconciliationAccountTier.Reserve,
-  ReconciliationAccountTier.ShortTerm,
-]);
 
 function isCashTier(tier: ReconciliationAccountTier): boolean {
   return CASH_TIERS.has(tier);

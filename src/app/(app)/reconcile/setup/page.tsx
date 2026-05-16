@@ -3,7 +3,9 @@
 import { useState } from "react";
 
 import { DeleteAccountDialog } from "@/components/reconcile/DeleteAccountDialog";
+import { DELETE_ACCOUNT_DIALOG_COPY } from "@/components/reconcile/DeleteAccountDialog.copy";
 import { DeleteExpenseDialog } from "@/components/reconcile/DeleteExpenseDialog";
+import { DELETE_EXPENSE_DIALOG_COPY } from "@/components/reconcile/DeleteExpenseDialog.copy";
 import type { EditAccountInput } from "@/components/reconcile/EditAccountDialog";
 import { EditAccountDialog } from "@/components/reconcile/EditAccountDialog";
 import type { EditExpenseInput } from "@/components/reconcile/EditExpenseDialog";
@@ -69,7 +71,7 @@ export default function ReconcileSetupPage() {
       await deleteReconciliationAccount(uid, deletingAccount.id);
       setDeletingAccount(undefined);
     } catch {
-      setAccountDeleteError("Failed to delete account. Please try again.");
+      setAccountDeleteError(DELETE_ACCOUNT_DIALOG_COPY.deleteError);
     } finally {
       setIsDeletingAccount(false);
     }
@@ -94,7 +96,7 @@ export default function ReconcileSetupPage() {
       await deleteReconciliationExpense(uid, deletingExpense.id);
       setDeletingExpense(undefined);
     } catch {
-      setExpenseDeleteError("Failed to delete expense. Please try again.");
+      setExpenseDeleteError(DELETE_EXPENSE_DIALOG_COPY.deleteError);
     } finally {
       setIsDeletingExpense(false);
     }
@@ -112,6 +114,7 @@ export default function ReconcileSetupPage() {
       />
 
       <EditAccountDialog
+        key={editingAccount?.id ?? "none"}
         open={editingAccount !== undefined}
         onOpenChange={(open) => {
           if (!open) setEditingAccount(undefined);
@@ -135,6 +138,7 @@ export default function ReconcileSetupPage() {
       />
 
       <EditExpenseDialog
+        key={editingExpense?.id ?? "none"}
         open={editingExpense !== undefined}
         onOpenChange={(open) => {
           if (!open) setEditingExpense(undefined);

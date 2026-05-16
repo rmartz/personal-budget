@@ -1,22 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { type ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
 import {
-  type ReconciliationAccount,
-  ReconciliationAccountTier,
-} from "@/lib/firebase/schema/reconciliation-accounts";
-import type { ReconciliationExpense } from "@/lib/firebase/schema/reconciliation-expenses";
+  type ReconciliationExpense,
+  ReconciliationExpenseType,
+} from "@/lib/firebase/schema/reconciliation-expenses";
+import { CASH_TIERS } from "@/lib/reconciliation/cash-tiers";
 
 import { RECONCILE_SETUP_VIEW_COPY } from "./ReconcileSetupView.copy";
 
-const CASH_TIERS = new Set<ReconciliationAccountTier>([
-  ReconciliationAccountTier.LongTerm,
-  ReconciliationAccountTier.Reserve,
-  ReconciliationAccountTier.ShortTerm,
-]);
-
 function isCashAccount(account: ReconciliationAccount): boolean {
   return CASH_TIERS.has(account.tier);
+}
+
+function expenseTypeLabel(type: ReconciliationExpenseType): string {
+  return type === ReconciliationExpenseType.StatementBalance
+    ? RECONCILE_SETUP_VIEW_COPY.expenseTypeStatementBalance
+    : RECONCILE_SETUP_VIEW_COPY.expenseTypeRunningBalance;
 }
 
 function formatCurrency(amount: number): string {
@@ -171,6 +172,7 @@ export function ReconcileSetupView({
                 <div className="flex flex-col gap-0.5">
                   <span className="font-medium">{expense.name}</span>
                   <span className="text-xs text-muted-foreground">
+                    {expenseTypeLabel(expense.type)} ·{" "}
                     {formatCurrency(expense.typicalAmount)}
                   </span>
                 </div>

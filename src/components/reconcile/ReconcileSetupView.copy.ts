@@ -7,5 +7,7 @@ export const RECONCILE_SETUP_VIEW_COPY = {
   expensesEmptyState:
     "No recurring expenses yet. Add your first expense to get started.",
   expensesSectionHeading: "Recurring expenses",
+  expenseTypeRunningBalance: "Running balance",
+  expenseTypeStatementBalance: "Statement",
   investmentAccountsGroupLabel: "Investment accounts",
 } as const;

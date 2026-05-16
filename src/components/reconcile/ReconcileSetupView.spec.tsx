@@ -183,7 +183,39 @@ describe("ReconcileSetupView — expenses section", () => {
         expenses={[makeExpense({ typicalAmount: 350 })]}
       />,
     );
-    expect(screen.getByText("$350.00")).toBeDefined();
+    expect(screen.getByText("$350.00", { exact: false })).toBeDefined();
+  });
+
+  it("renders the Statement type label for statement-balance expenses", () => {
+    render(
+      <ReconcileSetupView
+        {...baseProps}
+        expenses={[
+          makeExpense({ type: ReconciliationExpenseType.StatementBalance }),
+        ]}
+      />,
+    );
+    expect(
+      screen.getByText(RECONCILE_SETUP_VIEW_COPY.expenseTypeStatementBalance, {
+        exact: false,
+      }),
+    ).toBeDefined();
+  });
+
+  it("renders the Running balance type label for running-balance expenses", () => {
+    render(
+      <ReconcileSetupView
+        {...baseProps}
+        expenses={[
+          makeExpense({ type: ReconciliationExpenseType.RunningBalance }),
+        ]}
+      />,
+    );
+    expect(
+      screen.getByText(RECONCILE_SETUP_VIEW_COPY.expenseTypeRunningBalance, {
+        exact: false,
+      }),
+    ).toBeDefined();
   });
 
   it("shows expenses empty state when no expenses", () => {
