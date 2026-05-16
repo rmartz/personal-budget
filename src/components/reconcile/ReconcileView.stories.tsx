@@ -25,3 +25,12 @@ export const Mobile: Story = {
     viewport: { defaultViewport: "mobile1" },
   },
 };
+
+export const WithNewExpenseButton: Story = {
+  args: {
+    onNewExpense: () => undefined,
+  },
+  parameters: {
+    viewport: { defaultViewport: "responsive" },
+  },
+};
