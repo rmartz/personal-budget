@@ -71,3 +71,13 @@ export const WithActionsSelected: Story = {
     onDelete: () => {},
   },
 };
+
+export const WithPrincipal: Story = {
+  args: {
+    annuity: {
+      ...baseAnnuity,
+      annualRatePercent: 6,
+      presentValue: 350000,
+    },
+  },
+};

@@ -18,6 +18,7 @@ export const ANNUITY_CARD_COPY = {
   paymentHistoryEmpty: "No payment history yet.",
   paymentHistoryTitle: (annuityName: string) =>
     `${annuityName} · payment history`,
+  principalLabel: "Principal",
   selectAriaLabel: (name: string) => `Select ${name}`,
   termRemainingIndefinite: "Ongoing",
   termRemainingLabel: "Term remaining",

@@ -116,6 +116,48 @@ describe("AnnuityCard — selection state", () => {
   });
 });
 
+describe("AnnuityCard — principal row", () => {
+  it("shows the principal label for a PVDerived annuity with presentValue", () => {
+    render(
+      <AnnuityCard
+        annuity={makeAnnuity({
+          monthlyMode: AnnuityMonthlyMode.PVDerived,
+          presentValue: 200000,
+          annualRatePercent: 6,
+          durationMonths: 360,
+          startDate: new Date("2099-01-01T00:00:00.000Z"),
+        })}
+      />,
+    );
+    expect(screen.getByText(ANNUITY_CARD_COPY.principalLabel)).toBeDefined();
+  });
+
+  it("shows the computed principal balance for a future-dated PVDerived annuity", () => {
+    // startDate in 2099 → monthsElapsed = 0 → principal = presentValue = $200,000.00
+    render(
+      <AnnuityCard
+        annuity={makeAnnuity({
+          monthlyMode: AnnuityMonthlyMode.PVDerived,
+          presentValue: 200000,
+          annualRatePercent: 6,
+          durationMonths: 360,
+          startDate: new Date("2099-01-01T00:00:00.000Z"),
+        })}
+      />,
+    );
+    expect(screen.getByText("$200,000.00")).toBeDefined();
+  });
+
+  it("does not render the principal row for flat-mode annuities", () => {
+    render(
+      <AnnuityCard
+        annuity={makeAnnuity({ monthlyMode: AnnuityMonthlyMode.Flat })}
+      />,
+    );
+    expect(screen.queryByText(ANNUITY_CARD_COPY.principalLabel)).toBeNull();
+  });
+});
+
 describe("AnnuityCard — edit action", () => {
   it("renders an edit button when onEdit is provided", () => {
     render(
