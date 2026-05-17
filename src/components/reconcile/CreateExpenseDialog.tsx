@@ -56,6 +56,7 @@ export function CreateExpenseDialogView({
   const nameErrorId = `${baseId}-name-error`;
   const amountInputId = `${baseId}-amount`;
   const amountErrorId = `${baseId}-amount-error`;
+  const typeLabelId = `${baseId}-type-label`;
 
   return (
     <Dialog
@@ -110,10 +111,13 @@ export function CreateExpenseDialogView({
 
             {/* Type toggle */}
             <div className="flex flex-col gap-1.5">
-              <p className="text-sm font-medium leading-none">
+              <p
+                id={typeLabelId}
+                className="text-sm font-medium leading-none"
+              >
                 {CREATE_EXPENSE_DIALOG_COPY.typeLabel}
               </p>
-              <div className="flex gap-2">
+              <div role="group" aria-labelledby={typeLabelId} className="flex gap-2">
                 <button
                   type="button"
                   aria-pressed={

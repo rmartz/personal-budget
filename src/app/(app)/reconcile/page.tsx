@@ -13,7 +13,7 @@ export default function ReconcilePage() {
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
 
   const handleCreateExpense = async (data: CreateExpenseInput) => {
-    if (authLoading || !user) return;
+    if (authLoading || !user) throw new Error("User is not authenticated");
     await createReconciliationExpense(user.uid, {
       name: data.name,
       type: data.type,
@@ -21,16 +21,14 @@ export default function ReconcilePage() {
     });
   };
 
+  if (authLoading || !user) return null;
+
   return (
     <>
       <ReconcileView
-        onNewExpense={
-          authLoading || !user
-            ? undefined
-            : () => {
-                setExpenseDialogOpen(true);
-              }
-        }
+        onNewExpense={() => {
+          setExpenseDialogOpen(true);
+        }}
       />
       <CreateExpenseDialog
         open={expenseDialogOpen}
