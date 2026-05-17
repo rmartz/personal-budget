@@ -111,13 +111,14 @@ export function CreateExpenseDialogView({
 
             {/* Type toggle */}
             <div className="flex flex-col gap-1.5">
-              <p
-                id={typeLabelId}
-                className="text-sm font-medium leading-none"
-              >
+              <p id={typeLabelId} className="text-sm font-medium leading-none">
                 {CREATE_EXPENSE_DIALOG_COPY.typeLabel}
               </p>
-              <div role="group" aria-labelledby={typeLabelId} className="flex gap-2">
+              <div
+                role="group"
+                aria-labelledby={typeLabelId}
+                className="flex gap-2"
+              >
                 <button
                   type="button"
                   aria-pressed={
