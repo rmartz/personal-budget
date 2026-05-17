@@ -300,15 +300,19 @@ describe("CreateAnnuityDialog integration", () => {
     });
 
     const callArg = onSubmit.mock.calls[0]![0] as {
-      name: string;
+      annualRatePercent: number | undefined;
+      durationMonths: number;
       monthlyAmount: number;
       monthlyMode: AnnuityMonthlyMode;
-      durationMonths: number;
+      name: string;
+      presentValue: number | undefined;
     };
-    expect(callArg.name).toBe("Car Loan");
+    expect(callArg.annualRatePercent).toBe(5);
+    expect(callArg.durationMonths).toBe(12);
     expect(Math.round(callArg.monthlyAmount * 100) / 100).toBe(856.07);
     expect(callArg.monthlyMode).toBe(AnnuityMonthlyMode.PVDerived);
-    expect(callArg.durationMonths).toBe(12);
+    expect(callArg.name).toBe("Car Loan");
+    expect(callArg.presentValue).toBe(10000);
   });
 
   it("calls onSubmit with flat monthly amount in flat mode", async () => {
@@ -336,10 +340,12 @@ describe("CreateAnnuityDialog integration", () => {
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith({
-        name: "Netflix",
+        annualRatePercent: undefined,
+        durationMonths: undefined,
         monthlyAmount: 15.99,
         monthlyMode: AnnuityMonthlyMode.Flat,
-        durationMonths: undefined,
+        name: "Netflix",
+        presentValue: undefined,
       });
     });
   });

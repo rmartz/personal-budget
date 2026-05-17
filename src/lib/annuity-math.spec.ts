@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateMonthlyPayment } from "./annuity-math";
+import {
+  calculateMonthlyPayment,
+  calculateRemainingPrincipal,
+} from "./annuity-math";
 
 describe("calculateMonthlyPayment", () => {
   it("calculates the correct monthly payment for a known loan", () => {
@@ -32,5 +35,50 @@ describe("calculateMonthlyPayment", () => {
       durationMonths: 12,
     });
     expect(result).toBe(100);
+  });
+});
+
+describe("calculateRemainingPrincipal", () => {
+  it("returns the full present value when 0 payments have been made", () => {
+    const result = calculateRemainingPrincipal({
+      presentValue: 10000,
+      annualRatePercent: 5,
+      durationMonths: 12,
+      monthsElapsed: 0,
+    });
+    expect(result).toBe(10000);
+  });
+
+  it("returns approximately 0 when all payments have been made", () => {
+    const result = calculateRemainingPrincipal({
+      presentValue: 10000,
+      annualRatePercent: 5,
+      durationMonths: 12,
+      monthsElapsed: 12,
+    });
+    expect(Math.abs(result)).toBeLessThan(0.01);
+  });
+
+  it("returns PV - PMT * n when rate is 0", () => {
+    // $1200 at 0% for 12 months → PMT = $100/month; after 6 payments: $600
+    const result = calculateRemainingPrincipal({
+      presentValue: 1200,
+      annualRatePercent: 0,
+      durationMonths: 12,
+      monthsElapsed: 6,
+    });
+    expect(result).toBe(600);
+  });
+
+  it("returns the correct mid-term balance for a known mortgage", () => {
+    // $200,000 at 6% for 360 months, after 1 payment
+    // B(1) = PV*(1+r) - PMT = 201000 - 1199.10 = 199800.90
+    const result = calculateRemainingPrincipal({
+      presentValue: 200000,
+      annualRatePercent: 6,
+      durationMonths: 360,
+      monthsElapsed: 1,
+    });
+    expect(Math.round(result * 100) / 100).toBe(199800.9);
   });
 });
