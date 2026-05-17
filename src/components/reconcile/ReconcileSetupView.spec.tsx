@@ -51,9 +51,7 @@ const baseProps = {
 describe("ReconcileSetupView — page title", () => {
   it("renders the page title", () => {
     render(<ReconcileSetupView {...baseProps} />);
-    expect(
-      screen.getByText(RECONCILE_SETUP_VIEW_COPY.pageTitle),
-    ).toBeDefined();
+    expect(screen.getByText(RECONCILE_SETUP_VIEW_COPY.pageTitle)).toBeDefined();
   });
 });
 

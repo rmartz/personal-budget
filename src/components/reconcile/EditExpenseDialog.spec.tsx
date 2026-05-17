@@ -10,10 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ReconciliationExpense } from "@/lib/firebase/schema/reconciliation-expenses";
 import { ReconciliationExpenseType } from "@/lib/firebase/schema/reconciliation-expenses";
 
-import {
-  EditExpenseDialog,
-  EditExpenseDialogView,
-} from "./EditExpenseDialog";
+import { EditExpenseDialog, EditExpenseDialogView } from "./EditExpenseDialog";
 import { EDIT_EXPENSE_DIALOG_COPY } from "./EditExpenseDialog.copy";
 
 afterEach(cleanup);
