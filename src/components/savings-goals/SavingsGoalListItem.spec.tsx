@@ -225,6 +225,112 @@ describe("Confirming deletes the goal via the service layer", () => {
   });
 });
 
+describe("When fundedAmount >= targetAmount, progress displays as fully funded", () => {
+  it("shows the funded label when fundedAmount equals targetAmount", () => {
+    const goal = makeSavingsGoal({ fundedAmount: 5000, targetAmount: 5000 });
+    render(
+      <table>
+        <tbody>
+          <SavingsGoalListItemView
+            goal={goal}
+            deleteDialogOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDeleteDialogOpenChange={vi.fn()}
+            onDeleteMenuClick={vi.fn()}
+            onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(
+      screen.getByText(SAVINGS_GOAL_LIST_ITEM_COPY.fundedLabel),
+    ).toBeDefined();
+  });
+
+  it("shows the funded label when fundedAmount exceeds targetAmount", () => {
+    const goal = makeSavingsGoal({ fundedAmount: 5500, targetAmount: 5000 });
+    render(
+      <table>
+        <tbody>
+          <SavingsGoalListItemView
+            goal={goal}
+            deleteDialogOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDeleteDialogOpenChange={vi.fn()}
+            onDeleteMenuClick={vi.fn()}
+            onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(
+      screen.getByText(SAVINGS_GOAL_LIST_ITEM_COPY.fundedLabel),
+    ).toBeDefined();
+  });
+
+  it("does not display a raw percentage above 100 when overfunded", () => {
+    const goal = makeSavingsGoal({ fundedAmount: 5500, targetAmount: 5000 });
+    render(
+      <table>
+        <tbody>
+          <SavingsGoalListItemView
+            goal={goal}
+            deleteDialogOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDeleteDialogOpenChange={vi.fn()}
+            onDeleteMenuClick={vi.fn()}
+            onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(screen.queryByText("110%")).toBeNull();
+  });
+});
+
+describe("When targetAmount is 0, the goal is not considered funded", () => {
+  it("does not display the funded label when targetAmount and fundedAmount are both 0", () => {
+    const goal = makeSavingsGoal({ fundedAmount: 0, targetAmount: 0 });
+    render(
+      <table>
+        <tbody>
+          <SavingsGoalListItemView
+            goal={goal}
+            deleteDialogOpen={false}
+            isFirst={true}
+            isLast={true}
+            prevGoalId={undefined}
+            nextGoalId={undefined}
+            onDeleteDialogOpenChange={vi.fn()}
+            onDeleteMenuClick={vi.fn()}
+            onDeleteConfirm={vi.fn()}
+            onEdit={noop}
+            onReorder={noop}
+          />
+        </tbody>
+      </table>,
+    );
+    expect(
+      screen.queryByText(SAVINGS_GOAL_LIST_ITEM_COPY.fundedLabel),
+    ).toBeNull();
+  });
+});
+
 describe("dropdownOpen prop controls the dropdown menu open state statically", () => {
   it("shows the delete menu item immediately when dropdownOpen is true", () => {
     const goal = makeSavingsGoal();
