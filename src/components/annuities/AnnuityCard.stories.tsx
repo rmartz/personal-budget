@@ -50,3 +50,24 @@ export const NoTerm: Story = {
     },
   },
 };
+
+export const WithActions: Story = {
+  args: {
+    annuity: baseAnnuity,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onEdit: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDelete: () => {},
+  },
+};
+
+export const WithActionsSelected: Story = {
+  args: {
+    annuity: baseAnnuity,
+    isSelected: true,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onEdit: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDelete: () => {},
+  },
+};
