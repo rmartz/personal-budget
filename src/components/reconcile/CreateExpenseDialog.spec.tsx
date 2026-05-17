@@ -272,6 +272,62 @@ describe("CreateExpenseDialog — container integration", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it("shows amount invalid error and does not call onSubmit when amount is zero", async () => {
+    const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
+    const onSubmit = vi.fn();
+
+    render(
+      <CreateExpenseDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.nameLabel),
+      { target: { value: "Electric bill" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.amountLabel),
+      { target: { value: "0" } },
+    );
+    fireEvent.click(screen.getByText(CREATE_EXPENSE_DIALOG_COPY.submitButton));
+
+    expect(
+      screen.getByText(CREATE_EXPENSE_DIALOG_COPY.amountInvalidError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("shows amount invalid error and does not call onSubmit when amount is negative", async () => {
+    const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
+    const onSubmit = vi.fn();
+
+    render(
+      <CreateExpenseDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.nameLabel),
+      { target: { value: "Electric bill" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.amountLabel),
+      { target: { value: "-5" } },
+    );
+    fireEvent.click(screen.getByText(CREATE_EXPENSE_DIALOG_COPY.submitButton));
+
+    expect(
+      screen.getByText(CREATE_EXPENSE_DIALOG_COPY.amountInvalidError),
+    ).toBeDefined();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it("calls onOpenChange with false and resets fields after a successful submit", async () => {
     const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
     const onSubmit = vi.fn().mockResolvedValue(undefined);
