@@ -271,4 +271,63 @@ describe("CreateExpenseDialog — container integration", () => {
     ).toBeDefined();
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it("calls onOpenChange with false and resets fields after a successful submit", async () => {
+    const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const onOpenChange = vi.fn();
+
+    render(
+      <CreateExpenseDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.nameLabel),
+      { target: { value: "Electric bill" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.amountLabel),
+      { target: { value: "120" } },
+    );
+    fireEvent.click(screen.getByText(CREATE_EXPENSE_DIALOG_COPY.submitButton));
+
+    await vi.waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+  });
+
+  it("shows submit error and does not call onOpenChange when onSubmit rejects", async () => {
+    const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
+    const onSubmit = vi.fn().mockRejectedValue(new Error("network error"));
+    const onOpenChange = vi.fn();
+
+    render(
+      <CreateExpenseDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.nameLabel),
+      { target: { value: "Electric bill" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText(CREATE_EXPENSE_DIALOG_COPY.amountLabel),
+      { target: { value: "120" } },
+    );
+    fireEvent.click(screen.getByText(CREATE_EXPENSE_DIALOG_COPY.submitButton));
+
+    await vi.waitFor(() => {
+      expect(
+        screen.getByText(CREATE_EXPENSE_DIALOG_COPY.submitError),
+      ).toBeDefined();
+    });
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
 });
