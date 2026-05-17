@@ -49,8 +49,8 @@ export function calculateRemainingPrincipal({
     presentValue,
   });
   if (r === 0) {
-    return presentValue - pmt * monthsElapsed;
+    return Math.max(0, presentValue - pmt * monthsElapsed);
   }
   const factor = Math.pow(1 + r, monthsElapsed);
-  return presentValue * factor - (pmt * (factor - 1)) / r;
+  return Math.max(0, presentValue * factor - (pmt * (factor - 1)) / r);
 }

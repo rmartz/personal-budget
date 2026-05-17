@@ -81,4 +81,24 @@ describe("calculateRemainingPrincipal", () => {
     });
     expect(Math.round(result * 100) / 100).toBe(199800.9);
   });
+
+  it("returns 0 when monthsElapsed exceeds durationMonths (with interest rate)", () => {
+    const result = calculateRemainingPrincipal({
+      presentValue: 10000,
+      annualRatePercent: 5,
+      durationMonths: 12,
+      monthsElapsed: 13,
+    });
+    expect(result).toBe(0);
+  });
+
+  it("returns 0 when monthsElapsed exceeds durationMonths (zero rate)", () => {
+    const result = calculateRemainingPrincipal({
+      presentValue: 1200,
+      annualRatePercent: 0,
+      durationMonths: 12,
+      monthsElapsed: 15,
+    });
+    expect(result).toBe(0);
+  });
 });
