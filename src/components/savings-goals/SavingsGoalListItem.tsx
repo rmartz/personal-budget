@@ -68,7 +68,7 @@ export function SavingsGoalListItemView({
     goal.targetAmount > 0
       ? Math.round((goal.fundedAmount / goal.targetAmount) * 100)
       : 0;
-  const isFunded = goal.fundedAmount >= goal.targetAmount;
+  const isFunded = goal.targetAmount > 0 && goal.fundedAmount >= goal.targetAmount;
   const progressLabel = isFunded
     ? SAVINGS_GOAL_LIST_ITEM_COPY.fundedLabel
     : `${progressPercent.toString()}%`;
