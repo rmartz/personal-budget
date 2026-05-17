@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 
 import { RECONCILE_VIEW_COPY } from "./ReconcileView.copy";
@@ -38,7 +40,11 @@ const PLACEHOLDER_INVESTMENT_ROWS = [
   { label: "Target allocation", value: "70 / 30" },
 ];
 
-export function ReconcileView() {
+export interface ReconcileViewProps {
+  onNewExpense?: () => void;
+}
+
+export function ReconcileView({ onNewExpense }: ReconcileViewProps) {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
       {/* Page header */}
@@ -52,6 +58,16 @@ export function ReconcileView() {
           </p>
         </div>
         <div className="flex gap-2 text-sm">
+          {onNewExpense !== undefined && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onNewExpense}
+            >
+              {RECONCILE_VIEW_COPY.actionNewExpense}
+            </Button>
+          )}
           <Button type="button" variant="outline" size="sm">
             {RECONCILE_VIEW_COPY.actionConfirmed}
           </Button>

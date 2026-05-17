@@ -1,5 +1,5 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ReconcileView } from "./ReconcileView";
 import { RECONCILE_VIEW_COPY } from "./ReconcileView.copy";
@@ -61,5 +61,26 @@ describe("ReconcileView — investment explanation panel", () => {
     expect(
       screen.getByText(RECONCILE_VIEW_COPY.investmentExplanationHeading),
     ).toBeDefined();
+  });
+});
+
+describe("ReconcileView — New expense button", () => {
+  it("renders the New expense button when onNewExpense is provided", () => {
+    render(<ReconcileView onNewExpense={vi.fn()} />);
+    expect(
+      screen.getByText(RECONCILE_VIEW_COPY.actionNewExpense),
+    ).toBeDefined();
+  });
+
+  it("does not render the New expense button when onNewExpense is undefined", () => {
+    render(<ReconcileView />);
+    expect(screen.queryByText(RECONCILE_VIEW_COPY.actionNewExpense)).toBeNull();
+  });
+
+  it("calls onNewExpense when the New expense button is clicked", () => {
+    const onNewExpense = vi.fn();
+    render(<ReconcileView onNewExpense={onNewExpense} />);
+    fireEvent.click(screen.getByText(RECONCILE_VIEW_COPY.actionNewExpense));
+    expect(onNewExpense).toHaveBeenCalled();
   });
 });
