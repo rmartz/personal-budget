@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { ReconciliationExpenseType } from "@/lib/firebase/schema/reconciliation-expenses";
 
-import { CreateExpenseDialogView } from "./CreateExpenseDialog";
 import { CREATE_EXPENSE_DIALOG_COPY } from "./CreateExpenseDialog.copy";
+import { CreateExpenseDialogView } from "./CreateExpenseDialogView";
 
 const meta: Meta<typeof CreateExpenseDialogView> = {
   component: CreateExpenseDialogView,
