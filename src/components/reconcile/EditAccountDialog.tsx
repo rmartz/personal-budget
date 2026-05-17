@@ -221,13 +221,18 @@ export function EditAccountDialog({
     }
 
     if (isCashTier(account.tier)) {
-      const parsed = parseFloat(targetFloat);
-      if (isNaN(parsed) || parsed <= 0) {
-        setTargetFloatError(EDIT_ACCOUNT_DIALOG_COPY.targetFloatInvalidError);
+      if (targetFloat.trim() === "") {
+        setTargetFloatError(EDIT_ACCOUNT_DIALOG_COPY.targetFloatRequiredError);
         valid = false;
       } else {
-        setTargetFloatError(undefined);
-        parsedTargetFloat = parsed;
+        const parsed = parseFloat(targetFloat);
+        if (isNaN(parsed) || parsed <= 0) {
+          setTargetFloatError(EDIT_ACCOUNT_DIALOG_COPY.targetFloatInvalidError);
+          valid = false;
+        } else {
+          setTargetFloatError(undefined);
+          parsedTargetFloat = parsed;
+        }
       }
     }
 

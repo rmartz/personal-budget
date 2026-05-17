@@ -9,5 +9,6 @@ export const EDIT_ACCOUNT_DIALOG_COPY = {
   targetFloatInvalidError: "Target float must be a positive number.",
   targetFloatLabel: "Target Float",
   targetFloatPlaceholder: "e.g. 2000",
+  targetFloatRequiredError: "Target float is required.",
   title: "Edit Account",
 } as const;

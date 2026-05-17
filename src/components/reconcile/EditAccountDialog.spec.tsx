@@ -215,6 +215,21 @@ describe("EditAccountDialog — validation", () => {
       screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.targetFloatInvalidError),
     ).toBeDefined();
   });
+
+  it("shows target float required error and does not call onSubmit when field is cleared for cash accounts", () => {
+    const { onSave } = renderContainer({
+      account: makeAccount({ tier: ReconciliationAccountTier.ShortTerm }),
+    });
+    fireEvent.change(
+      screen.getByLabelText(EDIT_ACCOUNT_DIALOG_COPY.targetFloatLabel),
+      { target: { value: "" } },
+    );
+    fireEvent.click(screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.submitButton));
+    expect(onSave).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.targetFloatRequiredError),
+    ).toBeDefined();
+  });
 });
 
 describe("EditAccountDialog — submit", () => {
