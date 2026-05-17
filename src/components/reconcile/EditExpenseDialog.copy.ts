@@ -1,0 +1,16 @@
+export const EDIT_EXPENSE_DIALOG_COPY = {
+  amountInvalidError: "Monthly amount must be a positive number.",
+  amountLabel: "Typical monthly amount",
+  amountPlaceholder: "e.g. 450.00",
+  cancelButton: "Cancel",
+  nameLabel: "Name",
+  namePlaceholder: "e.g. Credit card",
+  nameRequiredError: "Name is required.",
+  savingButton: "Saving…",
+  submitButton: "Save",
+  submitError: "Failed to save expense. Please try again.",
+  title: "Edit Expense",
+  typeLabel: "Type",
+  typeRunningBalance: "Running balance",
+  typeStatementBalance: "Statement",
+} as const;
