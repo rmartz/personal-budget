@@ -7,6 +7,32 @@ import {
 } from "./annuities";
 
 describe("annuityToFirebase", () => {
+  it("serializes presentValue and annualRatePercent for PVDerived annuity", () => {
+    const result = annuityToFirebase({
+      name: "Car Loan",
+      monthlyAmount: 856.07,
+      startDate: new Date(),
+      durationMonths: 12,
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+      presentValue: 10000,
+      annualRatePercent: 5,
+    });
+    expect(result.presentValue).toBe(10000);
+    expect(result.annualRatePercent).toBe(5);
+  });
+
+  it("omits presentValue and annualRatePercent for Flat annuity", () => {
+    const result = annuityToFirebase({
+      name: "Netflix",
+      monthlyAmount: 15,
+      startDate: new Date(),
+      durationMonths: undefined,
+      monthlyMode: AnnuityMonthlyMode.Flat,
+    });
+    expect(result.presentValue).toBeUndefined();
+    expect(result.annualRatePercent).toBeUndefined();
+  });
+
   it("serializes date to ISO string", () => {
     const startDate = new Date("2024-01-01T00:00:00.000Z");
     const result = annuityToFirebase({
@@ -117,5 +143,45 @@ describe("firebaseToAnnuity", () => {
       durationMonths: null,
     });
     expect(result.monthlyMode).toBe(AnnuityMonthlyMode.Flat);
+  });
+
+  it("deserializes presentValue and annualRatePercent from a PVDerived Firebase record", () => {
+    const result = firebaseToAnnuity("a-1", {
+      name: "Car Loan",
+      monthlyAmount: 856.07,
+      startDate: "2024-01-01T00:00:00.000Z",
+      durationMonths: 12,
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+      presentValue: 10000,
+      annualRatePercent: 5,
+    });
+    expect(result.presentValue).toBe(10000);
+    expect(result.annualRatePercent).toBe(5);
+  });
+
+  it("leaves presentValue and annualRatePercent undefined when absent from Firebase record", () => {
+    const result = firebaseToAnnuity("a-1", {
+      name: "Legacy",
+      monthlyAmount: 200,
+      startDate: "2020-01-01T00:00:00.000Z",
+      durationMonths: null,
+    });
+    expect(result.presentValue).toBeUndefined();
+    expect(result.annualRatePercent).toBeUndefined();
+  });
+
+  it("round-trips presentValue and annualRatePercent for a PVDerived annuity", () => {
+    const firebase = annuityToFirebase({
+      name: "Mortgage",
+      monthlyAmount: 1199.1,
+      startDate: new Date("2025-01-01T00:00:00.000Z"),
+      durationMonths: 360,
+      monthlyMode: AnnuityMonthlyMode.PVDerived,
+      presentValue: 200000,
+      annualRatePercent: 6,
+    });
+    const result = firebaseToAnnuity("m-1", firebase);
+    expect(result.presentValue).toBe(200000);
+    expect(result.annualRatePercent).toBe(6);
   });
 });

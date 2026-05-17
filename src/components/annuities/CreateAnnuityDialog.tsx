@@ -23,10 +23,12 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export interface CreateAnnuityInput {
-  name: string;
+  annualRatePercent: number | undefined;
+  durationMonths: number | undefined;
   monthlyAmount: number;
   monthlyMode: AnnuityMonthlyMode;
-  durationMonths: number | undefined;
+  name: string;
+  presentValue: number | undefined;
 }
 
 export interface CreateAnnuityDialogViewProps {
@@ -454,6 +456,8 @@ export function CreateAnnuityDialog({
 
     let resolvedMonthlyAmount: number | undefined;
     let resolvedDuration: number | undefined;
+    let resolvedPresentValue: number | undefined;
+    let resolvedAnnualRate: number | undefined;
 
     if (mode === "flat") {
       const parsed = parseFloat(monthlyAmount);
@@ -475,6 +479,7 @@ export function CreateAnnuityDialog({
         valid = false;
       } else {
         setPresentValueError(undefined);
+        resolvedPresentValue = pv;
       }
 
       const rate = parseFloat(annualRate);
@@ -483,6 +488,7 @@ export function CreateAnnuityDialog({
         valid = false;
       } else {
         setAnnualRateError(undefined);
+        resolvedAnnualRate = rate;
       }
 
       const dur = parseInt(durationMonths, 10);
@@ -496,9 +502,9 @@ export function CreateAnnuityDialog({
 
       if (valid) {
         resolvedMonthlyAmount = calculateMonthlyPayment({
-          presentValue: pv,
           annualRatePercent: rate,
           durationMonths: dur,
+          presentValue: pv,
         });
       }
     }
@@ -508,13 +514,15 @@ export function CreateAnnuityDialog({
     setIsSubmitting(true);
     try {
       await onSubmit({
-        name: name.trim(),
+        annualRatePercent: resolvedAnnualRate,
+        durationMonths: resolvedDuration,
         monthlyAmount: resolvedMonthlyAmount,
         monthlyMode:
           mode === "pv"
             ? AnnuityMonthlyMode.PVDerived
             : AnnuityMonthlyMode.Flat,
-        durationMonths: resolvedDuration,
+        name: name.trim(),
+        presentValue: resolvedPresentValue,
       });
       handleOpenChange(false);
     } catch {
