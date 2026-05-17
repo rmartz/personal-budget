@@ -49,6 +49,7 @@ export function AnnuityCard({
       : ANNUITY_CARD_COPY.termRemainingIndefinite;
 
   const principalBalance =
+    annuity.monthlyMode === AnnuityMonthlyMode.PVDerived &&
     annuity.presentValue !== undefined &&
     annuity.annualRatePercent !== undefined &&
     annuity.durationMonths !== undefined

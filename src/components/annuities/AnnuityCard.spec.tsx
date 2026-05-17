@@ -148,10 +148,14 @@ describe("AnnuityCard — principal row", () => {
     expect(screen.getByText("$200,000.00")).toBeDefined();
   });
 
-  it("does not render the principal row for flat-mode annuities", () => {
+  it("does not render the principal row for flat-mode annuities even when presentValue is set", () => {
     render(
       <AnnuityCard
-        annuity={makeAnnuity({ monthlyMode: AnnuityMonthlyMode.Flat })}
+        annuity={makeAnnuity({
+          monthlyMode: AnnuityMonthlyMode.Flat,
+          presentValue: 200000,
+          annualRatePercent: 6,
+        })}
       />,
     );
     expect(screen.queryByText(ANNUITY_CARD_COPY.principalLabel)).toBeNull();
