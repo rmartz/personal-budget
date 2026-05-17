@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
-import { SAVINGS_GOAL_LIST_COPY } from "./copy";
+import { SAVINGS_GOAL_LIST_COPY, SAVINGS_GOAL_LIST_ITEM_COPY } from "./copy";
 import { SavingsGoalListView } from "./SavingsGoalList";
 
 afterEach(cleanup);
@@ -177,7 +177,11 @@ describe("SavingsGoalListView", () => {
           onReorder={noop}
         />,
       );
-      expect(screen.getByText("100%")).toBeDefined();
+      // Column header also reads "Funded"; assert length > 1 to confirm the
+      // label appears in at least one goal row in addition to the header.
+      expect(
+        screen.getAllByText(SAVINGS_GOAL_LIST_ITEM_COPY.fundedLabel).length,
+      ).toBeGreaterThan(1);
       const progressbar = screen.getByRole("progressbar");
       expect(Number(progressbar.getAttribute("aria-valuenow"))).toBe(100);
     });
