@@ -41,24 +41,25 @@ export function AnnuityCard({
       ? ANNUITY_CARD_COPY.monthlyModePVDerivedSublabel
       : ANNUITY_CARD_COPY.monthlyModeFlatSublabel;
 
-  const termDisplay =
+  const remaining =
     annuity.durationMonths !== undefined
-      ? ANNUITY_CARD_COPY.termRemainingMonths(
-          monthsRemaining(annuity.startDate, annuity.durationMonths),
-        )
+      ? monthsRemaining(annuity.startDate, annuity.durationMonths)
+      : undefined;
+
+  const termDisplay =
+    remaining !== undefined
+      ? ANNUITY_CARD_COPY.termRemainingMonths(remaining)
       : ANNUITY_CARD_COPY.termRemainingIndefinite;
 
   const principalBalance =
     annuity.monthlyMode === AnnuityMonthlyMode.PVDerived &&
     annuity.presentValue !== undefined &&
     annuity.annualRatePercent !== undefined &&
-    annuity.durationMonths !== undefined
+    remaining !== undefined
       ? calculateRemainingPrincipal({
           annualRatePercent: annuity.annualRatePercent,
           durationMonths: annuity.durationMonths,
-          monthsElapsed:
-            annuity.durationMonths -
-            monthsRemaining(annuity.startDate, annuity.durationMonths),
+          monthsElapsed: annuity.durationMonths - remaining,
           presentValue: annuity.presentValue,
         })
       : undefined;

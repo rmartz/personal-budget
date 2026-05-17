@@ -76,6 +76,9 @@ export const WithPrincipal: Story = {
   args: {
     annuity: {
       ...baseAnnuity,
+      // Far-future startDate pins monthsElapsed=0 so the displayed
+      // principal ($350,000.00) stays stable for screenshot regression.
+      startDate: new Date("2099-01-01"),
       annualRatePercent: 6,
       presentValue: 350000,
     },
