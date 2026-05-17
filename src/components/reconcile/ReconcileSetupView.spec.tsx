@@ -48,6 +48,15 @@ const baseProps = {
   onDeleteExpense: vi.fn(),
 };
 
+describe("ReconcileSetupView — page title", () => {
+  it("renders the page title", () => {
+    render(<ReconcileSetupView {...baseProps} />);
+    expect(
+      screen.getByText(RECONCILE_SETUP_VIEW_COPY.pageTitle),
+    ).toBeDefined();
+  });
+});
+
 describe("ReconcileSetupView — accounts section", () => {
   it("renders the accounts section heading", () => {
     render(<ReconcileSetupView {...baseProps} />);

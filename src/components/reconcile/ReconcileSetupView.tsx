@@ -54,6 +54,10 @@ export function ReconcileSetupView({
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-10 px-4 py-8">
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {RECONCILE_SETUP_VIEW_COPY.pageTitle}
+      </h1>
+
       {/* Accounts section */}
       <section>
         <h2 className="mb-4 text-lg font-semibold">

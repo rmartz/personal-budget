@@ -3,6 +3,7 @@ import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-
 export const RECONCILE_SETUP_VIEW_COPY = {
   accountsEmptyState: "No accounts yet. Add your first account to get started.",
   accountsSectionHeading: "Accounts",
+  pageTitle: "Reconcile Setup",
   cashAccountsGroupLabel: "Cash accounts",
   cashTierLabels: {
     [ReconciliationAccountTier.LongTerm]: "Long-term",

@@ -1,9 +1,16 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
 import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
 
-import { EditAccountDialogView } from "./EditAccountDialog";
+import { EditAccountDialog, EditAccountDialogView } from "./EditAccountDialog";
 import { EDIT_ACCOUNT_DIALOG_COPY } from "./EditAccountDialog.copy";
 
 afterEach(cleanup);
@@ -149,5 +156,118 @@ describe("EditAccountDialogView — submit", () => {
       .getByText(EDIT_ACCOUNT_DIALOG_COPY.savingButton)
       .closest("button");
     expect(savingBtn?.disabled).toBe(true);
+  });
+});
+
+function makeAccount(
+  overrides: Partial<ReconciliationAccount> = {},
+): ReconciliationAccount {
+  return {
+    id: "account-1",
+    name: "Chase Checking",
+    tier: ReconciliationAccountTier.ShortTerm,
+    targetFloat: 2000,
+    ...overrides,
+  };
+}
+
+function renderContainer(
+  overrides: Partial<Parameters<typeof EditAccountDialog>[0]> = {},
+) {
+  const onSave = vi.fn().mockResolvedValue(undefined);
+  const onOpenChange = vi.fn();
+  const props = {
+    open: true,
+    onOpenChange,
+    account: makeAccount(),
+    onSubmit: onSave,
+    ...overrides,
+  };
+  const result = render(<EditAccountDialog {...props} />);
+  return { ...result, onSave, onOpenChange };
+}
+
+describe("EditAccountDialog — validation", () => {
+  it("shows name required error and does not call onSubmit when name is empty", () => {
+    const { onSave } = renderContainer();
+    fireEvent.change(
+      screen.getByLabelText(EDIT_ACCOUNT_DIALOG_COPY.nameLabel),
+      { target: { value: "" } },
+    );
+    fireEvent.click(screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.submitButton));
+    expect(onSave).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.nameRequiredError),
+    ).toBeDefined();
+  });
+
+  it("shows target float error and does not call onSubmit when amount is invalid for cash accounts", () => {
+    const { onSave } = renderContainer({
+      account: makeAccount({ tier: ReconciliationAccountTier.ShortTerm }),
+    });
+    fireEvent.change(
+      screen.getByLabelText(EDIT_ACCOUNT_DIALOG_COPY.targetFloatLabel),
+      { target: { value: "-5" } },
+    );
+    fireEvent.click(screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.submitButton));
+    expect(onSave).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.targetFloatInvalidError),
+    ).toBeDefined();
+  });
+});
+
+describe("EditAccountDialog — submit", () => {
+  it("calls onSubmit with correct id and values on valid submit", async () => {
+    const { onSave } = renderContainer({
+      account: makeAccount({
+        id: "account-42",
+        name: "Savings",
+        tier: ReconciliationAccountTier.ShortTerm,
+        targetFloat: 1000,
+      }),
+    });
+    fireEvent.change(
+      screen.getByLabelText(EDIT_ACCOUNT_DIALOG_COPY.nameLabel),
+      { target: { value: "Updated Savings" } },
+    );
+    fireEvent.change(
+      screen.getByLabelText(EDIT_ACCOUNT_DIALOG_COPY.targetFloatLabel),
+      { target: { value: "3000" } },
+    );
+    fireEvent.click(screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.submitButton));
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith("account-42", {
+        name: "Updated Savings",
+        targetFloat: 3000,
+      });
+    });
+  });
+
+  it("shows submit error when onSubmit rejects", async () => {
+    const { onSave } = renderContainer();
+    onSave.mockRejectedValue(new Error("Network error"));
+    fireEvent.click(screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.submitButton));
+    await waitFor(() => {
+      expect(
+        screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.submitError),
+      ).toBeDefined();
+    });
+  });
+});
+
+describe("EditAccountDialog — form reset on close", () => {
+  it("clears errors when the dialog is closed", () => {
+    const { onOpenChange } = renderContainer();
+    fireEvent.change(
+      screen.getByLabelText(EDIT_ACCOUNT_DIALOG_COPY.nameLabel),
+      { target: { value: "" } },
+    );
+    fireEvent.click(screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.submitButton));
+    expect(
+      screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.nameRequiredError),
+    ).toBeDefined();
+    fireEvent.click(screen.getByText(EDIT_ACCOUNT_DIALOG_COPY.cancelButton));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });
