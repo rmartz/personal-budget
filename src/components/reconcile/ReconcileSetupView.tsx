@@ -6,6 +6,7 @@ import {
   type ReconciliationExpense,
   ReconciliationExpenseType,
 } from "@/lib/firebase/schema/reconciliation-expenses";
+import { currencyFormatter } from "@/lib/formatters";
 import { CASH_TIERS } from "@/lib/reconciliation/cash-tiers";
 
 import { RECONCILE_SETUP_VIEW_COPY } from "./ReconcileSetupView.copy";
@@ -22,14 +23,6 @@ function expenseTypeLabel(type: ReconciliationExpenseType): string {
   return type === ReconciliationExpenseType.StatementBalance
     ? RECONCILE_SETUP_VIEW_COPY.expenseTypeStatementBalance
     : RECONCILE_SETUP_VIEW_COPY.expenseTypeRunningBalance;
-}
-
-function formatCurrency(amount: number): string {
-  return amount.toLocaleString("en-US", {
-    currency: "USD",
-    minimumFractionDigits: 2,
-    style: "currency",
-  });
 }
 
 export interface ReconcileSetupViewProps {
@@ -86,7 +79,7 @@ export function ReconcileSetupView({
                         <span className="text-xs text-muted-foreground">
                           {cashTierLabel(account)}
                           {account.targetFloat !== undefined &&
-                            ` · ${formatCurrency(account.targetFloat)}`}
+                            ` · ${currencyFormatter.format(account.targetFloat)}`}
                         </span>
                       </div>
                       <div className="flex gap-2">
@@ -193,7 +186,7 @@ export function ReconcileSetupView({
                   <span className="font-medium">{expense.name}</span>
                   <span className="text-xs text-muted-foreground">
                     {expenseTypeLabel(expense.type)} ·{" "}
-                    {formatCurrency(expense.typicalAmount)}
+                    {currencyFormatter.format(expense.typicalAmount)}
                   </span>
                 </div>
                 <div className="flex gap-2">
