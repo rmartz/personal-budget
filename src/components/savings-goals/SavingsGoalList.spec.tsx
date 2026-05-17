@@ -177,10 +177,11 @@ describe("SavingsGoalListView", () => {
           onReorder={noop}
         />,
       );
-      // Column header also reads "Funded"; getAllByText confirms the label appears
+      // Column header also reads "Funded"; assert length > 1 to confirm the
+      // label appears in at least one goal row in addition to the header.
       expect(
-        screen.getAllByText(SAVINGS_GOAL_LIST_ITEM_COPY.fundedLabel),
-      ).toBeDefined();
+        screen.getAllByText(SAVINGS_GOAL_LIST_ITEM_COPY.fundedLabel).length,
+      ).toBeGreaterThan(1);
       const progressbar = screen.getByRole("progressbar");
       expect(Number(progressbar.getAttribute("aria-valuenow"))).toBe(100);
     });
