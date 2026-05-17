@@ -33,5 +33,6 @@ export const SAVINGS_GOAL_LIST_ITEM_COPY = {
     "This will permanently delete this savings goal. Any funded progress will be lost and cannot be recovered.",
   deleteConfirmTitle: "Delete savings goal?",
   deleteMenuLabel: "Delete",
+  fundedLabel: "Funded",
   overflowMenuLabel: "More options",
 } as const;

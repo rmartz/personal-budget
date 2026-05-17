@@ -81,3 +81,23 @@ export const ConfirmDialogOpen: Story = {
     deleteDialogOpen: true,
   },
 };
+
+export const Funded: Story = {
+  args: {
+    goal: {
+      ...goal,
+      fundedAmount: 10000,
+    },
+    deleteDialogOpen: false,
+  },
+};
+
+export const Overfunded: Story = {
+  args: {
+    goal: {
+      ...goal,
+      fundedAmount: 11500,
+    },
+    deleteDialogOpen: false,
+  },
+};
