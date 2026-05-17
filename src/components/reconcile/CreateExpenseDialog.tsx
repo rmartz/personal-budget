@@ -268,7 +268,7 @@ export function CreateExpenseDialog({
       setNameError(undefined);
     }
 
-    const parsed = parseFloat(typicalAmount);
+    const parsed = Number(typicalAmount);
     if (isNaN(parsed) || parsed <= 0 || !isFinite(parsed)) {
       setTypicalAmountError(CREATE_EXPENSE_DIALOG_COPY.amountInvalidError);
       valid = false;

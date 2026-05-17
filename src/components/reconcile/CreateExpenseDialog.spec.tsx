@@ -328,7 +328,7 @@ describe("CreateExpenseDialog — container integration", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it("calls onOpenChange with false and resets fields after a successful submit", async () => {
+  it("calls onOpenChange with false after a successful submit", async () => {
     const { CreateExpenseDialog } = await import("./CreateExpenseDialog");
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     const onOpenChange = vi.fn();
