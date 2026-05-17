@@ -11,11 +11,14 @@ export const ANNUITY_CARD_COPY = {
   columnMonth: "Month",
   columnPayment: "Payment",
   columnPrincipal: "Principal",
+  deleteAriaLabel: "Delete annuity",
+  editAriaLabel: "Edit annuity",
   monthlyModeFlatSublabel: "monthly · Flat",
   monthlyModePVDerivedSublabel: "monthly · PV-derived",
   paymentHistoryEmpty: "No payment history yet.",
   paymentHistoryTitle: (annuityName: string) =>
     `${annuityName} · payment history`,
+  selectAriaLabel: (name: string) => `Select ${name}`,
   termRemainingIndefinite: "Ongoing",
   termRemainingLabel: "Term remaining",
   termRemainingMonths: (months: number) => {
@@ -58,6 +61,30 @@ export const NEW_ANNUITY_DIALOG_COPY = {
   submitButton: "Create Annuity",
   submitError: "Something went wrong. Please try again.",
   title: "New Annuity",
+} as const;
+
+export const DELETE_ANNUITY_DIALOG_COPY = {
+  cancelButton: "Cancel",
+  confirmButton: "Delete",
+  confirmMessage: (name: string) =>
+    `Are you sure you want to permanently delete "${name}"? This cannot be undone.`,
+  deleteError: "Failed to delete annuity. Please try again.",
+  deletingButton: "Deleting…",
+  title: "Delete Annuity",
+} as const;
+
+export const EDIT_ANNUITY_DIALOG_COPY = {
+  cancelButton: "Cancel",
+  monthlyAmountInvalidError: "Monthly amount must be a positive number.",
+  monthlyAmountLabel: "Monthly amount",
+  monthlyAmountPlaceholder: "e.g. 150.00",
+  nameLabel: "Name",
+  namePlaceholder: "e.g. Car loan",
+  nameRequiredError: "Name is required.",
+  savingButton: "Saving…",
+  submitButton: "Save Changes",
+  submitError: "Failed to save changes. Please try again.",
+  title: "Edit Annuity",
 } as const;
 
 export const CREATE_ANNUITY_DIALOG_COPY = {
