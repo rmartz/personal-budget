@@ -55,6 +55,7 @@ export function AnnuityCard({
     annuity.monthlyMode === AnnuityMonthlyMode.PVDerived &&
     annuity.presentValue !== undefined &&
     annuity.annualRatePercent !== undefined &&
+    annuity.durationMonths !== undefined &&
     remaining !== undefined
       ? calculateRemainingPrincipal({
           annualRatePercent: annuity.annualRatePercent,
