@@ -1,5 +1,6 @@
 "use client";
 
+import { calculateRemainingPrincipal } from "@/lib/annuity-math";
 import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
@@ -40,12 +41,29 @@ export function AnnuityCard({
       ? ANNUITY_CARD_COPY.monthlyModePVDerivedSublabel
       : ANNUITY_CARD_COPY.monthlyModeFlatSublabel;
 
-  const termDisplay =
+  const remaining =
     annuity.durationMonths !== undefined
-      ? ANNUITY_CARD_COPY.termRemainingMonths(
-          monthsRemaining(annuity.startDate, annuity.durationMonths),
-        )
+      ? monthsRemaining(annuity.startDate, annuity.durationMonths)
+      : undefined;
+
+  const termDisplay =
+    remaining !== undefined
+      ? ANNUITY_CARD_COPY.termRemainingMonths(remaining)
       : ANNUITY_CARD_COPY.termRemainingIndefinite;
+
+  const principalBalance =
+    annuity.monthlyMode === AnnuityMonthlyMode.PVDerived &&
+    annuity.presentValue !== undefined &&
+    annuity.annualRatePercent !== undefined &&
+    annuity.durationMonths !== undefined &&
+    remaining !== undefined
+      ? calculateRemainingPrincipal({
+          annualRatePercent: annuity.annualRatePercent,
+          durationMonths: annuity.durationMonths,
+          monthsElapsed: annuity.durationMonths - remaining,
+          presentValue: annuity.presentValue,
+        })
+      : undefined;
 
   return (
     <div
@@ -78,6 +96,16 @@ export function AnnuityCard({
             </dt>
             <dd className="font-mono font-medium">{termDisplay}</dd>
           </div>
+          {principalBalance !== undefined && (
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">
+                {ANNUITY_CARD_COPY.principalLabel}
+              </dt>
+              <dd className="font-mono font-medium">
+                {currencyFormatter.format(principalBalance)}
+              </dd>
+            </div>
+          )}
         </dl>
       </button>
 
