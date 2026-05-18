@@ -127,6 +127,22 @@ describe("distributeInvestmentAllocation — fallback to target percent", () => 
   });
 });
 
+describe("distributeInvestmentAllocation — degenerate inputs", () => {
+  it("allocates zero to all accounts when all target percents are zero", () => {
+    // No gaps are positive (all gaps = 0/100 - currentShare ≤ 0), totalTargetPercent = 0
+    // Guard prevents division by zero; all accounts receive 0
+    const result = distributeInvestmentAllocation(
+      [
+        { accountId: "a", currentBalance: 500, targetPercent: 0 },
+        { accountId: "b", currentBalance: 500, targetPercent: 0 },
+      ],
+      1000,
+    );
+    expect(result.find((r) => r.accountId === "a")?.allocatedAmount).toBe(0);
+    expect(result.find((r) => r.accountId === "b")?.allocatedAmount).toBe(0);
+  });
+});
+
 describe("distributeInvestmentAllocation — output shape", () => {
   it("returns one result per input account with matching accountId", () => {
     const accounts = [

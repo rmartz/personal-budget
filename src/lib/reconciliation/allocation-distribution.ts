@@ -20,10 +20,12 @@ export interface AllocationResult {
  *   (accounts above target receive nothing in this pass)
  *
  * Falls back to distributing by target percent when no account has a
- * positive gap (i.e. all accounts are exactly at their targets). This
- * also covers the case where all balances are zero.
+ * positive gap (i.e. all accounts are at or above their targets).
+ * Note: accounts with zero balances produce positive gaps equal to their
+ * target fraction, so they naturally take the gap-weighted path.
  *
- * Returns an empty array for an empty input.
+ * Returns an empty array for an empty input. Accounts whose target percents
+ * all sum to zero receive zero allocations regardless of totalAmount.
  */
 export function distributeInvestmentAllocation(
   accounts: AllocationAccount[],
@@ -58,6 +60,13 @@ export function distributeInvestmentAllocation(
     (sum, a) => sum + a.targetPercent,
     0,
   );
+
+  if (totalTargetPercent <= 0) {
+    return accounts.map((account) => ({
+      accountId: account.accountId,
+      allocatedAmount: 0,
+    }));
+  }
 
   return accounts.map((account) => ({
     accountId: account.accountId,
