@@ -27,6 +27,14 @@ describe("calculateLedgerDeposits — single ledger", () => {
     expect(deposits).toEqual([]);
   });
 
+  it("excludes a ledger whose balance exceeds its cap", () => {
+    const deposits = calculateLedgerDeposits({
+      ledgers: [{ cashBalance: 1200, cashCap: 1000, id: "ledger-1" }],
+      unallocatedCash: 500,
+    });
+    expect(deposits).toEqual([]);
+  });
+
   it("excludes a ledger without a cashCap", () => {
     const deposits = calculateLedgerDeposits({
       ledgers: [{ cashBalance: 0, cashCap: undefined, id: "ledger-1" }],
