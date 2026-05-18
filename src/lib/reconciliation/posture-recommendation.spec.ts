@@ -172,3 +172,35 @@ describe("applyPostureAdjustment — Conservative posture", () => {
     ).toBe(-300);
   });
 });
+
+describe("applyPostureAdjustment — zero base recommendation", () => {
+  it("returns zero for Aggressive posture regardless of margin", () => {
+    expect(
+      applyPostureAdjustment({
+        baseRecommendation: 0,
+        margin: 500,
+        posture: Posture.Aggressive,
+      }),
+    ).toBe(0);
+  });
+
+  it("returns zero for Balanced posture regardless of margin", () => {
+    expect(
+      applyPostureAdjustment({
+        baseRecommendation: 0,
+        margin: -200,
+        posture: Posture.Balanced,
+      }),
+    ).toBe(0);
+  });
+
+  it("returns zero for Conservative posture regardless of margin", () => {
+    expect(
+      applyPostureAdjustment({
+        baseRecommendation: 0,
+        margin: 300,
+        posture: Posture.Conservative,
+      }),
+    ).toBe(0);
+  });
+});
