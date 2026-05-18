@@ -10,27 +10,34 @@ import {
 describe("firebaseToUserSettings", () => {
   it("maps 'aggressive' to Posture.Aggressive", () => {
     const result = firebaseToUserSettings({
-      reconciliationPosture: "aggressive",
+      reconciliationPosture: Posture.Aggressive,
     });
     expect(result.reconciliationPosture).toBe(Posture.Aggressive);
   });
 
   it("maps 'balanced' to Posture.Balanced", () => {
     const result = firebaseToUserSettings({
-      reconciliationPosture: "balanced",
+      reconciliationPosture: Posture.Balanced,
     });
     expect(result.reconciliationPosture).toBe(Posture.Balanced);
   });
 
   it("maps 'conservative' to Posture.Conservative", () => {
     const result = firebaseToUserSettings({
-      reconciliationPosture: "conservative",
+      reconciliationPosture: Posture.Conservative,
     });
     expect(result.reconciliationPosture).toBe(Posture.Conservative);
   });
 
   it("defaults to Posture.Balanced when reconciliationPosture is absent", () => {
     const result = firebaseToUserSettings({});
+    expect(result.reconciliationPosture).toBe(Posture.Balanced);
+  });
+
+  it("defaults to Posture.Balanced when reconciliationPosture is an unknown string", () => {
+    const result = firebaseToUserSettings({
+      reconciliationPosture: "invalid-posture" as unknown as Posture,
+    });
     expect(result.reconciliationPosture).toBe(Posture.Balanced);
   });
 });

@@ -5,35 +5,35 @@ import { useEffect, useState } from "react";
 
 import { getClientApp } from "@/lib/firebase/client";
 import { Posture } from "@/lib/firebase/schema/investments";
-import {
-  firebaseToUserSettings,
-  type FirebaseUserSettings,
-} from "@/lib/firebase/schema/user-settings";
+import { firebaseToUserSettings } from "@/lib/firebase/schema/user-settings";
 
 export function useReconciliationPosture(uid: string) {
   const [posture, setPosture] = useState<Posture>(Posture.Balanced);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!!uid);
   const [error, setError] = useState<Error | undefined>(undefined);
 
   useEffect(() => {
     if (!uid) {
       setPosture(Posture.Balanced);
+      setError(undefined);
       setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
+    setError(undefined);
+
     const db = getDatabase(getClientApp());
-    const settingsRef = ref(db, `users/${uid}/settings`);
+    const postureRef = ref(db, `users/${uid}/settings/reconciliationPosture`);
 
     const unsubscribe = onValue(
-      settingsRef,
+      postureRef,
       (snapshot) => {
-        if (!snapshot.exists()) {
-          setPosture(Posture.Balanced);
-        } else {
-          const data = snapshot.val() as FirebaseUserSettings;
-          setPosture(firebaseToUserSettings(data).reconciliationPosture);
-        }
+        setPosture(
+          firebaseToUserSettings({
+            reconciliationPosture: snapshot.val() as Posture | undefined,
+          }).reconciliationPosture,
+        );
         setIsLoading(false);
       },
       (err) => {

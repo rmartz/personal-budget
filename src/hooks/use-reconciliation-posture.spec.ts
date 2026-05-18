@@ -47,7 +47,7 @@ describe("useReconciliationPosture", () => {
     it("returns Posture.Balanced when snapshot has no data", async () => {
       mockOnValue.mockImplementation(
         (_ref: unknown, callback: (snap: unknown) => void) => {
-          callback({ exists: () => false });
+          callback({ val: () => null });
           return mockUnsubscribe;
         },
       );
@@ -64,10 +64,7 @@ describe("useReconciliationPosture", () => {
     it("returns the stored posture from Firebase", async () => {
       mockOnValue.mockImplementation(
         (_ref: unknown, callback: (snap: unknown) => void) => {
-          callback({
-            exists: () => true,
-            val: () => ({ reconciliationPosture: "conservative" }),
-          });
+          callback({ val: () => Posture.Conservative });
           return mockUnsubscribe;
         },
       );

@@ -1,19 +1,24 @@
 import { Posture } from "@/lib/firebase/schema/investments";
 
 export interface FirebaseUserSettings {
-  reconciliationPosture?: string;
+  reconciliationPosture?: Posture | undefined;
 }
 
 export interface UserSettings {
   reconciliationPosture: Posture;
 }
 
+const VALID_POSTURES: ReadonlySet<string> = new Set(Object.values(Posture));
+
 export function firebaseToUserSettings(
   data: FirebaseUserSettings,
 ): UserSettings {
   return {
     reconciliationPosture:
-      (data.reconciliationPosture as Posture | undefined) ?? Posture.Balanced,
+      data.reconciliationPosture !== undefined &&
+      VALID_POSTURES.has(data.reconciliationPosture)
+        ? data.reconciliationPosture
+        : Posture.Balanced,
   };
 }
 
