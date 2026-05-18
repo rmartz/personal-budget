@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
@@ -30,6 +32,7 @@ export function ReconcileBalanceInputsView({
   onAccountBalanceChange,
   onExpenseAmountChange,
 }: ReconcileBalanceInputsViewProps) {
+  const instanceId = useId();
   const isEmpty = accounts.length === 0 && expenses.length === 0;
 
   return isEmpty ? (
@@ -45,7 +48,7 @@ export function ReconcileBalanceInputsView({
           </h3>
           <ul className="space-y-3">
             {accounts.map((account) => {
-              const inputId = `account-balance-${account.id}`;
+              const inputId = `${instanceId}-account-balance-${account.id}`;
               const currentValue = accountBalances[account.id];
               return (
                 <li key={account.id} className="flex items-center gap-3">
@@ -85,7 +88,7 @@ export function ReconcileBalanceInputsView({
           </h3>
           <ul className="space-y-3">
             {expenses.map((expense) => {
-              const inputId = `expense-amount-${expense.id}`;
+              const inputId = `${instanceId}-expense-amount-${expense.id}`;
               const currentValue = expenseAmounts[expense.id];
               return (
                 <li key={expense.id} className="flex items-center gap-3">
