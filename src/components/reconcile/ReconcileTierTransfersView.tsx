@@ -11,15 +11,11 @@ export interface ReconcileTierTransfersViewProps {
 export function ReconcileTierTransfersView({
   transfers,
 }: ReconcileTierTransfersViewProps) {
-  if (transfers.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        {RECONCILE_TIER_TRANSFERS_VIEW_COPY.emptyState}
-      </p>
-    );
-  }
-
-  return (
+  return transfers.length === 0 ? (
+    <p className="text-sm text-muted-foreground">
+      {RECONCILE_TIER_TRANSFERS_VIEW_COPY.emptyState}
+    </p>
+  ) : (
     <ul className="space-y-2">
       {transfers.map((transfer, index) => {
         const fromLabel =

@@ -41,7 +41,7 @@ describe("calculateTierTransfers — short-term deficit", () => {
     ]);
   });
 
-  it("splits the short-term deficit across reserve and long-term when reserve is partially sufficient", () => {
+  it("draws the full deficit from long-term even when it exceeds the long-term surplus", () => {
     const transfers = calculateTierTransfers({
       currentBalances: {
         longTerm: 5000,

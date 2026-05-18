@@ -49,7 +49,7 @@ describe("ReconcileTierTransfersView — transfer display", () => {
     );
     expect(
       screen.getByText(
-        `${RECONCILE_TIER_TRANSFERS_VIEW_COPY.tierLabel["reserve"]} ${RECONCILE_TIER_TRANSFERS_VIEW_COPY.transferArrow} ${RECONCILE_TIER_TRANSFERS_VIEW_COPY.tierLabel["short-term"]}`,
+        `${RECONCILE_TIER_TRANSFERS_VIEW_COPY.tierLabel[ReconciliationAccountTier.Reserve]} ${RECONCILE_TIER_TRANSFERS_VIEW_COPY.transferArrow} ${RECONCILE_TIER_TRANSFERS_VIEW_COPY.tierLabel[ReconciliationAccountTier.ShortTerm]}`,
       ),
     ).toBeDefined();
   });
