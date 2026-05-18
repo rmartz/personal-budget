@@ -1,3 +1,5 @@
+export type { AllocationDashboardViewProps } from "./AllocationDashboardView";
+export { AllocationDashboardView } from "./AllocationDashboardView";
 export type { InvestmentsViewProps } from "./InvestmentsView";
 export { InvestmentsView } from "./InvestmentsView";
 export type {
