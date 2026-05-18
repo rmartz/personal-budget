@@ -26,9 +26,23 @@ export function calculateLedgerBalance({
   cashCap,
   transactions,
 }: LedgerBalanceInput): LedgerBalanceResult {
-  const sorted = [...transactions].sort(
-    (a, b) => a.date.getTime() - b.date.getTime(),
-  );
+  const sorted = [...transactions].sort((a, b) => {
+    const dateDiff = a.date.getTime() - b.date.getTime();
+    if (dateDiff !== 0) return dateDiff;
+    // Same day: deposits before expenses so same-day deposits can fund same-day expenses
+    if (
+      a.type === BudgetLedgerTransactionType.Deposit &&
+      b.type === BudgetLedgerTransactionType.Expense
+    )
+      return -1;
+    if (
+      a.type === BudgetLedgerTransactionType.Expense &&
+      b.type === BudgetLedgerTransactionType.Deposit
+    )
+      return 1;
+    // Same type, same day: stable ordering by id
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  });
 
   return sorted.reduce<LedgerBalanceResult>(
     (balance, tx) => {

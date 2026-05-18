@@ -114,4 +114,16 @@ describe("calculateLedgerBalance — mixed transactions", () => {
     expect(result.cashBalance).toBe(1000);
     expect(result.investmentBalance).toBe(300);
   });
+
+  it("applies deposits before expenses on the same day so the deposit funds the expense", () => {
+    // Deposit 500 and spend 200 on the same day (daysAgo = 0).
+    // Even though the expense appears first in the array, the deposit must be
+    // processed first so the expense can be deducted from the resulting balance.
+    const result = calculateLedgerBalance({
+      cashCap: 1000,
+      transactions: [makeExpense(200, 0), makeDeposit(500, 0)],
+    });
+    expect(result.cashBalance).toBe(300);
+    expect(result.investmentBalance).toBe(0);
+  });
 });
