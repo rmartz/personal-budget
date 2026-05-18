@@ -4,7 +4,8 @@ export interface AllocationRatio {
 
 /**
  * Returns true when the target allocation ratios across all investment
- * accounts sum to exactly 100% (within a floating-point tolerance of 0.01).
+ * accounts sum to exactly 100% (within a strict floating-point tolerance:
+ * the deviation must be less than 0.01, exclusive of the boundary).
  *
  * Returns false for an empty array — at least one account must be defined
  * for the allocation to be meaningful.

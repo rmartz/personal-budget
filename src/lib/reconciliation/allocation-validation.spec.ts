@@ -17,13 +17,13 @@ describe("validateAllocationRatios — valid inputs", () => {
     expect(validateAllocationRatios([{ targetPercent: 100 }])).toBe(true);
   });
 
-  it("returns true when floating-point ratios round to 100 within tolerance", () => {
-    // 33.33 + 33.33 + 33.34 = 100.00
+  it("returns true when floating-point ratios sum to within the strict tolerance", () => {
+    // 33.333 + 33.333 + 33.333 = 99.999 — 0.001 away from 100, within the < 0.01 threshold
     expect(
       validateAllocationRatios([
-        { targetPercent: 33.33 },
-        { targetPercent: 33.33 },
-        { targetPercent: 33.34 },
+        { targetPercent: 33.333 },
+        { targetPercent: 33.333 },
+        { targetPercent: 33.333 },
       ]),
     ).toBe(true);
   });
@@ -51,11 +51,21 @@ describe("validateAllocationRatios — invalid inputs", () => {
   });
 
   it("returns false when ratios are close but outside tolerance", () => {
-    // sum = 99.9 — outside the 0.01 tolerance
+    // sum = 99.9 — 0.1 away from 100, outside the strict < 0.01 threshold
     expect(
       validateAllocationRatios([
         { targetPercent: 49.9 },
         { targetPercent: 50 },
+      ]),
+    ).toBe(false);
+  });
+
+  it("returns false when ratios are exactly at the tolerance boundary", () => {
+    // 50.005 + 50.005 = 100.01 — exactly 0.01 away; the boundary is exclusive (< not <=)
+    expect(
+      validateAllocationRatios([
+        { targetPercent: 50.005 },
+        { targetPercent: 50.005 },
       ]),
     ).toBe(false);
   });
