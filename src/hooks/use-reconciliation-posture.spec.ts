@@ -83,6 +83,25 @@ describe("useReconciliationPosture", () => {
       expect(mockUnsubscribe).toHaveBeenCalled();
     });
 
+    it("re-subscribes when uid changes from one non-empty value to another", async () => {
+      mockOnValue.mockReturnValue(mockUnsubscribe);
+
+      const { rerender } = renderHook(
+        ({ uid }: { uid: string }) => useReconciliationPosture(uid),
+        { initialProps: { uid: "user-1" } },
+      );
+
+      expect(mockOnValue).toHaveBeenCalledTimes(1);
+
+      rerender({ uid: "user-2" });
+
+      await waitFor(() => {
+        expect(mockOnValue).toHaveBeenCalledTimes(2);
+      });
+
+      expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+    });
+
     it("sets error when onValue calls the error callback", async () => {
       mockOnValue.mockImplementation(
         (_ref: unknown, _cb: unknown, errCb: (err: Error) => void) => {

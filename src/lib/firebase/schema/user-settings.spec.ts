@@ -36,7 +36,7 @@ describe("firebaseToUserSettings", () => {
 
   it("defaults to Posture.Balanced when reconciliationPosture is an unknown string", () => {
     const result = firebaseToUserSettings({
-      reconciliationPosture: "invalid-posture" as unknown as Posture,
+      reconciliationPosture: "invalid-posture",
     });
     expect(result.reconciliationPosture).toBe(Posture.Balanced);
   });

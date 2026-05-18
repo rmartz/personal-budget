@@ -1,7 +1,7 @@
 import { Posture } from "@/lib/firebase/schema/investments";
 
 export interface FirebaseUserSettings {
-  reconciliationPosture?: Posture | undefined;
+  reconciliationPosture?: string | undefined;
 }
 
 export interface UserSettings {
@@ -17,7 +17,7 @@ export function firebaseToUserSettings(
     reconciliationPosture:
       data.reconciliationPosture !== undefined &&
       VALID_POSTURES.has(data.reconciliationPosture)
-        ? data.reconciliationPosture
+        ? (data.reconciliationPosture as Posture)
         : Posture.Balanced,
   };
 }

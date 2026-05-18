@@ -31,7 +31,7 @@ export function useReconciliationPosture(uid: string) {
       (snapshot) => {
         setPosture(
           firebaseToUserSettings({
-            reconciliationPosture: snapshot.val() as Posture | undefined,
+            reconciliationPosture: snapshot.val() as string | undefined,
           }).reconciliationPosture,
         );
         setIsLoading(false);
