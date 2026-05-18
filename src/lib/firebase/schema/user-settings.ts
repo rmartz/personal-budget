@@ -1,7 +1,7 @@
 import { Posture } from "@/lib/firebase/schema/investments";
 
 export interface FirebaseUserSettings {
-  reconciliationPosture?: string | undefined;
+  reconciliationPosture?: string;
 }
 
 export interface UserSettings {

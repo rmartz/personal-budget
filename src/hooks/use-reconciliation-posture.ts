@@ -29,9 +29,10 @@ export function useReconciliationPosture(uid: string) {
     const unsubscribe = onValue(
       postureRef,
       (snapshot) => {
+        const rawPosture = snapshot.val() as string | null;
         setPosture(
           firebaseToUserSettings({
-            reconciliationPosture: snapshot.val() as string | undefined,
+            reconciliationPosture: rawPosture ?? undefined,
           }).reconciliationPosture,
         );
         setIsLoading(false);
