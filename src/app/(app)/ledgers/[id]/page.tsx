@@ -21,6 +21,7 @@ import { useTransactions } from "@/hooks/use-transactions";
 import { useUpdateSavingsGoal } from "@/hooks/use-update-savings-goal";
 import { useUpdateTransaction } from "@/hooks/use-update-transaction";
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
+import { calculateLedgerBalance } from "@/lib/reconciliation/ledger-balance";
 import type { Ledger, UpdateLedgerInput } from "@/lib/types";
 import { updateLedger } from "@/services/ledgers";
 import { createSavingsGoal } from "@/services/savings-goals";
@@ -54,7 +55,13 @@ export default function LedgerDetailPage() {
 
   const budgetLedger = ledgers.find((l) => l.id === id);
   const ledger: Ledger | undefined = budgetLedger
-    ? { ...budgetLedger, cashBalance: 0, investmentBalance: 0 }
+    ? {
+        ...budgetLedger,
+        ...calculateLedgerBalance({
+          cashCap: budgetLedger.cashCap,
+          transactions,
+        }),
+      }
     : undefined;
   const isLoading = authLoading || ledgersLoading || txLoading;
 
