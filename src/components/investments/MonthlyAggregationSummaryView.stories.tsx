@@ -23,18 +23,21 @@ export const WithRows: Story = {
       {
         cashBalance: 4200,
         investmentBalance: 12000,
+        ledgerId: "ledger-primary",
         ledgerName: "Primary",
         netBuySell: 800,
       },
       {
         cashBalance: 1600,
         investmentBalance: 8400,
+        ledgerId: "ledger-travel-fund",
         ledgerName: "Travel Fund",
         netBuySell: -360,
       },
       {
         cashBalance: 900,
         investmentBalance: 3500,
+        ledgerId: "ledger-emergency",
         ledgerName: "Emergency",
         netBuySell: 0,
       },

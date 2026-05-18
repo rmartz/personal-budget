@@ -13,12 +13,14 @@ const baseRows = [
   {
     cashBalance: 4200,
     investmentBalance: 12000,
+    ledgerId: "ledger-primary",
     ledgerName: "Primary",
     netBuySell: 800,
   },
   {
     cashBalance: 1600,
     investmentBalance: 8400,
+    ledgerId: "ledger-travel-fund",
     ledgerName: "Travel Fund",
     netBuySell: -360,
   },
@@ -100,13 +102,26 @@ describe("MonthlyAggregationSummaryView — row data", () => {
 });
 
 describe("MonthlyAggregationSummaryView — view all link", () => {
-  it("renders the view all link with total ledger count", () => {
+  it("renders the view all link with total ledger count when onViewAll is provided", () => {
     render(
-      <MonthlyAggregationSummaryView rows={baseRows} totalLedgerCount={14} />,
+      <MonthlyAggregationSummaryView
+        rows={baseRows}
+        totalLedgerCount={14}
+        onViewAll={() => undefined}
+      />,
     );
     expect(
       screen.getByText(LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(14)),
     ).toBeDefined();
+  });
+
+  it("does not render the view all link when onViewAll is not provided", () => {
+    render(
+      <MonthlyAggregationSummaryView rows={baseRows} totalLedgerCount={14} />,
+    );
+    expect(
+      screen.queryByText(LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(14)),
+    ).toBeNull();
   });
 });
 

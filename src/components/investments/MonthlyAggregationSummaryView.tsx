@@ -15,16 +15,19 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 export interface LedgerAggregationRow {
   cashBalance: number;
   investmentBalance: number;
+  ledgerId: string;
   ledgerName: string;
   netBuySell: number;
 }
 
 export interface MonthlyAggregationSummaryViewProps {
+  onViewAll?: () => void;
   rows: LedgerAggregationRow[];
   totalLedgerCount: number;
 }
 
 export function MonthlyAggregationSummaryView({
+  onViewAll,
   rows,
   totalLedgerCount,
 }: MonthlyAggregationSummaryViewProps) {
@@ -61,7 +64,7 @@ export function MonthlyAggregationSummaryView({
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.ledgerName} className="border-b last:border-b-0">
+                  <tr key={row.ledgerId} className="border-b last:border-b-0">
                     <td className="px-4 py-2 font-medium">{row.ledgerName}</td>
                     <td className="px-4 py-2 text-right font-mono">
                       {currencyFormatter.format(row.cashBalance)}
@@ -82,14 +85,17 @@ export function MonthlyAggregationSummaryView({
                 ))}
               </tbody>
             </table>
-            <div className="border-t px-4 py-2 text-right">
-              <button
-                type="button"
-                className="text-xs text-primary hover:underline"
-              >
-                {LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(totalLedgerCount)}
-              </button>
-            </div>
+            {onViewAll !== undefined && (
+              <div className="border-t px-4 py-2 text-right">
+                <button
+                  type="button"
+                  className="text-xs text-primary hover:underline"
+                  onClick={onViewAll}
+                >
+                  {LEDGER_INVESTMENT_TABLE_COPY.viewAllLink(totalLedgerCount)}
+                </button>
+              </div>
+            )}
           </>
         )}
       </CardContent>
