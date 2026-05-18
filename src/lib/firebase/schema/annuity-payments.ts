@@ -13,7 +13,7 @@ export interface AnnuityPayment {
 }
 
 export function annuityPaymentToFirebase(
-  payment: Omit<AnnuityPayment, "id">,
+  payment: Omit<AnnuityPayment, "id" | "annuityId">,
 ): FirebaseAnnuityPayment {
   return {
     amount: payment.amount,

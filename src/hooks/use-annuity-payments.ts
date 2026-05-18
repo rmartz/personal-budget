@@ -17,10 +17,14 @@ export function useAnnuityPayments(uid: string, annuityId: string) {
 
   useEffect(() => {
     if (!uid || !annuityId) {
+      setError(undefined);
       setPayments([]);
       setIsLoading(false);
       return;
     }
+
+    setError(undefined);
+    setIsLoading(true);
 
     const db = getDatabase(getClientApp());
     const paymentsRef = ref(db, `users/${uid}/annuityPayments/${annuityId}`);

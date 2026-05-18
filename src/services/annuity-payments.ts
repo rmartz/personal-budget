@@ -43,7 +43,7 @@ export async function createAnnuityPayment(
   if (!newRef.key) {
     throw new Error("Failed to generate annuity payment key");
   }
-  await set(newRef, annuityPaymentToFirebase({ annuityId, ...data }));
+  await set(newRef, annuityPaymentToFirebase(data));
   return { id: newRef.key, annuityId, ...data };
 }
 

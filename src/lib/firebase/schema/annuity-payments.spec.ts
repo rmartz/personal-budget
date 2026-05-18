@@ -9,7 +9,6 @@ describe("annuityPaymentToFirebase", () => {
   it("serializes date to ISO string", () => {
     const date = new Date("2024-03-15T12:00:00.000Z");
     const result = annuityPaymentToFirebase({
-      annuityId: "ann-1",
       amount: 250,
       date,
     });
@@ -18,7 +17,6 @@ describe("annuityPaymentToFirebase", () => {
 
   it("preserves amount", () => {
     const result = annuityPaymentToFirebase({
-      annuityId: "ann-1",
       amount: 500.75,
       date: new Date("2024-03-01T00:00:00.000Z"),
     });
@@ -27,7 +25,6 @@ describe("annuityPaymentToFirebase", () => {
 
   it("includes notes when provided", () => {
     const result = annuityPaymentToFirebase({
-      annuityId: "ann-1",
       amount: 100,
       date: new Date("2024-03-01T00:00:00.000Z"),
       notes: "Extra payment",
@@ -37,7 +34,6 @@ describe("annuityPaymentToFirebase", () => {
 
   it("omits notes when not provided", () => {
     const result = annuityPaymentToFirebase({
-      annuityId: "ann-1",
       amount: 100,
       date: new Date("2024-03-01T00:00:00.000Z"),
     });
@@ -91,7 +87,6 @@ describe("firebaseToAnnuityPayment", () => {
   it("round-trips date through serialization", () => {
     const date = new Date("2024-09-20T08:30:00.000Z");
     const firebase = annuityPaymentToFirebase({
-      annuityId: "ann-1",
       amount: 200,
       date,
     });
