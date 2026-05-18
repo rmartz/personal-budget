@@ -6,7 +6,7 @@ import { TARGET_ALLOCATION_COPY } from "./copy";
 
 afterEach(cleanup);
 
-const makeAccount = (
+const makeInvestmentAccount = (
   overrides?: Partial<{
     id: string;
     name: string;
@@ -38,13 +38,13 @@ describe("AllocationDashboardView — empty state", () => {
 describe("AllocationDashboardView — account names", () => {
   it("renders each account name", () => {
     const accounts = [
-      makeAccount({
+      makeInvestmentAccount({
         id: "a",
         name: "Stocks",
         currentPercent: 60,
         targetPercent: 60,
       }),
-      makeAccount({
+      makeInvestmentAccount({
         id: "b",
         name: "Bonds",
         currentPercent: 30,
@@ -61,7 +61,9 @@ describe("AllocationDashboardView — account names", () => {
 
 describe("AllocationDashboardView — current and target percentages", () => {
   it("renders current and target percent for each account", () => {
-    const accounts = [makeAccount({ currentPercent: 65, targetPercent: 70 })];
+    const accounts = [
+      makeInvestmentAccount({ currentPercent: 65, targetPercent: 70 }),
+    ];
     const { getByText } = render(
       <AllocationDashboardView accounts={accounts} />,
     );
@@ -72,7 +74,9 @@ describe("AllocationDashboardView — current and target percentages", () => {
 
 describe("AllocationDashboardView — deviation display", () => {
   it("shows a negative deviation when account is under target", () => {
-    const accounts = [makeAccount({ currentPercent: 60, targetPercent: 70 })];
+    const accounts = [
+      makeInvestmentAccount({ currentPercent: 60, targetPercent: 70 }),
+    ];
     const { getByText } = render(
       <AllocationDashboardView accounts={accounts} />,
     );
@@ -80,7 +84,9 @@ describe("AllocationDashboardView — deviation display", () => {
   });
 
   it("shows a positive deviation when account is over target", () => {
-    const accounts = [makeAccount({ currentPercent: 75, targetPercent: 70 })];
+    const accounts = [
+      makeInvestmentAccount({ currentPercent: 75, targetPercent: 70 }),
+    ];
     const { getByText } = render(
       <AllocationDashboardView accounts={accounts} />,
     );
@@ -88,7 +94,9 @@ describe("AllocationDashboardView — deviation display", () => {
   });
 
   it("shows zero deviation when account is exactly at target", () => {
-    const accounts = [makeAccount({ currentPercent: 70, targetPercent: 70 })];
+    const accounts = [
+      makeInvestmentAccount({ currentPercent: 70, targetPercent: 70 }),
+    ];
     const { getByText } = render(
       <AllocationDashboardView accounts={accounts} />,
     );
@@ -98,7 +106,7 @@ describe("AllocationDashboardView — deviation display", () => {
 
 describe("AllocationDashboardView — footer note", () => {
   it("renders the footer note when accounts are present", () => {
-    const accounts = [makeAccount()];
+    const accounts = [makeInvestmentAccount()];
     const { getByText } = render(
       <AllocationDashboardView accounts={accounts} />,
     );
@@ -114,9 +122,9 @@ describe("AllocationDashboardView — footer note", () => {
 describe("AllocationDashboardView — output shape", () => {
   it("renders one row per account", () => {
     const accounts = [
-      makeAccount({ id: "a", name: "Stocks" }),
-      makeAccount({ id: "b", name: "Bonds" }),
-      makeAccount({ id: "c", name: "International" }),
+      makeInvestmentAccount({ id: "a", name: "Stocks" }),
+      makeInvestmentAccount({ id: "b", name: "Bonds" }),
+      makeInvestmentAccount({ id: "c", name: "International" }),
     ];
     const { getAllByRole } = render(
       <AllocationDashboardView accounts={accounts} />,
