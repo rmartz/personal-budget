@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
+import type { ReconciliationExpense } from "@/lib/firebase/schema/reconciliation-expenses";
 
+import { ReconcileBalanceInputsView } from "./ReconcileBalanceInputsView";
 import { RECONCILE_VIEW_COPY } from "./ReconcileView.copy";
 
 // TODO: Replace placeholder data with useReconciliation(uid, month) — see epic #18 (Monthly Reconciliation)
@@ -27,12 +30,6 @@ const PLACEHOLDER_TILES = [
   { label: RECONCILE_VIEW_COPY.tileAssignToLedgers, value: "$400" },
 ];
 
-const PLACEHOLDER_INPUTS = [
-  { account: "Checking", balance: "$4,200", confirmed: false },
-  { account: "High-yield savings", balance: "$18,500", confirmed: true },
-  { account: "Brokerage", balance: "$62,000", confirmed: false },
-];
-
 const PLACEHOLDER_INVESTMENT_ROWS = [
   { label: "Posture", value: "Moderate growth" },
   { label: "Cash above floors", value: "$1,200" },
@@ -41,10 +38,30 @@ const PLACEHOLDER_INVESTMENT_ROWS = [
 ];
 
 export interface ReconcileViewProps {
+  accountBalances?: Record<string, number | undefined>;
+  accounts?: ReconciliationAccount[];
+  expenseAmounts?: Record<string, number | undefined>;
+  expenses?: ReconciliationExpense[];
+  onAccountBalanceChange?: (
+    accountId: string,
+    balance: number | undefined,
+  ) => void;
+  onExpenseAmountChange?: (
+    expenseId: string,
+    amount: number | undefined,
+  ) => void;
   onNewExpense?: () => void;
 }
 
-export function ReconcileView({ onNewExpense }: ReconcileViewProps) {
+export function ReconcileView({
+  accountBalances = {},
+  accounts = [],
+  expenseAmounts = {},
+  expenses = [],
+  onAccountBalanceChange = () => undefined,
+  onExpenseAmountChange = () => undefined,
+  onNewExpense,
+}: ReconcileViewProps) {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
       {/* Page header */}
@@ -135,34 +152,14 @@ export function ReconcileView({ onNewExpense }: ReconcileViewProps) {
           <h2 className="mb-4 text-sm font-semibold">
             {RECONCILE_VIEW_COPY.inputsNeededHeading}
           </h2>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-xs text-muted-foreground">
-                <th className="pb-2 text-left font-medium">
-                  {RECONCILE_VIEW_COPY.inputsTableAccountHeader}
-                </th>
-                <th className="pb-2 text-right font-medium">
-                  {RECONCILE_VIEW_COPY.inputsTableBalanceHeader}
-                </th>
-                <th className="pb-2 text-right font-medium">
-                  {RECONCILE_VIEW_COPY.inputsTableStatusHeader}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {PLACEHOLDER_INPUTS.map((row) => (
-                <tr key={row.account} className="border-b last:border-0">
-                  <td className="py-2">{row.account}</td>
-                  <td className="py-2 text-right">{row.balance}</td>
-                  <td className="py-2 text-right text-xs text-muted-foreground">
-                    {row.confirmed
-                      ? RECONCILE_VIEW_COPY.inputsTableStatusConfirmed
-                      : RECONCILE_VIEW_COPY.inputsTableStatusPending}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <ReconcileBalanceInputsView
+            accountBalances={accountBalances}
+            accounts={accounts}
+            expenseAmounts={expenseAmounts}
+            expenses={expenses}
+            onAccountBalanceChange={onAccountBalanceChange}
+            onExpenseAmountChange={onExpenseAmountChange}
+          />
         </section>
 
         {/* Why this investment amount? */}
