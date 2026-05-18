@@ -109,6 +109,18 @@ describe("calculateMonthlyInvestmentTarget — expenses only", () => {
     });
     expect(result.netInvestmentTarget).toBe(-150);
   });
+
+  it("clamps investment balance to zero when expense exceeds all available funds", () => {
+    // 50 cash + 200 investment = 250 total; expense of 400 exhausts everything
+    // Net investment target = 0 - 200 = -200 (full starting investment drawn and clamped)
+    const result = calculateMonthlyInvestmentTarget({
+      cashCap: 1000,
+      startingCashBalance: 50,
+      startingInvestmentBalance: 200,
+      transactions: [makeExpense(400)],
+    });
+    expect(result.netInvestmentTarget).toBe(-200);
+  });
 });
 
 describe("calculateMonthlyInvestmentTarget — mixed transactions", () => {
