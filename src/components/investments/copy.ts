@@ -51,3 +51,7 @@ export const LEDGER_INVESTMENT_TABLE_COPY = {
   title: "Per-ledger investment portion",
   viewAllLink: (count: number) => `View all ${String(count)}`,
 } as const;
+
+export const MONTHLY_AGGREGATION_SUMMARY_COPY = {
+  noLedgerData: "No ledger data available.",
+} as const;
