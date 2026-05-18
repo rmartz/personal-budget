@@ -1,13 +1,25 @@
 import { describe, expect, it } from "vitest";
 
+import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
+import { ReconciliationExpenseType } from "@/lib/firebase/schema/reconciliation-expenses";
+
 import { checkDataCompleteness } from "./data-completeness";
 
 function makeAccount(id: string) {
-  return { id, name: `Account ${id}` };
+  return {
+    id,
+    name: `Account ${id}`,
+    tier: ReconciliationAccountTier.ShortTerm,
+  };
 }
 
 function makeExpense(id: string) {
-  return { id, name: `Expense ${id}` };
+  return {
+    id,
+    name: `Expense ${id}`,
+    type: ReconciliationExpenseType.StatementBalance,
+    typicalAmount: 100,
+  };
 }
 
 describe("checkDataCompleteness — complete inputs", () => {

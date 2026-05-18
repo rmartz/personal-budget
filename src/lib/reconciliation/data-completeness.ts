@@ -1,8 +1,11 @@
+import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
+import type { ReconciliationExpense } from "@/lib/firebase/schema/reconciliation-expenses";
+
 export interface DataCompletenessInputs {
   accountBalances: Record<string, number | undefined>;
-  accounts: { id: string }[];
+  accounts: ReconciliationAccount[];
   expenseAmounts: Record<string, number | undefined>;
-  expenses: { id: string }[];
+  expenses: ReconciliationExpense[];
 }
 
 export interface DataCompletenessResult {
