@@ -32,15 +32,11 @@ export function ReconcileBalanceInputsView({
 }: ReconcileBalanceInputsViewProps) {
   const isEmpty = accounts.length === 0 && expenses.length === 0;
 
-  if (isEmpty) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        {RECONCILE_BALANCE_INPUTS_COPY.emptyState}
-      </p>
-    );
-  }
-
-  return (
+  return isEmpty ? (
+    <p className="text-sm text-muted-foreground">
+      {RECONCILE_BALANCE_INPUTS_COPY.emptyState}
+    </p>
+  ) : (
     <div className="space-y-6">
       {accounts.length > 0 && (
         <section>
