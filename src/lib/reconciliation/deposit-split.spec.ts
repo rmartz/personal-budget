@@ -13,6 +13,17 @@ describe("applyDepositSplit — no cash cap", () => {
     expect(result.cashBalance).toBe(600);
     expect(result.investmentBalance).toBe(0);
   });
+
+  it("preserves an existing investment balance when there is no cash cap", () => {
+    const result = applyDepositSplit({
+      cashBalance: 0,
+      cashCap: undefined,
+      depositAmount: 300,
+      investmentBalance: 150,
+    });
+    expect(result.cashBalance).toBe(300);
+    expect(result.investmentBalance).toBe(150);
+  });
 });
 
 describe("applyDepositSplit — cash below cap", () => {
