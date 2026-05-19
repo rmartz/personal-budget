@@ -22,6 +22,20 @@ function makeAnnuity(overrides: Partial<Annuity> = {}): Annuity {
   };
 }
 
+/**
+ * Returns an array of payment objects with distinct monthly dates.
+ * Each payment falls in a different calendar month starting from 2024-01.
+ */
+function makeMonthlyPayments(
+  count: number,
+  amount: number,
+): { amount: number; date: Date }[] {
+  return Array.from({ length: count }, (_, i) => ({
+    amount,
+    date: new Date(2024 + Math.floor(i / 12), i % 12, 1),
+  }));
+}
+
 describe("computeRemainingBalance", () => {
   describe("PV-derived annuity uses amortization formula", () => {
     it("returns presentValue when no payments have been made", () => {
@@ -42,7 +56,7 @@ describe("computeRemainingBalance", () => {
         annualRatePercent: 5,
         durationMonths: 12,
       });
-      const payments = Array.from({ length: 12 }, () => ({ amount: 856.07 }));
+      const payments = makeMonthlyPayments(12, 856.07);
       const result = computeRemainingBalance(annuity, payments);
       expect(result).toBeDefined();
       expect(Math.abs(result!)).toBeLessThan(0.01);
@@ -55,7 +69,7 @@ describe("computeRemainingBalance", () => {
         annualRatePercent: 6,
         durationMonths: 360,
       });
-      const payments = [{ amount: 1199.1 }];
+      const payments = [{ amount: 1199.1, date: new Date(2024, 0, 1) }];
       const result = computeRemainingBalance(annuity, payments);
       expect(result).toBeDefined();
       expect(Math.round(result! * 100) / 100).toBe(199800.9);
@@ -68,9 +82,30 @@ describe("computeRemainingBalance", () => {
         annualRatePercent: 5,
         durationMonths: 12,
       });
-      const payments = Array.from({ length: 15 }, () => ({ amount: 856.07 }));
+      const payments = makeMonthlyPayments(15, 856.07);
       const result = computeRemainingBalance(annuity, payments);
       expect(result).toBe(0);
+    });
+
+    it("ignores payment amount when computing elapsed months for amortization", () => {
+      const annuity = makeAnnuity({
+        monthlyMode: AnnuityMonthlyMode.PVDerived,
+        presentValue: 200000,
+        annualRatePercent: 6,
+        durationMonths: 360,
+      });
+      // Two payments in the same calendar month — one at scheduled PMT,
+      // one extra partial payment. The balance should reflect 1 elapsed month,
+      // not 2, because only distinct months are counted.
+      const scheduledDate = new Date(2024, 0, 1);
+      const payments = [
+        { amount: 1199.1, date: scheduledDate },
+        { amount: 500, date: scheduledDate },
+      ];
+      const result = computeRemainingBalance(annuity, payments);
+      expect(result).toBeDefined();
+      // Same as the 1-payment mid-term balance test
+      expect(Math.round(result! * 100) / 100).toBe(199800.9);
     });
 
     it("returns undefined when annualRatePercent is undefined", () => {
@@ -103,7 +138,7 @@ describe("computeRemainingBalance", () => {
         presentValue: 1200,
         durationMonths: 12,
       });
-      const payments = Array.from({ length: 4 }, () => ({ amount: 100 }));
+      const payments = makeMonthlyPayments(4, 100);
       const result = computeRemainingBalance(annuity, payments);
       expect(result).toBe(800);
     });
@@ -113,7 +148,7 @@ describe("computeRemainingBalance", () => {
         monthlyMode: AnnuityMonthlyMode.Flat,
         presentValue: 300,
       });
-      const payments = Array.from({ length: 4 }, () => ({ amount: 100 }));
+      const payments = makeMonthlyPayments(4, 100);
       const result = computeRemainingBalance(annuity, payments);
       expect(result).toBe(0);
     });
@@ -141,23 +176,34 @@ describe("computeRemainingTerm", () => {
 
     it("returns durationMonths minus payment count after some payments", () => {
       const annuity = makeAnnuity({ durationMonths: 12 });
-      const payments = Array.from({ length: 5 }, () => ({ amount: 100 }));
+      const payments = makeMonthlyPayments(5, 100);
       const result = computeRemainingTerm(annuity, payments);
       expect(result).toBe(7);
     });
 
     it("returns 0 when payment count equals durationMonths", () => {
       const annuity = makeAnnuity({ durationMonths: 12 });
-      const payments = Array.from({ length: 12 }, () => ({ amount: 100 }));
+      const payments = makeMonthlyPayments(12, 100);
       const result = computeRemainingTerm(annuity, payments);
       expect(result).toBe(0);
     });
 
     it("clamps to 0 when payment count exceeds durationMonths", () => {
       const annuity = makeAnnuity({ durationMonths: 12 });
-      const payments = Array.from({ length: 15 }, () => ({ amount: 100 }));
+      const payments = makeMonthlyPayments(15, 100);
       const result = computeRemainingTerm(annuity, payments);
       expect(result).toBe(0);
+    });
+
+    it("counts multiple payments in the same month as one elapsed period", () => {
+      const annuity = makeAnnuity({ durationMonths: 12 });
+      const sameMonth = new Date(2024, 0, 1);
+      const payments = [
+        { amount: 100, date: sameMonth },
+        { amount: 50, date: sameMonth },
+      ];
+      const result = computeRemainingTerm(annuity, payments);
+      expect(result).toBe(11);
     });
   });
 
