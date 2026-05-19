@@ -108,6 +108,48 @@ describe("GoalCard — content", () => {
     });
   });
 
+  describe("renders fully funded badge", () => {
+    it("shows the fully funded badge when fundedAmount equals targetAmount", () => {
+      render(
+        <GoalCard
+          goal={makeGoal({ fundedAmount: 5000, targetAmount: 5000 })}
+          ledgerName="Primary"
+        />,
+      );
+      expect(screen.getByText(GOAL_CARD_COPY.fullyFunded)).toBeDefined();
+    });
+
+    it("shows the fully funded badge when fundedAmount exceeds targetAmount", () => {
+      render(
+        <GoalCard
+          goal={makeGoal({ fundedAmount: 6000, targetAmount: 5000 })}
+          ledgerName="Primary"
+        />,
+      );
+      expect(screen.getByText(GOAL_CARD_COPY.fullyFunded)).toBeDefined();
+    });
+
+    it("does not show the fully funded badge when not fully funded", () => {
+      render(
+        <GoalCard
+          goal={makeGoal({ fundedAmount: 4999, targetAmount: 5000 })}
+          ledgerName="Primary"
+        />,
+      );
+      expect(screen.queryByText(GOAL_CARD_COPY.fullyFunded)).toBeNull();
+    });
+
+    it("does not show the fully funded badge when targetAmount is 0", () => {
+      render(
+        <GoalCard
+          goal={makeGoal({ fundedAmount: 0, targetAmount: 0 })}
+          ledgerName="Primary"
+        />,
+      );
+      expect(screen.queryByText(GOAL_CARD_COPY.fullyFunded)).toBeNull();
+    });
+  });
+
   describe("renders amount-to-go when not fully funded", () => {
     it("shows '$Y to go' when fundedAmount < targetAmount", () => {
       render(
