@@ -138,8 +138,11 @@ export default function AnnuitiesPage() {
 
           {selectedAnnuity !== undefined && (
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <AnnuityPaymentHistoryTable annuity={selectedAnnuity} />
-              <AnnuityBalanceTrend annuity={selectedAnnuity} />
+              <AnnuityPaymentHistoryTable
+                annuity={selectedAnnuity}
+                payments={[]}
+              />
+              <AnnuityBalanceTrend annuity={selectedAnnuity} payments={[]} />
             </div>
           )}
         </>

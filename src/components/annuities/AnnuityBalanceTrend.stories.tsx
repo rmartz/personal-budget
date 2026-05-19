@@ -22,5 +22,6 @@ export const Default: Story = {
       durationMonths: 360,
       monthlyMode: AnnuityMonthlyMode.PVDerived,
     },
+    payments: [],
   },
 };

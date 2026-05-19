@@ -1,17 +1,119 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { calculateRemainingPrincipal } from "@/lib/annuity-math";
 import type { Annuity } from "@/lib/firebase/schema/annuities";
+import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { ANNUITY_CARD_COPY } from "./copy";
 
+export interface AnnuityPaymentRecord {
+  id: string;
+  amount: number;
+  date: Date;
+  notes?: string;
+}
+
 export interface AnnuityPaymentHistoryTableProps {
   annuity: Annuity;
+  payments: AnnuityPaymentRecord[];
+}
+
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
+
+const monthFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+});
+
+interface PaymentRowData {
+  id: string;
+  month: string;
+  payment: string;
+  principal: string;
+  interest: string;
+  balance: string;
+}
+
+function buildRows(
+  annuity: Annuity,
+  payments: AnnuityPaymentRecord[],
+): PaymentRowData[] {
+  const isPVDerived =
+    annuity.monthlyMode === AnnuityMonthlyMode.PVDerived &&
+    annuity.presentValue !== undefined &&
+    annuity.annualRatePercent !== undefined &&
+    annuity.durationMonths !== undefined;
+
+  return payments.map((payment, index) => {
+    const month = monthFormatter.format(payment.date);
+    const paymentFormatted = currencyFormatter.format(payment.amount);
+
+    if (
+      isPVDerived &&
+      annuity.presentValue !== undefined &&
+      annuity.annualRatePercent !== undefined &&
+      annuity.durationMonths !== undefined
+    ) {
+      const commonArgs = {
+        annualRatePercent: annuity.annualRatePercent,
+        durationMonths: annuity.durationMonths,
+        presentValue: annuity.presentValue,
+      };
+      const balanceBefore = calculateRemainingPrincipal({
+        ...commonArgs,
+        monthsElapsed: index,
+      });
+      const balanceAfter = calculateRemainingPrincipal({
+        ...commonArgs,
+        monthsElapsed: index + 1,
+      });
+      const principal = balanceBefore - balanceAfter;
+      const interest = payment.amount - principal;
+      return {
+        id: payment.id,
+        month,
+        payment: paymentFormatted,
+        principal: currencyFormatter.format(principal),
+        interest: currencyFormatter.format(interest),
+        balance: currencyFormatter.format(balanceAfter),
+      };
+    }
+
+    const balanceAfter =
+      annuity.presentValue !== undefined
+        ? Math.max(
+            0,
+            annuity.presentValue -
+              payments
+                .slice(0, index + 1)
+                .reduce((sum, p) => sum + p.amount, 0),
+          )
+        : undefined;
+
+    return {
+      id: payment.id,
+      month,
+      payment: paymentFormatted,
+      principal: ANNUITY_CARD_COPY.balanceTrendPlaceholderValue,
+      interest: ANNUITY_CARD_COPY.balanceTrendPlaceholderValue,
+      balance:
+        balanceAfter !== undefined
+          ? currencyFormatter.format(balanceAfter)
+          : ANNUITY_CARD_COPY.balanceTrendPlaceholderValue,
+    };
+  });
 }
 
 export function AnnuityPaymentHistoryTable({
   annuity,
+  payments,
 }: AnnuityPaymentHistoryTableProps) {
+  const rows = buildRows(annuity, payments);
+
   return (
     <Card>
       <div className="px-4 py-3">
@@ -41,14 +143,34 @@ export function AnnuityPaymentHistoryTable({
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td
-                colSpan={5}
-                className="px-4 py-8 text-center text-muted-foreground"
-              >
-                {ANNUITY_CARD_COPY.paymentHistoryEmpty}
-              </td>
-            </tr>
+            {rows.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-4 py-8 text-center text-muted-foreground"
+                >
+                  {ANNUITY_CARD_COPY.paymentHistoryEmpty}
+                </td>
+              </tr>
+            ) : (
+              rows.map((row) => (
+                <tr key={row.id} className="border-b last:border-0">
+                  <td className="px-4 py-2">{row.month}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {row.payment}
+                  </td>
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {row.principal}
+                  </td>
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {row.interest}
+                  </td>
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {row.balance}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
