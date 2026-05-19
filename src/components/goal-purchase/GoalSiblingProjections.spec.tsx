@@ -1,0 +1,138 @@
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+
+import { GOAL_SIBLING_PROJECTIONS_COPY } from "./copy";
+import { GoalSiblingProjections } from "./GoalSiblingProjections";
+
+afterEach(cleanup);
+
+function makeGoal(
+  overrides: Partial<BudgetLedgerSavingsGoal> = {},
+): BudgetLedgerSavingsGoal {
+  return {
+    id: "goal-1",
+    ledgerId: "ledger-1",
+    name: "Emergency Fund",
+    targetAmount: 1000,
+    fundedAmount: 0,
+    priority: 1,
+    ...overrides,
+  };
+}
+
+const purchasedGoal = makeGoal({
+  id: "purchased",
+  name: "Studio Display",
+  priority: 1,
+});
+
+describe("GoalSiblingProjections — structure", () => {
+  describe("renders the section title", () => {
+    it("shows the sibling projections title", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={500}
+          purchasedGoal={purchasedGoal}
+          siblingGoals={[]}
+        />,
+      );
+      expect(
+        screen.getByText(GOAL_SIBLING_PROJECTIONS_COPY.title),
+      ).toBeDefined();
+    });
+  });
+
+  describe("renders the footer note", () => {
+    it("shows the footer text", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={500}
+          purchasedGoal={purchasedGoal}
+          siblingGoals={[]}
+        />,
+      );
+      expect(
+        screen.getByText(GOAL_SIBLING_PROJECTIONS_COPY.footer),
+      ).toBeDefined();
+    });
+  });
+});
+
+describe("GoalSiblingProjections — table", () => {
+  describe("renders sibling goal rows", () => {
+    it("shows each sibling goal name", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={500}
+          purchasedGoal={purchasedGoal}
+          siblingGoals={[
+            makeGoal({ id: "g2", name: "MacBook Pro", priority: 2 }),
+            makeGoal({ id: "g3", name: "Keyboard", priority: 3 }),
+          ]}
+        />,
+      );
+      expect(screen.getByText("MacBook Pro")).toBeDefined();
+      expect(screen.getByText("Keyboard")).toBeDefined();
+    });
+
+    it("shows projected ETA dates when monthly allocation is non-zero", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={1200}
+          purchasedGoal={purchasedGoal}
+          siblingGoals={[
+            makeGoal({
+              id: "g2",
+              name: "Vacation",
+              priority: 2,
+              targetAmount: 600,
+              fundedAmount: 0,
+            }),
+          ]}
+        />,
+      );
+      // With allocation, we should NOT see placeholder for both columns
+      const placeholders = screen.queryAllByText(
+        GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder,
+      );
+      // There should be fewer than 2 placeholders (at least one ETA is shown)
+      expect(placeholders.length).toBeLessThan(2);
+    });
+  });
+
+  describe("shows placeholder when monthly allocation is zero", () => {
+    it("renders the placeholder in both ETA columns when allocation is 0", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={0}
+          purchasedGoal={purchasedGoal}
+          siblingGoals={[makeGoal({ id: "g2", name: "Vacation", priority: 2 })]}
+        />,
+      );
+      const placeholders = screen.queryAllByText(
+        GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder,
+      );
+      expect(placeholders.length).toBe(2);
+    });
+  });
+
+  describe("hides the table when there are no sibling goals", () => {
+    it("does not render column headers when siblingGoals is empty", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={500}
+          purchasedGoal={purchasedGoal}
+          siblingGoals={[]}
+        />,
+      );
+      expect(
+        screen.queryByText(GOAL_SIBLING_PROJECTIONS_COPY.columnGoal),
+      ).toBeNull();
+    });
+  });
+});
+
+// Suppress React warnings from vi.fn() usage in other suites leaking into this file
+vi.fn();

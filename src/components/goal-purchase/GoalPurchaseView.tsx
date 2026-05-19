@@ -12,17 +12,22 @@ import { GoalSiblingProjections } from "./GoalSiblingProjections";
 
 export interface GoalPurchaseViewProps {
   goal: BudgetLedgerSavingsGoal;
+  ledgerCashBalance: number;
   ledgerName: string;
+  monthlyAllocation: number;
   siblingGoals: BudgetLedgerSavingsGoal[];
   onSubmit: () => void;
 }
 
 export function GoalPurchaseView({
   goal,
+  ledgerCashBalance,
   ledgerName,
+  monthlyAllocation,
   siblingGoals,
   onSubmit,
 }: GoalPurchaseViewProps) {
+  const hasInsufficientCash = goal.targetAmount > ledgerCashBalance;
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -51,8 +56,12 @@ export function GoalPurchaseView({
         />
 
         <div className="flex flex-col gap-4">
-          <GoalPurchaseWarning />
-          <GoalSiblingProjections siblingGoals={siblingGoals} />
+          {hasInsufficientCash && <GoalPurchaseWarning />}
+          <GoalSiblingProjections
+            monthlyAllocation={monthlyAllocation}
+            purchasedGoal={goal}
+            siblingGoals={siblingGoals}
+          />
         </div>
       </div>
     </div>

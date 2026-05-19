@@ -2,17 +2,24 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
+import { monthYearFormatter } from "@/lib/formatters";
+import { computeGoalEta } from "@/lib/goal-funding";
 
 import { GOAL_SIBLING_PROJECTIONS_COPY } from "./copy";
 
 export interface GoalSiblingProjectionsProps {
+  monthlyAllocation: number;
+  purchasedGoal: BudgetLedgerSavingsGoal;
   siblingGoals: BudgetLedgerSavingsGoal[];
 }
 
 export function GoalSiblingProjections({
+  monthlyAllocation,
+  purchasedGoal,
   siblingGoals,
 }: GoalSiblingProjectionsProps) {
-  // TODO: Implement real ETA recalculation in epic #14 (Goal Purchase Flow)
+  const allGoalsBeforePurchase = [...siblingGoals, purchasedGoal];
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -37,17 +44,33 @@ export function GoalSiblingProjections({
               </tr>
             </thead>
             <tbody>
-              {siblingGoals.map((goal) => (
-                <tr key={goal.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-2 font-medium">{goal.name}</td>
-                  <td className="px-4 py-2 text-muted-foreground">
-                    {GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder}
-                  </td>
-                  <td className="px-4 py-2 text-muted-foreground">
-                    {GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder}
-                  </td>
-                </tr>
-              ))}
+              {siblingGoals.map((goal) => {
+                const priorEta = computeGoalEta(
+                  goal,
+                  allGoalsBeforePurchase,
+                  monthlyAllocation,
+                );
+                const newEta = computeGoalEta(
+                  goal,
+                  siblingGoals,
+                  monthlyAllocation,
+                );
+                return (
+                  <tr key={goal.id} className="border-b last:border-b-0">
+                    <td className="px-4 py-2 font-medium">{goal.name}</td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {priorEta !== undefined
+                        ? monthYearFormatter.format(priorEta)
+                        : GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder}
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {newEta !== undefined
+                        ? monthYearFormatter.format(newEta)
+                        : GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
