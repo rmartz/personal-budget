@@ -8,8 +8,9 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * Computes the average monthly deposit amount from a transaction history.
  *
  * The time window runs from the calendar month of the earliest deposit to the
- * calendar month of the reference date (inclusive). The window is clamped to a
- * minimum of 1 month so a single-month history still yields a meaningful rate.
+ * calendar month of the reference date (exclusive of the start month — e.g.
+ * January to June yields 5 months). The window is clamped to a minimum of 1
+ * month so a single-month history still yields a meaningful rate.
  */
 export function computeMonthlyDepositRate(
   transactions: BudgetLedgerTransaction[],

@@ -10,6 +10,8 @@ const meta: Meta<typeof GoalSiblingProjections> = {
 export default meta;
 type Story = StoryObj<typeof GoalSiblingProjections>;
 
+const referenceDate = new Date(2025, 5, 1);
+
 const purchasedGoal = {
   id: "goal-1",
   ledgerId: "ledger-1",
@@ -42,6 +44,7 @@ export const WithSiblings: Story = {
   args: {
     monthlyAllocation: 400,
     purchasedGoal,
+    referenceDate,
     siblingGoals,
   },
 };
@@ -50,6 +53,7 @@ export const NoAllocation: Story = {
   args: {
     monthlyAllocation: 0,
     purchasedGoal,
+    referenceDate,
     siblingGoals,
   },
 };
@@ -58,6 +62,7 @@ export const NoSiblings: Story = {
   args: {
     monthlyAllocation: 400,
     purchasedGoal,
+    referenceDate,
     siblingGoals: [],
   },
 };

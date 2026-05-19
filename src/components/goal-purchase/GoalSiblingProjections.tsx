@@ -10,17 +10,20 @@ import { GOAL_SIBLING_PROJECTIONS_COPY } from "./copy";
 export interface GoalSiblingProjectionsProps {
   monthlyAllocation: number;
   purchasedGoal: BudgetLedgerSavingsGoal;
+  referenceDate: Date;
   siblingGoals: BudgetLedgerSavingsGoal[];
 }
 
 export function GoalSiblingProjections({
   monthlyAllocation,
   purchasedGoal,
+  referenceDate,
   siblingGoals,
 }: GoalSiblingProjectionsProps) {
-  const allGoalsBeforePurchase = [...siblingGoals, purchasedGoal].filter(
-    (g) => g.fundedAmount < g.targetAmount,
-  );
+  const allGoalsBeforePurchase = [
+    ...siblingGoals.filter((g) => g.fundedAmount < g.targetAmount),
+    purchasedGoal,
+  ];
   const unfundedSiblingGoals = siblingGoals.filter(
     (g) => g.fundedAmount < g.targetAmount,
   );
@@ -54,11 +57,13 @@ export function GoalSiblingProjections({
                   goal,
                   allGoalsBeforePurchase,
                   monthlyAllocation,
+                  referenceDate,
                 );
                 const newEta = computeGoalEta(
                   goal,
                   unfundedSiblingGoals,
                   monthlyAllocation,
+                  referenceDate,
                 );
                 return (
                   <tr key={goal.id} className="border-b last:border-b-0">

@@ -75,6 +75,7 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
         ledgerCashBalance={ledgerCashBalance}
         ledgerName={ledgerName}
         monthlyAllocation={monthlyAllocation}
+        referenceDate={referenceDate}
         siblingGoals={siblings}
         onSubmit={handleSubmit}
       />

@@ -8,6 +8,8 @@ import { GoalPurchaseView } from "./GoalPurchaseView";
 
 afterEach(cleanup);
 
+const referenceDate = new Date(2025, 5, 1);
+
 function makeGoal(
   overrides: Partial<BudgetLedgerSavingsGoal> = {},
 ): BudgetLedgerSavingsGoal {
@@ -31,6 +33,7 @@ describe("GoalPurchaseView — header", () => {
           ledgerCashBalance={10000}
           ledgerName="Tech Fund"
           monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[]}
           onSubmit={vi.fn()}
         />,
@@ -50,6 +53,7 @@ describe("GoalPurchaseView — header", () => {
           ledgerCashBalance={20000}
           ledgerName="Primary"
           monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[]}
           onSubmit={vi.fn()}
         />,
@@ -72,6 +76,7 @@ describe("GoalPurchaseView — panels", () => {
           ledgerCashBalance={0}
           ledgerName="Primary"
           monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[]}
           onSubmit={vi.fn()}
         />,
@@ -86,6 +91,7 @@ describe("GoalPurchaseView — panels", () => {
           ledgerCashBalance={5000}
           ledgerName="Primary"
           monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[]}
           onSubmit={vi.fn()}
         />,
@@ -102,6 +108,7 @@ describe("GoalPurchaseView — panels", () => {
           ledgerCashBalance={10000}
           ledgerName="Primary"
           monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[makeGoal({ id: "g2", name: "Vacation" })]}
           onSubmit={vi.fn()}
         />,

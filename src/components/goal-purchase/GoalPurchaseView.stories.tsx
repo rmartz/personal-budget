@@ -38,12 +38,15 @@ const siblingGoals = [
   },
 ];
 
+const referenceDate = new Date(2025, 5, 1);
+
 export const NoSiblings: Story = {
   args: {
     goal: baseGoal,
     ledgerCashBalance: 2000,
     ledgerName: "Tech Fund",
     monthlyAllocation: 400,
+    referenceDate,
     siblingGoals: [],
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onSubmit: () => {},
@@ -56,6 +59,7 @@ export const WithSiblings: Story = {
     ledgerCashBalance: 2000,
     ledgerName: "Tech Fund",
     monthlyAllocation: 400,
+    referenceDate,
     siblingGoals,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onSubmit: () => {},
@@ -68,6 +72,7 @@ export const InsufficientCash: Story = {
     ledgerCashBalance: 0,
     ledgerName: "Tech Fund",
     monthlyAllocation: 400,
+    referenceDate,
     siblingGoals,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onSubmit: () => {},

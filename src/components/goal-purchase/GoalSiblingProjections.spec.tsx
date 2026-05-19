@@ -28,6 +28,8 @@ const purchasedGoal = makeGoal({
   priority: 1,
 });
 
+const referenceDate = new Date(2025, 5, 1);
+
 describe("GoalSiblingProjections — structure", () => {
   describe("renders the section title", () => {
     it("shows the sibling projections title", () => {
@@ -35,6 +37,7 @@ describe("GoalSiblingProjections — structure", () => {
         <GoalSiblingProjections
           monthlyAllocation={500}
           purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
           siblingGoals={[]}
         />,
       );
@@ -50,6 +53,7 @@ describe("GoalSiblingProjections — structure", () => {
         <GoalSiblingProjections
           monthlyAllocation={500}
           purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
           siblingGoals={[]}
         />,
       );
@@ -67,6 +71,7 @@ describe("GoalSiblingProjections — table", () => {
         <GoalSiblingProjections
           monthlyAllocation={500}
           purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
           siblingGoals={[
             makeGoal({ id: "g2", name: "MacBook Pro", priority: 2 }),
             makeGoal({ id: "g3", name: "Keyboard", priority: 3 }),
@@ -82,6 +87,7 @@ describe("GoalSiblingProjections — table", () => {
         <GoalSiblingProjections
           monthlyAllocation={1200}
           purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
           siblingGoals={[
             makeGoal({
               id: "g2",
@@ -113,6 +119,7 @@ describe("GoalSiblingProjections — table", () => {
         <GoalSiblingProjections
           monthlyAllocation={1200}
           purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
           siblingGoals={[
             makeGoal({
               id: "g2",
@@ -139,12 +146,67 @@ describe("GoalSiblingProjections — table", () => {
     });
   });
 
+  describe("includes fully-funded purchased goal in the Was ETA denominator", () => {
+    it("shows different Was and New ETAs when the purchased goal is fully funded", () => {
+      // When the purchased goal is fully funded (the typical purchase-flow case),
+      // it must still appear in the Was denominator so the Zipf share for siblings
+      // is smaller pre-purchase than post-purchase. This produces a Was ETA that
+      // is further out than the New ETA, demonstrating the benefit of the purchase.
+      //
+      // Setup: purchasedGoal (priority 1, fully funded), sibling (priority 2, needs $600).
+      // Was denominator: [sibling(p=2), purchasedGoal(p=1)] → sibling gets 1/3 of allocation
+      // New denominator: [sibling(p=2)] → sibling gets 100% of allocation
+      // With $1200/month: Was monthly = $400 → ceil(600/400) = 2 months (Aug 2025)
+      //                    New monthly = $1200 → ceil(600/1200) = 1 month (Jul 2025)
+      const fullyFundedPurchasedGoal = makeGoal({
+        id: "purchased",
+        name: "Studio Display",
+        priority: 1,
+        targetAmount: 1000,
+        fundedAmount: 1000,
+      });
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={1200}
+          purchasedGoal={fullyFundedPurchasedGoal}
+          referenceDate={referenceDate}
+          siblingGoals={[
+            makeGoal({
+              id: "g2",
+              name: "Vacation",
+              priority: 2,
+              targetAmount: 600,
+              fundedAmount: 0,
+            }),
+          ]}
+        />,
+      );
+      // Both ETA columns should show concrete dates (not placeholders)
+      const placeholders = screen.queryAllByText(
+        GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder,
+      );
+      expect(placeholders.length).toBe(0);
+
+      // Was ETA = Aug 2025 (2 months out); New ETA = Jul 2025 (1 month out)
+      // The month/year formatter uses { month: "short", year: "numeric" } locale "en-US".
+      const wasEta = new Date(2025, 7, 1); // Aug 2025
+      const newEta = new Date(2025, 6, 1); // Jul 2025
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        year: "numeric",
+      });
+      expect(screen.getByText(formatter.format(wasEta))).toBeDefined();
+      expect(screen.getByText(formatter.format(newEta))).toBeDefined();
+    });
+  });
+
   describe("shows placeholder when monthly allocation is zero", () => {
     it("renders the placeholder in both ETA columns when allocation is 0", () => {
       render(
         <GoalSiblingProjections
           monthlyAllocation={0}
           purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
           siblingGoals={[makeGoal({ id: "g2", name: "Vacation", priority: 2 })]}
         />,
       );
@@ -161,6 +223,7 @@ describe("GoalSiblingProjections — table", () => {
         <GoalSiblingProjections
           monthlyAllocation={500}
           purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
           siblingGoals={[]}
         />,
       );

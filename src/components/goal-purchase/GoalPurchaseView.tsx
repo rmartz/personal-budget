@@ -15,6 +15,7 @@ export interface GoalPurchaseViewProps {
   ledgerCashBalance: number;
   ledgerName: string;
   monthlyAllocation: number;
+  referenceDate: Date;
   siblingGoals: BudgetLedgerSavingsGoal[];
   onSubmit: () => void;
 }
@@ -24,6 +25,7 @@ export function GoalPurchaseView({
   ledgerCashBalance,
   ledgerName,
   monthlyAllocation,
+  referenceDate,
   siblingGoals,
   onSubmit,
 }: GoalPurchaseViewProps) {
@@ -60,6 +62,7 @@ export function GoalPurchaseView({
           <GoalSiblingProjections
             monthlyAllocation={monthlyAllocation}
             purchasedGoal={goal}
+            referenceDate={referenceDate}
             siblingGoals={siblingGoals}
           />
         </div>
