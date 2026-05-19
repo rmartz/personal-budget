@@ -18,7 +18,9 @@ export function GoalSiblingProjections({
   purchasedGoal,
   siblingGoals,
 }: GoalSiblingProjectionsProps) {
-  const allGoalsBeforePurchase = [...siblingGoals, purchasedGoal];
+  const allGoalsBeforePurchase = [...siblingGoals, purchasedGoal].filter(
+    (g) => g.fundedAmount < g.targetAmount,
+  );
 
   return (
     <Card>

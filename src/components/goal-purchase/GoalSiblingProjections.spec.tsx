@@ -1,5 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
@@ -97,8 +97,8 @@ describe("GoalSiblingProjections — table", () => {
       const placeholders = screen.queryAllByText(
         GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder,
       );
-      // There should be fewer than 2 placeholders (at least one ETA is shown)
-      expect(placeholders.length).toBeLessThan(2);
+      // Both ETAs should resolve to concrete dates — no placeholders expected
+      expect(placeholders.length).toBe(0);
     });
   });
 
@@ -133,6 +133,3 @@ describe("GoalSiblingProjections — table", () => {
     });
   });
 });
-
-// Suppress React warnings from vi.fn() usage in other suites leaking into this file
-vi.fn();

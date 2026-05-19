@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { use } from "react";
+import { use, useMemo } from "react";
 
 import { GoalPurchaseView } from "@/components/goal-purchase";
 import { GOAL_PURCHASE_PAGE_COPY } from "@/components/goal-purchase/copy";
@@ -31,6 +31,7 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   const ledgerId = goal?.ledgerId ?? "";
   const { savingsGoals: siblingGoals } = useSavingsGoals(uid, ledgerId);
   const { transactions } = useTransactions(uid, ledgerId);
+  const referenceDate = useMemo(() => new Date(), []);
 
   if (authLoading || goalLoading || !user) {
     return null;
@@ -56,7 +57,10 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
     cashCap: budgetLedger?.cashCap,
     transactions,
   });
-  const monthlyAllocation = computeMonthlyDepositRate(transactions);
+  const monthlyAllocation = computeMonthlyDepositRate(
+    transactions,
+    referenceDate,
+  );
   const siblings = siblingGoals.filter((g) => g.id !== goal.id);
 
   function handleSubmit() {

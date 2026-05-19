@@ -76,7 +76,9 @@ export function computeGoalEta(
 
   const monthsNeeded = Math.ceil(remaining / monthlyForGoal);
 
-  const eta = new Date(referenceDate);
-  eta.setMonth(eta.getMonth() + monthsNeeded);
-  return eta;
+  return new Date(
+    referenceDate.getFullYear(),
+    referenceDate.getMonth() + monthsNeeded,
+    1,
+  );
 }
