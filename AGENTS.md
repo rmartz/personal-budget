@@ -22,7 +22,7 @@ pnpm run secrets-check # Config validation + gitleaks scan (also runs pre-commit
 
 ## Worktree Setup
 
-After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `pnpm install --frozen-lockfile` inside it before invoking any build or test commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. The global store is already populated so this step only creates hardlinks — it takes a few seconds and requires no network access.
+After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `pnpm install --frozen-lockfile` inside it before invoking any build, lint, format, type-check, or test commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. This step typically requires no network access when the global store is already populated, since only hardlinks are created — it takes a few seconds.
 
 ## Deployment Config
 
