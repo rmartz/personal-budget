@@ -15,11 +15,13 @@ export async function purchaseGoal(
   goal: BudgetLedgerSavingsGoal,
   data: PurchaseGoalInput,
 ): Promise<void> {
+  const description =
+    data.description.trim() !== "" ? data.description.trim() : goal.name;
   const transaction = await createTransaction(uid, goal.ledgerId, {
     type: BudgetLedgerTransactionType.Expense,
     date: data.date,
     amount: data.amount,
-    description: data.description,
+    description,
   });
   try {
     await deleteSavingsGoalAndReorder(uid, goal.ledgerId, goal.id);
@@ -27,7 +29,8 @@ export async function purchaseGoal(
     try {
       await deleteTransaction(uid, goal.ledgerId, transaction.id);
     } catch (rollbackErr) {
-      throw new Error(
+      throw new AggregateError(
+        [err, rollbackErr],
         "Goal deletion failed and transaction rollback also failed",
         { cause: rollbackErr },
       );

@@ -44,6 +44,7 @@ export function GoalPurchaseForm({
 
   async function handleSubmit() {
     if (isSubmitting) return;
+    setSubmitError(undefined);
     let valid = true;
 
     const amount = parseFloat(amountStr);
@@ -65,7 +66,6 @@ export function GoalPurchaseForm({
     if (!valid) return;
 
     setIsSubmitting(true);
-    setSubmitError(undefined);
     try {
       await onSubmit({
         amount,
@@ -80,7 +80,14 @@ export function GoalPurchaseForm({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <form
+      noValidate
+      className="flex flex-col gap-5"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void handleSubmit();
+      }}
+    >
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="purchase-amount">
           {GOAL_PURCHASE_FORM_COPY.amountLabel}
@@ -92,7 +99,7 @@ export function GoalPurchaseForm({
           <Input
             id="purchase-amount"
             type="number"
-            min={0}
+            min="0.01"
             step={0.01}
             value={amountStr}
             onChange={(e) => {
@@ -179,15 +186,10 @@ export function GoalPurchaseForm({
         >
           {GOAL_PURCHASE_FORM_COPY.cancelButton}
         </Link>
-        <Button
-          onClick={() => {
-            void handleSubmit();
-          }}
-          disabled={isSubmitting}
-        >
+        <Button type="submit" disabled={isSubmitting}>
           {GOAL_PURCHASE_FORM_COPY.submitButton}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

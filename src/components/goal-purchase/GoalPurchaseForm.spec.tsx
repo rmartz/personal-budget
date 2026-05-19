@@ -244,6 +244,35 @@ describe("GoalPurchaseForm — actions", () => {
       });
     });
 
+    it("clears a stale submit error when a new submission attempt begins", async () => {
+      const onSubmit = vi
+        .fn()
+        .mockRejectedValueOnce(new Error("first failure"))
+        .mockResolvedValue(undefined);
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={onSubmit}
+        />,
+      );
+      const button = screen.getByRole("button", {
+        name: GOAL_PURCHASE_FORM_COPY.submitButton,
+      });
+      fireEvent.click(button);
+      await vi.waitFor(() => {
+        expect(
+          screen.getByText(GOAL_PURCHASE_FORM_COPY.submitError),
+        ).toBeDefined();
+      });
+      fireEvent.click(button);
+      await vi.waitFor(() => {
+        expect(
+          screen.queryByText(GOAL_PURCHASE_FORM_COPY.submitError),
+        ).toBeNull();
+      });
+    });
+
     it("re-enables the submit button after onSubmit resolves", async () => {
       const onSubmit = vi.fn().mockResolvedValue(undefined);
       render(

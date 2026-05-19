@@ -75,6 +75,42 @@ describe("purchaseGoal", () => {
       expect(payload.description).toBe("Studio Display");
     });
 
+    it("falls back to the goal name when description is empty", async () => {
+      const newRef = { key: "txn-new" };
+      vi.mocked(push).mockReturnValue(newRef as never);
+      vi.mocked(set).mockResolvedValue(undefined);
+
+      const goal = makeGoal({ name: "New Laptop", ledgerId: "ledger-abc" });
+
+      await purchaseGoal("uid-1", goal, {
+        amount: 1500,
+        date: new Date("2024-06-15T00:00:00.000Z"),
+        description: "",
+      });
+
+      const setCall = vi.mocked(set).mock.calls[0] ?? [];
+      const payload = setCall[1] as { description: string };
+      expect(payload.description).toBe("New Laptop");
+    });
+
+    it("falls back to the goal name when description is whitespace", async () => {
+      const newRef = { key: "txn-new" };
+      vi.mocked(push).mockReturnValue(newRef as never);
+      vi.mocked(set).mockResolvedValue(undefined);
+
+      const goal = makeGoal({ name: "New Laptop", ledgerId: "ledger-abc" });
+
+      await purchaseGoal("uid-1", goal, {
+        amount: 1500,
+        date: new Date("2024-06-15T00:00:00.000Z"),
+        description: "   ",
+      });
+
+      const setCall = vi.mocked(set).mock.calls[0] ?? [];
+      const payload = setCall[1] as { description: string };
+      expect(payload.description).toBe("New Laptop");
+    });
+
     it("writes the transaction to the goal's ledger path", async () => {
       const newRef = { key: "txn-new" };
       vi.mocked(push).mockReturnValue(newRef as never);
@@ -139,26 +175,32 @@ describe("purchaseGoal", () => {
       expect(remove).toHaveBeenCalled();
     });
 
-    it("throws a combined error if rollback also fails", async () => {
+    it("throws an AggregateError preserving both errors if rollback also fails", async () => {
       const { runTransaction } = await import("firebase/database");
 
       const newRef = { key: "txn-comp" };
       vi.mocked(push).mockReturnValue(newRef as never);
       vi.mocked(set).mockResolvedValue(undefined);
-      vi.mocked(runTransaction).mockRejectedValue(new Error("delete failed"));
-      vi.mocked(remove).mockRejectedValue(new Error("rollback failed"));
+      const deletionErr = new Error("delete failed");
+      const rollbackErr = new Error("rollback failed");
+      vi.mocked(runTransaction).mockRejectedValue(deletionErr);
+      vi.mocked(remove).mockRejectedValue(rollbackErr);
 
       const goal = makeGoal({ id: "goal-1", ledgerId: "ledger-1" });
 
-      await expect(
-        purchaseGoal("uid-1", goal, {
-          amount: 1500,
-          date: new Date("2024-06-01T00:00:00.000Z"),
-          description: "New laptop",
-        }),
-      ).rejects.toThrow(
+      const thrown = await purchaseGoal("uid-1", goal, {
+        amount: 1500,
+        date: new Date("2024-06-01T00:00:00.000Z"),
+        description: "New laptop",
+      }).catch((e: unknown) => e);
+
+      expect(thrown).toBeInstanceOf(AggregateError);
+      const aggregate = thrown as AggregateError;
+      expect(aggregate.message).toBe(
         "Goal deletion failed and transaction rollback also failed",
       );
+      expect(aggregate.errors).toContain(deletionErr);
+      expect(aggregate.errors).toContain(rollbackErr);
     });
   });
 });
