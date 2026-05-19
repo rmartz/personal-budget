@@ -70,8 +70,9 @@ function buildRows(
         ...commonArgs,
         monthsElapsed: index + 1,
       });
+      const monthlyRate = annuity.annualRatePercent / 100 / 12;
+      const interest = balanceBefore * monthlyRate;
       const principal = balanceBefore - balanceAfter;
-      const interest = payment.amount - principal;
       return {
         id: payment.id,
         month,

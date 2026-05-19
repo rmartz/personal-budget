@@ -1,7 +1,7 @@
 export const ANNUITY_CARD_COPY = {
   balanceTrendChartPlaceholder: "Balance trend chart",
   balanceTrendNowLabel: "Now",
-  balanceTrendPayoffLabel: "Payoff",
+  balanceTrendPayoffLabel: "Payments remaining",
   balanceTrendPlaceholderValue: "—",
   balanceTrendStartedLabel: "Started",
   balanceTrendTitle: (annuityName: string) =>
