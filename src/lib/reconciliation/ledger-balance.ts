@@ -6,6 +6,8 @@ import { applyExpenseDeduction } from "./expense-deduction";
 
 export interface LedgerBalanceInput {
   cashCap: number | undefined;
+  startingCashBalance?: number;
+  startingInvestmentBalance?: number;
   transactions: BudgetLedgerTransaction[];
 }
 
@@ -24,6 +26,8 @@ export interface LedgerBalanceResult {
  */
 export function calculateLedgerBalance({
   cashCap,
+  startingCashBalance = 0,
+  startingInvestmentBalance = 0,
   transactions,
 }: LedgerBalanceInput): LedgerBalanceResult {
   const sorted = [...transactions].sort((a, b) => {
@@ -64,6 +68,9 @@ export function calculateLedgerBalance({
         investmentBalance: Math.max(0, next.investmentBalance),
       };
     },
-    { cashBalance: 0, investmentBalance: 0 },
+    {
+      cashBalance: startingCashBalance,
+      investmentBalance: startingInvestmentBalance,
+    },
   );
 }

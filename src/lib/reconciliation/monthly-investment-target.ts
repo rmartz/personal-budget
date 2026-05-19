@@ -1,8 +1,6 @@
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
-import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 
-import { applyDepositSplit } from "./deposit-split";
-import { applyExpenseDeduction } from "./expense-deduction";
+import { calculateLedgerBalance } from "./ledger-balance";
 
 export interface MonthlyInvestmentTargetInput {
   cashCap: number | undefined;
@@ -34,49 +32,11 @@ export function calculateMonthlyInvestmentTarget({
   startingInvestmentBalance,
   transactions,
 }: MonthlyInvestmentTargetInput): MonthlyInvestmentTargetResult {
-  const sorted = [...transactions].sort((a, b) => {
-    const dateDiff = a.date.getTime() - b.date.getTime();
-    if (dateDiff !== 0) return dateDiff;
-    if (
-      a.type === BudgetLedgerTransactionType.Deposit &&
-      b.type === BudgetLedgerTransactionType.Expense
-    )
-      return -1;
-    if (
-      a.type === BudgetLedgerTransactionType.Expense &&
-      b.type === BudgetLedgerTransactionType.Deposit
-    )
-      return 1;
-    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  const { investmentBalance } = calculateLedgerBalance({
+    cashCap,
+    startingCashBalance,
+    startingInvestmentBalance,
+    transactions,
   });
-
-  const ending = sorted.reduce(
-    (balance, tx) => {
-      if (tx.type === BudgetLedgerTransactionType.Deposit) {
-        return applyDepositSplit({
-          cashBalance: balance.cashBalance,
-          cashCap,
-          depositAmount: tx.amount,
-          investmentBalance: balance.investmentBalance,
-        });
-      }
-      const next = applyExpenseDeduction({
-        cashBalance: balance.cashBalance,
-        expenseAmount: tx.amount,
-        investmentBalance: balance.investmentBalance,
-      });
-      return {
-        cashBalance: Math.max(0, next.cashBalance),
-        investmentBalance: Math.max(0, next.investmentBalance),
-      };
-    },
-    {
-      cashBalance: startingCashBalance,
-      investmentBalance: startingInvestmentBalance,
-    },
-  );
-
-  return {
-    netInvestmentTarget: ending.investmentBalance - startingInvestmentBalance,
-  };
+  return { netInvestmentTarget: investmentBalance - startingInvestmentBalance };
 }
