@@ -18,7 +18,7 @@ export function annuityPaymentToFirebase(
   return {
     amount: payment.amount,
     date: payment.date.toISOString(),
-    notes: payment.notes,
+    ...(payment.notes !== undefined && { notes: payment.notes }),
   };
 }
 

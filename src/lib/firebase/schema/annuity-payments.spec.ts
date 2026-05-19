@@ -37,7 +37,7 @@ describe("annuityPaymentToFirebase", () => {
       amount: 100,
       date: new Date("2024-03-01T00:00:00.000Z"),
     });
-    expect(result.notes).toBeUndefined();
+    expect(result).not.toHaveProperty("notes");
   });
 });
 
