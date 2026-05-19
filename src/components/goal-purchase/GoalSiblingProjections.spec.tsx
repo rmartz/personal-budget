@@ -102,6 +102,43 @@ describe("GoalSiblingProjections — table", () => {
     });
   });
 
+  describe("excludes fully-funded siblings from the New ETA denominator", () => {
+    it("shows concrete ETAs for unfunded siblings when a fully-funded sibling is present", () => {
+      // "Vacation" is unfunded; "Already Funded" is fully funded.
+      // The unfunded sibling's ETA columns should show concrete dates.
+      // The fully-funded sibling correctly returns undefined for both ETAs
+      // (it needs no more funding), so exactly 2 placeholders total should appear —
+      // one per ETA column for "Already Funded" only.
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={1200}
+          purchasedGoal={purchasedGoal}
+          siblingGoals={[
+            makeGoal({
+              id: "g2",
+              name: "Vacation",
+              priority: 2,
+              targetAmount: 600,
+              fundedAmount: 0,
+            }),
+            makeGoal({
+              id: "g3",
+              name: "Already Funded",
+              priority: 3,
+              targetAmount: 500,
+              fundedAmount: 500,
+            }),
+          ]}
+        />,
+      );
+      // Exactly 2 placeholders: one per ETA column for the fully-funded sibling only
+      const placeholders = screen.queryAllByText(
+        GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder,
+      );
+      expect(placeholders.length).toBe(2);
+    });
+  });
+
   describe("shows placeholder when monthly allocation is zero", () => {
     it("renders the placeholder in both ETA columns when allocation is 0", () => {
       render(

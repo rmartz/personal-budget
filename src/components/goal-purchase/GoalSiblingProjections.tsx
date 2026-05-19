@@ -21,6 +21,9 @@ export function GoalSiblingProjections({
   const allGoalsBeforePurchase = [...siblingGoals, purchasedGoal].filter(
     (g) => g.fundedAmount < g.targetAmount,
   );
+  const unfundedSiblingGoals = siblingGoals.filter(
+    (g) => g.fundedAmount < g.targetAmount,
+  );
 
   return (
     <Card>
@@ -54,7 +57,7 @@ export function GoalSiblingProjections({
                 );
                 const newEta = computeGoalEta(
                   goal,
-                  siblingGoals,
+                  unfundedSiblingGoals,
                   monthlyAllocation,
                 );
                 return (
