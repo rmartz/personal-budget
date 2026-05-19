@@ -20,3 +20,4 @@ export { EditAnnuityDialog } from "./EditAnnuityDialog";
 export type { EditAnnuityDialogViewProps } from "./EditAnnuityDialogView";
 export { EditAnnuityDialogView } from "./EditAnnuityDialogView";
 export { NewAnnuityDialog } from "./NewAnnuityDialog";
+export type { AnnuityPaymentRecord } from "./types";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { use } from "react";
+import { use, useMemo } from "react";
 
 import { GoalPurchaseView } from "@/components/goal-purchase";
 import { GOAL_PURCHASE_PAGE_COPY } from "@/components/goal-purchase/copy";
@@ -9,6 +9,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 import { useSavingsGoal } from "@/hooks/use-savings-goal";
 import { useSavingsGoals } from "@/hooks/use-savings-goals";
+import { useTransactions } from "@/hooks/use-transactions";
+import { computeMonthlyDepositRate } from "@/lib/goal-funding";
+import { calculateLedgerBalance } from "@/lib/reconciliation/ledger-balance";
 
 interface GoalPurchasePageProps {
   params: Promise<{ goalId: string }>;
@@ -27,6 +30,8 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   const { ledgers } = useLedgersSubscription(uid);
   const ledgerId = goal?.ledgerId ?? "";
   const { savingsGoals: siblingGoals } = useSavingsGoals(uid, ledgerId);
+  const { transactions } = useTransactions(uid, ledgerId);
+  const referenceDate = useMemo(() => new Date(), []);
 
   if (authLoading || goalLoading || !user) {
     return null;
@@ -46,8 +51,16 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
     return null;
   }
 
-  const ledger = ledgers.find((l) => l.id === goal.ledgerId);
-  const ledgerName = ledger?.name ?? goal.ledgerId;
+  const budgetLedger = ledgers.find((l) => l.id === goal.ledgerId);
+  const ledgerName = budgetLedger?.name ?? goal.ledgerId;
+  const { cashBalance: ledgerCashBalance } = calculateLedgerBalance({
+    cashCap: budgetLedger?.cashCap,
+    transactions,
+  });
+  const monthlyAllocation = computeMonthlyDepositRate(
+    transactions,
+    referenceDate,
+  );
   const siblings = siblingGoals.filter((g) => g.id !== goal.id);
 
   function handleSubmit() {
@@ -59,7 +72,10 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
       <GoalPurchaseView
         goal={goal}
+        ledgerCashBalance={ledgerCashBalance}
         ledgerName={ledgerName}
+        monthlyAllocation={monthlyAllocation}
+        referenceDate={referenceDate}
         siblingGoals={siblings}
         onSubmit={handleSubmit}
       />
