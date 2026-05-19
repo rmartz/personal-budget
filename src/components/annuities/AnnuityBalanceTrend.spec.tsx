@@ -133,4 +133,59 @@ describe("AnnuityBalanceTrend", () => {
       expect(nowValue?.textContent).not.toBe("$10,000.00");
     });
   });
+
+  describe("renders payments-remaining count in the Payoff cell", () => {
+    it("shows the singular form when exactly 1 payment remains", () => {
+      render(
+        <AnnuityBalanceTrend
+          annuity={makeAnnuity({ durationMonths: 5 })}
+          payments={Array.from({ length: 4 }, (_, i) => ({
+            id: `p${String(i + 1)}`,
+            amount: 100,
+            date: new Date(`2024-0${String(i + 1)}-01T00:00:00.000Z`),
+          }))}
+        />,
+      );
+      const payoffLabel = screen.getByText(
+        ANNUITY_CARD_COPY.balanceTrendPayoffLabel,
+      );
+      expect(payoffLabel.nextElementSibling?.textContent).toBe(
+        ANNUITY_CARD_COPY.balanceTrendPaymentsRemainingCount(1),
+      );
+    });
+
+    it("shows the plural form when 2 or more payments remain", () => {
+      render(
+        <AnnuityBalanceTrend
+          annuity={makeAnnuity({ durationMonths: 10 })}
+          payments={Array.from({ length: 3 }, (_, i) => ({
+            id: `p${String(i + 1)}`,
+            amount: 100,
+            date: new Date(`2024-0${String(i + 1)}-01T00:00:00.000Z`),
+          }))}
+        />,
+      );
+      const payoffLabel = screen.getByText(
+        ANNUITY_CARD_COPY.balanceTrendPayoffLabel,
+      );
+      expect(payoffLabel.nextElementSibling?.textContent).toBe(
+        ANNUITY_CARD_COPY.balanceTrendPaymentsRemainingCount(7),
+      );
+    });
+
+    it("shows the placeholder when durationMonths is undefined", () => {
+      render(
+        <AnnuityBalanceTrend
+          annuity={makeAnnuity({ durationMonths: undefined })}
+          payments={[]}
+        />,
+      );
+      const payoffLabel = screen.getByText(
+        ANNUITY_CARD_COPY.balanceTrendPayoffLabel,
+      );
+      expect(payoffLabel.nextElementSibling?.textContent).toBe(
+        ANNUITY_CARD_COPY.balanceTrendPlaceholderValue,
+      );
+    });
+  });
 });
