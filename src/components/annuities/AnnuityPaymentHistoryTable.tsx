@@ -47,6 +47,8 @@ function buildRows(
     annuity.annualRatePercent !== undefined &&
     annuity.durationMonths !== undefined;
 
+  let runningBalance = annuity.presentValue;
+
   return sorted.map((payment, index) => {
     const month = monthFormatter.format(payment.date);
     const paymentFormatted = currencyFormatter.format(payment.amount);
@@ -83,14 +85,10 @@ function buildRows(
       };
     }
 
-    const balanceAfter =
-      annuity.presentValue !== undefined
-        ? Math.max(
-            0,
-            annuity.presentValue -
-              sorted.slice(0, index + 1).reduce((sum, p) => sum + p.amount, 0),
-          )
-        : undefined;
+    if (runningBalance !== undefined) {
+      runningBalance = Math.max(0, runningBalance - payment.amount);
+    }
+    const balanceAfter = runningBalance;
 
     return {
       id: payment.id,
