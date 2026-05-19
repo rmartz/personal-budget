@@ -24,6 +24,7 @@ export function useTransactions(uid: string, ledgerId: string) {
       return;
     }
 
+    setIsLoading(true);
     const db = getDatabase(getClientApp());
     const txRef = ref(db, `users/${uid}/budgetLedgerTransactions/${ledgerId}`);
 
