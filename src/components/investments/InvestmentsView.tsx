@@ -8,13 +8,13 @@ import type {
 } from "@/lib/firebase/schema/investments";
 import { Posture } from "@/lib/firebase/schema/investments";
 
+import { AllocationDashboardView } from "./AllocationDashboardView";
 import {
   AGGREGATE_BUY_SELL_COPY,
   INVESTMENTS_VIEW_COPY,
   LEDGER_INVESTMENT_TABLE_COPY,
   MONTHLY_DISTRIBUTION_COPY,
   RECOMMENDED_CARD_COPY,
-  TARGET_ALLOCATION_COPY,
 } from "./copy";
 import { INVESTMENTS_PLACEHOLDER_FIXTURE } from "./fixtures";
 import { PostureCard } from "./PostureCard";
@@ -136,36 +136,7 @@ export function InvestmentsView({
       {/* Middle two-column section */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Target allocation */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-semibold">
-              {TARGET_ALLOCATION_COPY.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {accounts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {TARGET_ALLOCATION_COPY.noAccountsConfigured}
-              </p>
-            ) : (
-              accounts.map((account) => (
-                <div
-                  key={account.id}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span>{account.name}</span>
-                  <span className="font-mono text-muted-foreground">
-                    {String(account.currentPercent)}% /{" "}
-                    {String(account.targetPercent)}%
-                  </span>
-                </div>
-              ))
-            )}
-            <p className="text-xs text-muted-foreground">
-              {TARGET_ALLOCATION_COPY.footerNote}
-            </p>
-          </CardContent>
-        </Card>
+        <AllocationDashboardView accounts={accounts} />
 
         {/* Monthly distribution */}
         <Card>
