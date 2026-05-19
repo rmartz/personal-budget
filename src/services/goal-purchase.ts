@@ -2,7 +2,7 @@ import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
 import { deleteSavingsGoalAndReorder } from "./savings-goals";
-import { createTransaction } from "./transactions";
+import { createTransaction, deleteTransaction } from "./transactions";
 
 export interface PurchaseGoalInput {
   amount: number;
@@ -15,11 +15,16 @@ export async function purchaseGoal(
   goal: BudgetLedgerSavingsGoal,
   data: PurchaseGoalInput,
 ): Promise<void> {
-  await createTransaction(uid, goal.ledgerId, {
+  const transaction = await createTransaction(uid, goal.ledgerId, {
     type: BudgetLedgerTransactionType.Expense,
     date: data.date,
     amount: data.amount,
     description: data.description,
   });
-  await deleteSavingsGoalAndReorder(uid, goal.ledgerId, goal.id);
+  try {
+    await deleteSavingsGoalAndReorder(uid, goal.ledgerId, goal.id);
+  } catch (err) {
+    await deleteTransaction(uid, goal.ledgerId, transaction.id);
+    throw err;
+  }
 }

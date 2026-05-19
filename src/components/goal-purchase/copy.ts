@@ -19,6 +19,7 @@ export const GOAL_PURCHASE_FORM_COPY = {
   noteLabel: "Note",
   notePlaceholder: "e.g. Studio Display refurb…",
   submitButton: "Mark purchased",
+  submitError: "Something went wrong. Please try again.",
 } as const;
 
 export const GOAL_PURCHASE_WARNING_COPY = {

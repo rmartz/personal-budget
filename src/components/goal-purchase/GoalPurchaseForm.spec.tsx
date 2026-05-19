@@ -82,8 +82,8 @@ describe("GoalPurchaseForm — actions", () => {
   });
 
   describe("Mark purchased button calls onSubmit", () => {
-    it("calls onSubmit when the submit button is clicked", () => {
-      const onSubmit = vi.fn();
+    it("calls onSubmit when the submit button is clicked", async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
       render(
         <GoalPurchaseForm
           ledgerName="Primary"
@@ -96,11 +96,13 @@ describe("GoalPurchaseForm — actions", () => {
           name: GOAL_PURCHASE_FORM_COPY.submitButton,
         }),
       );
-      expect(onSubmit).toHaveBeenCalledOnce();
+      await vi.waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledOnce();
+      });
     });
 
-    it("passes the entered amount to onSubmit", () => {
-      const onSubmit = vi.fn();
+    it("passes the entered amount to onSubmit", async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
       render(
         <GoalPurchaseForm
           ledgerName="Primary"
@@ -117,13 +119,39 @@ describe("GoalPurchaseForm — actions", () => {
           name: GOAL_PURCHASE_FORM_COPY.submitButton,
         }),
       );
+      await vi.waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledOnce();
+      });
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({ amount: 1250.5 }),
       );
     });
 
-    it("passes the entered description to onSubmit", () => {
-      const onSubmit = vi.fn();
+    it("does not call onSubmit when amount is cleared", async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={onSubmit}
+        />,
+      );
+      fireEvent.change(
+        screen.getByLabelText(GOAL_PURCHASE_FORM_COPY.amountLabel),
+        { target: { value: "" } },
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: GOAL_PURCHASE_FORM_COPY.submitButton,
+        }),
+      );
+      await vi.waitFor(() => {
+        expect(onSubmit).not.toHaveBeenCalled();
+      });
+    });
+
+    it("passes the entered description to onSubmit", async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
       render(
         <GoalPurchaseForm
           ledgerName="Primary"
@@ -140,13 +168,16 @@ describe("GoalPurchaseForm — actions", () => {
           name: GOAL_PURCHASE_FORM_COPY.submitButton,
         }),
       );
+      await vi.waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledOnce();
+      });
       expect(onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({ description: "Studio Display refurb" }),
       );
     });
 
-    it("passes a Date object for the purchase date to onSubmit", () => {
-      const onSubmit = vi.fn();
+    it("passes a Date object for the purchase date to onSubmit", async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
       render(
         <GoalPurchaseForm
           ledgerName="Primary"
@@ -159,10 +190,52 @@ describe("GoalPurchaseForm — actions", () => {
           name: GOAL_PURCHASE_FORM_COPY.submitButton,
         }),
       );
+      await vi.waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledOnce();
+      });
       const callArg = (vi.mocked(onSubmit).mock.calls[0] ?? [])[0] as {
         date: unknown;
       };
       expect(callArg.date).toBeInstanceOf(Date);
+    });
+
+    it("shows an error message when onSubmit rejects", async () => {
+      const onSubmit = vi.fn().mockRejectedValue(new Error("network error"));
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={onSubmit}
+        />,
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: GOAL_PURCHASE_FORM_COPY.submitButton,
+        }),
+      );
+      await vi.waitFor(() => {
+        expect(
+          screen.getByText(GOAL_PURCHASE_FORM_COPY.submitError),
+        ).toBeDefined();
+      });
+    });
+
+    it("re-enables the submit button after onSubmit resolves", async () => {
+      const onSubmit = vi.fn().mockResolvedValue(undefined);
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={onSubmit}
+        />,
+      );
+      const button = screen.getByRole("button", {
+        name: GOAL_PURCHASE_FORM_COPY.submitButton,
+      });
+      fireEvent.click(button);
+      await vi.waitFor(() => {
+        expect((button as HTMLButtonElement).disabled).toBe(false);
+      });
     });
   });
 });

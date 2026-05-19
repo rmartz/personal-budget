@@ -22,21 +22,42 @@ export interface GoalPurchaseFormProps {
   onSubmit: (data: PurchaseFormData) => Promise<void> | void;
 }
 
+function localDateString(d: Date): string {
+  const year = String(d.getFullYear());
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function GoalPurchaseForm({
   ledgerName,
   targetAmount,
   onSubmit,
 }: GoalPurchaseFormProps) {
-  const [amount, setAmount] = useState(targetAmount);
-  const [dateStr, setDateStr] = useState(new Date().toISOString().slice(0, 10));
+  const [amountStr, setAmountStr] = useState(String(targetAmount));
+  const [dateStr, setDateStr] = useState(localDateString(new Date()));
   const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | undefined>();
 
-  function handleSubmit() {
-    void onSubmit({
-      amount,
-      date: new Date(dateStr),
-      description,
-    });
+  async function handleSubmit() {
+    const amount = parseFloat(amountStr);
+    if (isNaN(amount) || amount <= 0) {
+      return;
+    }
+    setIsSubmitting(true);
+    setSubmitError(undefined);
+    try {
+      await onSubmit({
+        amount,
+        date: new Date(`${dateStr}T00:00:00`),
+        description,
+      });
+    } catch {
+      setSubmitError(GOAL_PURCHASE_FORM_COPY.submitError);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -54,9 +75,9 @@ export function GoalPurchaseForm({
             type="number"
             min={0}
             step={0.01}
-            value={amount}
+            value={amountStr}
             onChange={(e) => {
-              setAmount(parseFloat(e.target.value));
+              setAmountStr(e.target.value);
             }}
             className="pl-6"
           />
@@ -100,6 +121,10 @@ export function GoalPurchaseForm({
         </span>
       </div>
 
+      {submitError !== undefined && (
+        <p className="text-sm text-destructive">{submitError}</p>
+      )}
+
       <div className="flex items-center justify-between">
         <Link
           href="/goals"
@@ -107,7 +132,12 @@ export function GoalPurchaseForm({
         >
           {GOAL_PURCHASE_FORM_COPY.cancelButton}
         </Link>
-        <Button onClick={handleSubmit}>
+        <Button
+          onClick={() => {
+            void handleSubmit();
+          }}
+          disabled={isSubmitting}
+        >
           {GOAL_PURCHASE_FORM_COPY.submitButton}
         </Button>
       </div>

@@ -13,7 +13,7 @@ vi.mock("@/lib/firebase/client", () => ({
   getClientApp: vi.fn(() => ({ name: "mock-app" })),
 }));
 
-import { getDatabase, push, ref, set } from "firebase/database";
+import { getDatabase, push, ref, remove, set } from "firebase/database";
 
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
@@ -113,6 +113,30 @@ describe("purchaseGoal", () => {
       });
 
       expect(runTransaction).toHaveBeenCalled();
+    });
+  });
+
+  describe("compensates on partial failure", () => {
+    it("deletes the transaction and rethrows if deleteSavingsGoalAndReorder fails", async () => {
+      const { runTransaction } = await import("firebase/database");
+
+      const newRef = { key: "txn-comp" };
+      vi.mocked(push).mockReturnValue(newRef as never);
+      vi.mocked(set).mockResolvedValue(undefined);
+      vi.mocked(runTransaction).mockRejectedValue(new Error("delete failed"));
+      vi.mocked(remove).mockResolvedValue(undefined);
+
+      const goal = makeGoal({ id: "goal-1", ledgerId: "ledger-1" });
+
+      await expect(
+        purchaseGoal("uid-1", goal, {
+          amount: 1500,
+          date: new Date("2024-06-01T00:00:00.000Z"),
+          description: "New laptop",
+        }),
+      ).rejects.toThrow("delete failed");
+
+      expect(remove).toHaveBeenCalled();
     });
   });
 });
