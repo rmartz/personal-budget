@@ -98,5 +98,71 @@ describe("GoalPurchaseForm — actions", () => {
       );
       expect(onSubmit).toHaveBeenCalledOnce();
     });
+
+    it("passes the entered amount to onSubmit", () => {
+      const onSubmit = vi.fn();
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={onSubmit}
+        />,
+      );
+      fireEvent.change(
+        screen.getByLabelText(GOAL_PURCHASE_FORM_COPY.amountLabel),
+        { target: { value: "1250.50" } },
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: GOAL_PURCHASE_FORM_COPY.submitButton,
+        }),
+      );
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ amount: 1250.5 }),
+      );
+    });
+
+    it("passes the entered description to onSubmit", () => {
+      const onSubmit = vi.fn();
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={onSubmit}
+        />,
+      );
+      fireEvent.change(
+        screen.getByLabelText(GOAL_PURCHASE_FORM_COPY.noteLabel),
+        { target: { value: "Studio Display refurb" } },
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: GOAL_PURCHASE_FORM_COPY.submitButton,
+        }),
+      );
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ description: "Studio Display refurb" }),
+      );
+    });
+
+    it("passes a Date object for the purchase date to onSubmit", () => {
+      const onSubmit = vi.fn();
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={onSubmit}
+        />,
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: GOAL_PURCHASE_FORM_COPY.submitButton,
+        }),
+      );
+      const callArg = (vi.mocked(onSubmit).mock.calls[0] ?? [])[0] as {
+        date: unknown;
+      };
+      expect(callArg.date).toBeInstanceOf(Date);
+    });
   });
 });

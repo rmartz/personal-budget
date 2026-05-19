@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +10,16 @@ import { currencyFormatter } from "@/lib/formatters";
 
 import { GOAL_PURCHASE_FORM_COPY } from "./copy";
 
+export interface PurchaseFormData {
+  amount: number;
+  date: Date;
+  description: string;
+}
+
 export interface GoalPurchaseFormProps {
   ledgerName: string;
   targetAmount: number;
-  onSubmit: () => void;
+  onSubmit: (data: PurchaseFormData) => Promise<void> | void;
 }
 
 export function GoalPurchaseForm({
@@ -20,6 +27,18 @@ export function GoalPurchaseForm({
   targetAmount,
   onSubmit,
 }: GoalPurchaseFormProps) {
+  const [amount, setAmount] = useState(targetAmount);
+  const [dateStr, setDateStr] = useState(new Date().toISOString().slice(0, 10));
+  const [description, setDescription] = useState("");
+
+  function handleSubmit() {
+    void onSubmit({
+      amount,
+      date: new Date(dateStr),
+      description,
+    });
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
@@ -35,7 +54,10 @@ export function GoalPurchaseForm({
             type="number"
             min={0}
             step={0.01}
-            defaultValue={targetAmount}
+            value={amount}
+            onChange={(e) => {
+              setAmount(parseFloat(e.target.value));
+            }}
             className="pl-6"
           />
         </div>
@@ -48,7 +70,10 @@ export function GoalPurchaseForm({
         <Input
           id="purchase-date"
           type="date"
-          defaultValue={new Date().toISOString().slice(0, 10)}
+          value={dateStr}
+          onChange={(e) => {
+            setDateStr(e.target.value);
+          }}
         />
       </div>
 
@@ -60,6 +85,10 @@ export function GoalPurchaseForm({
           id="purchase-note"
           rows={3}
           placeholder={GOAL_PURCHASE_FORM_COPY.notePlaceholder}
+          value={description}
+          onChange={(e) => {
+            setDescription(e.target.value);
+          }}
           className="flex w-full rounded-lg border border-input bg-background px-2.5 py-1.5 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </div>
@@ -78,7 +107,7 @@ export function GoalPurchaseForm({
         >
           {GOAL_PURCHASE_FORM_COPY.cancelButton}
         </Link>
-        <Button onClick={onSubmit}>
+        <Button onClick={handleSubmit}>
           {GOAL_PURCHASE_FORM_COPY.submitButton}
         </Button>
       </div>
