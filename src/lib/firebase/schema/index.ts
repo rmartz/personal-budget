@@ -1,5 +1,6 @@
 export * from "./accounts";
 export * from "./annuities";
+export * from "./annuity-payments";
 export * from "./budget-ledger-transactions";
 export * from "./budget-ledgers";
 export * from "./investments";
