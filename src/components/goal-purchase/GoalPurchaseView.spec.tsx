@@ -3,10 +3,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
-import { GOAL_PURCHASE_VIEW_COPY } from "./copy";
+import { GOAL_PURCHASE_VIEW_COPY, GOAL_PURCHASE_WARNING_COPY } from "./copy";
 import { GoalPurchaseView } from "./GoalPurchaseView";
 
 afterEach(cleanup);
+
+const referenceDate = new Date(2025, 5, 1);
 
 function makeGoal(
   overrides: Partial<BudgetLedgerSavingsGoal> = {},
@@ -28,7 +30,10 @@ describe("GoalPurchaseView — header", () => {
       render(
         <GoalPurchaseView
           goal={makeGoal({ name: "New Laptop" })}
+          ledgerCashBalance={10000}
           ledgerName="Tech Fund"
+          monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[]}
           onSubmit={vi.fn()}
         />,
@@ -45,7 +50,10 @@ describe("GoalPurchaseView — header", () => {
       render(
         <GoalPurchaseView
           goal={makeGoal({ targetAmount: 10000 })}
+          ledgerCashBalance={20000}
           ledgerName="Primary"
+          monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[]}
           onSubmit={vi.fn()}
         />,
@@ -61,16 +69,34 @@ describe("GoalPurchaseView — header", () => {
 
 describe("GoalPurchaseView — panels", () => {
   describe("renders the warning panel", () => {
-    it("shows the insufficient cash warning headline", () => {
+    it("shows the insufficient cash warning when ledger balance is below target", () => {
       render(
         <GoalPurchaseView
-          goal={makeGoal()}
+          goal={makeGoal({ targetAmount: 5000 })}
+          ledgerCashBalance={0}
           ledgerName="Primary"
+          monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[]}
           onSubmit={vi.fn()}
         />,
       );
-      expect(screen.getByText(/Insufficient cash/i)).toBeDefined();
+      expect(screen.getByText(GOAL_PURCHASE_WARNING_COPY.title)).toBeDefined();
+    });
+
+    it("hides the insufficient cash warning when ledger balance meets the target", () => {
+      render(
+        <GoalPurchaseView
+          goal={makeGoal({ targetAmount: 5000 })}
+          ledgerCashBalance={5000}
+          ledgerName="Primary"
+          monthlyAllocation={500}
+          referenceDate={referenceDate}
+          siblingGoals={[]}
+          onSubmit={vi.fn()}
+        />,
+      );
+      expect(screen.queryByText(GOAL_PURCHASE_WARNING_COPY.title)).toBeNull();
     });
   });
 
@@ -79,7 +105,10 @@ describe("GoalPurchaseView — panels", () => {
       render(
         <GoalPurchaseView
           goal={makeGoal()}
+          ledgerCashBalance={10000}
           ledgerName="Primary"
+          monthlyAllocation={500}
+          referenceDate={referenceDate}
           siblingGoals={[makeGoal({ id: "g2", name: "Vacation" })]}
           onSubmit={vi.fn()}
         />,
