@@ -37,20 +37,39 @@ export function GoalPurchaseForm({
   const [amountStr, setAmountStr] = useState(String(targetAmount));
   const [dateStr, setDateStr] = useState(localDateString(new Date()));
   const [description, setDescription] = useState("");
+  const [amountError, setAmountError] = useState<string | undefined>();
+  const [dateError, setDateError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | undefined>();
 
   async function handleSubmit() {
+    if (isSubmitting) return;
+    let valid = true;
+
     const amount = parseFloat(amountStr);
     if (isNaN(amount) || amount <= 0) {
-      return;
+      setAmountError(GOAL_PURCHASE_FORM_COPY.amountError);
+      valid = false;
+    } else {
+      setAmountError(undefined);
     }
+
+    const date = new Date(`${dateStr}T00:00:00`);
+    if (!dateStr || isNaN(date.getTime())) {
+      setDateError(GOAL_PURCHASE_FORM_COPY.dateError);
+      valid = false;
+    } else {
+      setDateError(undefined);
+    }
+
+    if (!valid) return;
+
     setIsSubmitting(true);
     setSubmitError(undefined);
     try {
       await onSubmit({
         amount,
-        date: new Date(`${dateStr}T00:00:00`),
+        date,
         description,
       });
     } catch {
@@ -80,8 +99,21 @@ export function GoalPurchaseForm({
               setAmountStr(e.target.value);
             }}
             className="pl-6"
+            aria-invalid={amountError !== undefined}
+            aria-describedby={
+              amountError !== undefined ? "purchase-amount-error" : undefined
+            }
           />
         </div>
+        {amountError !== undefined && (
+          <p
+            id="purchase-amount-error"
+            role="alert"
+            className="text-xs text-destructive"
+          >
+            {amountError}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -95,7 +127,20 @@ export function GoalPurchaseForm({
           onChange={(e) => {
             setDateStr(e.target.value);
           }}
+          aria-invalid={dateError !== undefined}
+          aria-describedby={
+            dateError !== undefined ? "purchase-date-error" : undefined
+          }
         />
+        {dateError !== undefined && (
+          <p
+            id="purchase-date-error"
+            role="alert"
+            className="text-xs text-destructive"
+          >
+            {dateError}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -122,7 +167,9 @@ export function GoalPurchaseForm({
       </div>
 
       {submitError !== undefined && (
-        <p className="text-sm text-destructive">{submitError}</p>
+        <p role="alert" className="text-sm text-destructive">
+          {submitError}
+        </p>
       )}
 
       <div className="flex items-center justify-between">

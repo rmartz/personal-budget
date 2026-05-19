@@ -150,6 +150,28 @@ describe("GoalPurchaseForm — actions", () => {
       });
     });
 
+    it("shows an amount error when amount is cleared and submit is clicked", async () => {
+      render(
+        <GoalPurchaseForm
+          ledgerName="Primary"
+          targetAmount={5000}
+          onSubmit={vi.fn()}
+        />,
+      );
+      fireEvent.change(
+        screen.getByLabelText(GOAL_PURCHASE_FORM_COPY.amountLabel),
+        { target: { value: "" } },
+      );
+      fireEvent.click(
+        screen.getByRole("button", {
+          name: GOAL_PURCHASE_FORM_COPY.submitButton,
+        }),
+      );
+      await vi.waitFor(() => {
+        expect(screen.getByText(GOAL_PURCHASE_FORM_COPY.amountError)).toBeDefined();
+      });
+    });
+
     it("passes the entered description to onSubmit", async () => {
       const onSubmit = vi.fn().mockResolvedValue(undefined);
       render(

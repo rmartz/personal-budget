@@ -138,5 +138,27 @@ describe("purchaseGoal", () => {
 
       expect(remove).toHaveBeenCalled();
     });
+
+    it("throws a combined error if rollback also fails", async () => {
+      const { runTransaction } = await import("firebase/database");
+
+      const newRef = { key: "txn-comp" };
+      vi.mocked(push).mockReturnValue(newRef as never);
+      vi.mocked(set).mockResolvedValue(undefined);
+      vi.mocked(runTransaction).mockRejectedValue(new Error("delete failed"));
+      vi.mocked(remove).mockRejectedValue(new Error("rollback failed"));
+
+      const goal = makeGoal({ id: "goal-1", ledgerId: "ledger-1" });
+
+      await expect(
+        purchaseGoal("uid-1", goal, {
+          amount: 1500,
+          date: new Date("2024-06-01T00:00:00.000Z"),
+          description: "New laptop",
+        }),
+      ).rejects.toThrow(
+        "Goal deletion failed and transaction rollback also failed",
+      );
+    });
   });
 });

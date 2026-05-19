@@ -24,7 +24,14 @@ export async function purchaseGoal(
   try {
     await deleteSavingsGoalAndReorder(uid, goal.ledgerId, goal.id);
   } catch (err) {
-    await deleteTransaction(uid, goal.ledgerId, transaction.id);
+    try {
+      await deleteTransaction(uid, goal.ledgerId, transaction.id);
+    } catch (rollbackErr) {
+      throw new Error(
+        "Goal deletion failed and transaction rollback also failed",
+        { cause: rollbackErr },
+      );
+    }
     throw err;
   }
 }
