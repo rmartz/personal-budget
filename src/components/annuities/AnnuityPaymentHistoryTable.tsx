@@ -6,13 +6,9 @@ import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { ANNUITY_CARD_COPY } from "./copy";
+import type { AnnuityPaymentRecord } from "./types";
 
-export interface AnnuityPaymentRecord {
-  id: string;
-  amount: number;
-  date: Date;
-  notes?: string;
-}
+export type { AnnuityPaymentRecord } from "./types";
 
 export interface AnnuityPaymentHistoryTableProps {
   annuity: Annuity;
@@ -42,13 +38,16 @@ function buildRows(
   annuity: Annuity,
   payments: AnnuityPaymentRecord[],
 ): PaymentRowData[] {
+  const sorted = [...payments].sort(
+    (a, b) => a.date.getTime() - b.date.getTime(),
+  );
   const isPVDerived =
     annuity.monthlyMode === AnnuityMonthlyMode.PVDerived &&
     annuity.presentValue !== undefined &&
     annuity.annualRatePercent !== undefined &&
     annuity.durationMonths !== undefined;
 
-  return payments.map((payment, index) => {
+  return sorted.map((payment, index) => {
     const month = monthFormatter.format(payment.date);
     const paymentFormatted = currencyFormatter.format(payment.amount);
 
@@ -88,9 +87,7 @@ function buildRows(
         ? Math.max(
             0,
             annuity.presentValue -
-              payments
-                .slice(0, index + 1)
-                .reduce((sum, p) => sum + p.amount, 0),
+              sorted.slice(0, index + 1).reduce((sum, p) => sum + p.amount, 0),
           )
         : undefined;
 

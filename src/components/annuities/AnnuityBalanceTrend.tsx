@@ -5,8 +5,8 @@ import { calculateRemainingPrincipal } from "@/lib/annuity-math";
 import type { Annuity } from "@/lib/firebase/schema/annuities";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
-import type { AnnuityPaymentRecord } from "./AnnuityPaymentHistoryTable";
 import { ANNUITY_CARD_COPY } from "./copy";
+import type { AnnuityPaymentRecord } from "./types";
 
 export interface AnnuityBalanceTrendProps {
   annuity: Annuity;
