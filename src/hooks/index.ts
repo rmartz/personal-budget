@@ -1,6 +1,7 @@
 export { useAccounts } from "./use-accounts";
 export { useAllSavingsGoals } from "./use-all-savings-goals";
 export { useAnnuities } from "./use-annuities";
+export { useAnnuityPayments } from "./use-annuity-payments";
 export { useAuth } from "./use-auth";
 export { useDeleteAnnuity } from "./use-delete-annuity";
 export { useDeleteSavingsGoal } from "./use-delete-savings-goal";
