@@ -274,7 +274,11 @@ describe("GoalPurchaseForm — actions", () => {
     });
 
     it("re-enables the submit button after onSubmit resolves", async () => {
-      const onSubmit = vi.fn().mockResolvedValue(undefined);
+      let resolve: () => void = () => undefined;
+      const deferred = new Promise<void>((res) => {
+        resolve = res;
+      });
+      const onSubmit = vi.fn().mockReturnValue(deferred);
       render(
         <GoalPurchaseForm
           ledgerName="Primary"
@@ -286,6 +290,10 @@ describe("GoalPurchaseForm — actions", () => {
         name: GOAL_PURCHASE_FORM_COPY.submitButton,
       });
       fireEvent.click(button);
+      await vi.waitFor(() => {
+        expect((button as HTMLButtonElement).disabled).toBe(true);
+      });
+      resolve();
       await vi.waitFor(() => {
         expect((button as HTMLButtonElement).disabled).toBe(false);
       });
