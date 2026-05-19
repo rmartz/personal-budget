@@ -20,6 +20,7 @@ import {
 } from "@/components/annuities/copy";
 import { Button } from "@/components/ui/button";
 import { useAnnuities } from "@/hooks/use-annuities";
+import { useAnnuityPayments } from "@/hooks/use-annuity-payments";
 import { useAuth } from "@/hooks/use-auth";
 import { useDeleteAnnuity } from "@/hooks/use-delete-annuity";
 import { useUpdateAnnuity } from "@/hooks/use-update-annuity";
@@ -47,6 +48,13 @@ export default function AnnuitiesPage() {
     undefined,
   );
   const [deleteError, setDeleteError] = useState<string | undefined>(undefined);
+
+  const selectedAnnuityId =
+    (annuities.find((a) => a.id === selectedId) ?? annuities[0])?.id ?? "";
+  const { payments: selectedPayments } = useAnnuityPayments(
+    uid,
+    selectedAnnuityId,
+  );
 
   if (authLoading || !user) {
     return null;
@@ -140,9 +148,12 @@ export default function AnnuitiesPage() {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <AnnuityPaymentHistoryTable
                 annuity={selectedAnnuity}
-                payments={[]}
+                payments={selectedPayments}
               />
-              <AnnuityBalanceTrend annuity={selectedAnnuity} payments={[]} />
+              <AnnuityBalanceTrend
+                annuity={selectedAnnuity}
+                payments={selectedPayments}
+              />
             </div>
           )}
         </>

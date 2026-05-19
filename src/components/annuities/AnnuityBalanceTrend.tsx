@@ -54,7 +54,7 @@ export function AnnuityBalanceTrend({
 
   const payoffValue =
     annuity.durationMonths !== undefined
-      ? ANNUITY_CARD_COPY.termRemainingMonths(
+      ? ANNUITY_CARD_COPY.balanceTrendPaymentsRemainingCount(
           Math.max(0, annuity.durationMonths - payments.length),
         )
       : placeholder;

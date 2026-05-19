@@ -1,6 +1,8 @@
 export const ANNUITY_CARD_COPY = {
   balanceTrendChartPlaceholder: "Balance trend chart",
   balanceTrendNowLabel: "Now",
+  balanceTrendPaymentsRemainingCount: (count: number) =>
+    count === 1 ? "1 payment left" : `${String(count)} payments left`,
   balanceTrendPayoffLabel: "Payments remaining",
   balanceTrendPlaceholderValue: "—",
   balanceTrendStartedLabel: "Started",
