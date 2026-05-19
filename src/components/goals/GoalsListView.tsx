@@ -22,7 +22,7 @@ export function GoalsListView({
   error,
 }: GoalsListViewProps) {
   const fullyFunded = goals.filter(
-    (g) => g.fundedAmount >= g.targetAmount,
+    (g) => g.targetAmount > 0 && g.fundedAmount >= g.targetAmount,
   ).length;
 
   return (

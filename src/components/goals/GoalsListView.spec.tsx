@@ -108,6 +108,53 @@ describe("GoalsListView — error state", () => {
   });
 });
 
+describe("GoalsListView — fullyFundedCount", () => {
+  describe("counts fully funded goals", () => {
+    it("counts goals where fundedAmount >= targetAmount and targetAmount > 0", () => {
+      const goals = [
+        makeGoal({ id: "g1", targetAmount: 5000, fundedAmount: 5000 }),
+        makeGoal({ id: "g2", targetAmount: 5000, fundedAmount: 3000 }),
+      ];
+      const { container } = render(
+        <GoalsListView
+          goals={goals}
+          ledgerNames={ledgerNames}
+          isLoading={false}
+        />,
+      );
+      const summaryParagraph = container.querySelector(
+        "p.text-muted-foreground",
+      );
+      expect(summaryParagraph?.textContent).toContain(
+        GOALS_LIST_COPY.fullyFundedCount(1),
+      );
+    });
+
+    it("does not count a goal with targetAmount === 0 as fully funded", () => {
+      const goals = [
+        makeGoal({ id: "g1", targetAmount: 0, fundedAmount: 0 }),
+        makeGoal({ id: "g2", targetAmount: 5000, fundedAmount: 5000 }),
+      ];
+      const { container } = render(
+        <GoalsListView
+          goals={goals}
+          ledgerNames={ledgerNames}
+          isLoading={false}
+        />,
+      );
+      const summaryParagraph = container.querySelector(
+        "p.text-muted-foreground",
+      );
+      expect(summaryParagraph?.textContent).toContain(
+        GOALS_LIST_COPY.fullyFundedCount(1),
+      );
+      expect(summaryParagraph?.textContent).not.toContain(
+        GOALS_LIST_COPY.fullyFundedCount(2),
+      );
+    });
+  });
+});
+
 describe("GoalsListView — populated state", () => {
   describe("renders a card for each goal", () => {
     it("renders goal names for all goals", () => {
