@@ -72,6 +72,28 @@ describe("computeRemainingBalance", () => {
       const result = computeRemainingBalance(annuity, payments);
       expect(result).toBe(0);
     });
+
+    it("returns undefined when annualRatePercent is undefined", () => {
+      const annuity = makeAnnuity({
+        monthlyMode: AnnuityMonthlyMode.PVDerived,
+        presentValue: 10000,
+        annualRatePercent: undefined,
+        durationMonths: 12,
+      });
+      const result = computeRemainingBalance(annuity, []);
+      expect(result).toBeUndefined();
+    });
+
+    it("returns undefined when durationMonths is undefined", () => {
+      const annuity = makeAnnuity({
+        monthlyMode: AnnuityMonthlyMode.PVDerived,
+        presentValue: 10000,
+        annualRatePercent: 5,
+        durationMonths: undefined,
+      });
+      const result = computeRemainingBalance(annuity, []);
+      expect(result).toBeUndefined();
+    });
   });
 
   describe("flat annuity with presentValue subtracts total paid", () => {

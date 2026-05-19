@@ -28,11 +28,13 @@ export function computeRemainingBalance(
     return undefined;
   }
 
-  if (
-    annuity.monthlyMode === AnnuityMonthlyMode.PVDerived &&
-    annuity.annualRatePercent !== undefined &&
-    annuity.durationMonths !== undefined
-  ) {
+  if (annuity.monthlyMode === AnnuityMonthlyMode.PVDerived) {
+    if (
+      annuity.annualRatePercent === undefined ||
+      annuity.durationMonths === undefined
+    ) {
+      return undefined;
+    }
     return calculateRemainingPrincipal({
       annualRatePercent: annuity.annualRatePercent,
       durationMonths: annuity.durationMonths,
