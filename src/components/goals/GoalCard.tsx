@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 import { Card } from "@/components/ui/card";
@@ -33,6 +34,13 @@ export function GoalCard({ goal, ledgerName }: GoalCardProps) {
         </div>
 
         <p className="text-base font-semibold leading-snug">{goal.name}</p>
+
+        {isFullyFunded && (
+          <span className="inline-flex w-fit items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+            <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+            {GOAL_CARD_COPY.fullyFunded}
+          </span>
+        )}
 
         <GoalProgressBar
           fundedAmount={goal.fundedAmount}

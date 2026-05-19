@@ -18,6 +18,7 @@ export const GOALS_LIST_COPY = {
 
 export const GOAL_CARD_COPY = {
   eyebrowSeparator: "·",
+  fullyFunded: "Fully funded",
   fundedLabel: (percent: number) => `${String(percent)}% funded`,
   ofTarget: (target: string) => `of ${target}`,
   priorityLabel: (n: number) => `P${String(n)}`,
