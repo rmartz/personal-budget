@@ -104,6 +104,7 @@ export function GoalPurchaseForm({
             value={amountStr}
             onChange={(e) => {
               setAmountStr(e.target.value);
+              setAmountError(undefined);
             }}
             className="pl-6"
             aria-invalid={amountError !== undefined}
@@ -133,6 +134,7 @@ export function GoalPurchaseForm({
           value={dateStr}
           onChange={(e) => {
             setDateStr(e.target.value);
+            setDateError(undefined);
           }}
           aria-invalid={dateError !== undefined}
           aria-describedby={
