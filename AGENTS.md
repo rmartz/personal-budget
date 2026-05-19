@@ -20,6 +20,10 @@ pnpm run env:validate # Validate deployment config files against schema
 pnpm run secrets-check # Config validation + gitleaks scan (also runs pre-commit)
 ```
 
+## Worktree Setup
+
+After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `pnpm install --frozen-lockfile` inside it before invoking any build, lint, format, type-check, or test commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. This step typically requires no network access when the global store is already populated, since only hardlinks are created — it takes a few seconds.
+
 ## Deployment Config
 
 Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
