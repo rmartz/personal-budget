@@ -168,7 +168,9 @@ describe("GoalPurchaseForm — actions", () => {
         }),
       );
       await vi.waitFor(() => {
-        expect(screen.getByText(GOAL_PURCHASE_FORM_COPY.amountError)).toBeDefined();
+        expect(
+          screen.getByText(GOAL_PURCHASE_FORM_COPY.amountError),
+        ).toBeDefined();
       });
     });
 
