@@ -6,6 +6,8 @@ import { applyExpenseDeduction } from "./expense-deduction";
 
 export interface LedgerBalanceInput {
   cashCap: number | undefined;
+  startingCashBalance?: number;
+  startingInvestmentBalance?: number;
   transactions: BudgetLedgerTransaction[];
 }
 
@@ -21,9 +23,18 @@ export interface LedgerBalanceResult {
  * Deposits fill the cash portion up to the cash cap; any amount above the cap
  * overflows into the investment portion. Expenses deduct from cash first; when
  * cash is exhausted, the remainder deducts from investment.
+ *
+ * @param startingCashBalance - Initial cash balance before replaying
+ *   transactions. Defaults to 0. Pass a non-zero value to continue from an
+ *   arbitrary balance, e.g. when chaining multi-period calculations.
+ * @param startingInvestmentBalance - Initial investment balance before
+ *   replaying transactions. Defaults to 0. Pass a non-zero value to continue
+ *   from an arbitrary balance, e.g. when chaining multi-period calculations.
  */
 export function calculateLedgerBalance({
   cashCap,
+  startingCashBalance = 0,
+  startingInvestmentBalance = 0,
   transactions,
 }: LedgerBalanceInput): LedgerBalanceResult {
   const sorted = [...transactions].sort((a, b) => {
@@ -64,6 +75,9 @@ export function calculateLedgerBalance({
         investmentBalance: Math.max(0, next.investmentBalance),
       };
     },
-    { cashBalance: 0, investmentBalance: 0 },
+    {
+      cashBalance: startingCashBalance,
+      investmentBalance: startingInvestmentBalance,
+    },
   );
 }

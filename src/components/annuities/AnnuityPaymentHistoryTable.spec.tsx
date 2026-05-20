@@ -115,6 +115,110 @@ describe("AnnuityPaymentHistoryTable", () => {
     });
   });
 
+  describe("computes running balance for flat annuities", () => {
+    it("shows the correct balance after the first payment", () => {
+      const annuity = makeAnnuity({ presentValue: 1000 });
+      render(
+        <AnnuityPaymentHistoryTable
+          annuity={annuity}
+          payments={[
+            {
+              id: "p1",
+              amount: 200,
+              date: new Date("2024-01-01T00:00:00.000Z"),
+            },
+            {
+              id: "p2",
+              amount: 300,
+              date: new Date("2024-02-01T00:00:00.000Z"),
+            },
+            {
+              id: "p3",
+              amount: 100,
+              date: new Date("2024-03-01T00:00:00.000Z"),
+            },
+          ]}
+        />,
+      );
+      // After p1: 1000 - 200 = 800
+      expect(screen.getByText("$800.00")).toBeDefined();
+    });
+
+    it("shows the correct balance after subsequent payments", () => {
+      const annuity = makeAnnuity({ presentValue: 1000 });
+      render(
+        <AnnuityPaymentHistoryTable
+          annuity={annuity}
+          payments={[
+            {
+              id: "p1",
+              amount: 200,
+              date: new Date("2024-01-01T00:00:00.000Z"),
+            },
+            {
+              id: "p2",
+              amount: 300,
+              date: new Date("2024-02-01T00:00:00.000Z"),
+            },
+            {
+              id: "p3",
+              amount: 100,
+              date: new Date("2024-03-01T00:00:00.000Z"),
+            },
+          ]}
+        />,
+      );
+      // After p2: 1000 - 200 - 300 = 500
+      expect(screen.getByText("$500.00")).toBeDefined();
+      // After p3: 1000 - 200 - 300 - 100 = 400
+      expect(screen.getByText("$400.00")).toBeDefined();
+    });
+
+    it("clamps balance to zero when payments exceed presentValue", () => {
+      const annuity = makeAnnuity({ presentValue: 100 });
+      render(
+        <AnnuityPaymentHistoryTable
+          annuity={annuity}
+          payments={[
+            {
+              id: "p1",
+              amount: 60,
+              date: new Date("2024-01-01T00:00:00.000Z"),
+            },
+            {
+              id: "p2",
+              amount: 60,
+              date: new Date("2024-02-01T00:00:00.000Z"),
+            },
+          ]}
+        />,
+      );
+      // After p2: 100 - 60 - 60 = -20 → clamped to 0
+      expect(screen.getByText("$0.00")).toBeDefined();
+    });
+
+    it("shows placeholder balance when annuity has no presentValue", () => {
+      const annuity = makeAnnuity({ presentValue: undefined });
+      render(
+        <AnnuityPaymentHistoryTable
+          annuity={annuity}
+          payments={[
+            {
+              id: "p1",
+              amount: 100,
+              date: new Date("2024-01-01T00:00:00.000Z"),
+            },
+          ]}
+        />,
+      );
+      // balance, principal, and interest columns all show placeholder when no presentValue
+      expect(
+        screen.getAllByText(ANNUITY_CARD_COPY.balanceTrendPlaceholderValue)
+          .length,
+      ).toBeGreaterThanOrEqual(1);
+    });
+  });
+
   describe("shows principal and interest breakdown for PV-derived annuities", () => {
     it("shows non-placeholder principal and interest values for a PV-derived annuity", () => {
       const pvAnnuity = makeAnnuity({
