@@ -19,11 +19,14 @@ export function useTransactions(uid: string, ledgerId: string) {
 
   useEffect(() => {
     if (!uid || !ledgerId) {
+      setError(undefined);
       setTransactions([]);
       setIsLoading(false);
       return;
     }
 
+    setError(undefined);
+    setIsLoading(true);
     const db = getDatabase(getClientApp());
     const txRef = ref(db, `users/${uid}/budgetLedgerTransactions/${ledgerId}`);
 
