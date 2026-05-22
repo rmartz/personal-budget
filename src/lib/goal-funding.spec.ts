@@ -6,7 +6,12 @@ import {
 } from "@/lib/firebase/schema/budget-ledger-transactions";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
-import { computeGoalEta, computeMonthlyDepositRate } from "./goal-funding";
+import {
+  computeGoalEta,
+  computeGoalEtaFromShare,
+  computeMonthlyDepositRate,
+  computeZipfShares,
+} from "./goal-funding";
 
 function makeTransaction(
   overrides: Partial<BudgetLedgerTransaction> = {},
@@ -207,6 +212,92 @@ describe("computeGoalEta", () => {
       expect(eta1!.getMonth()).toBe(6); // July
       // goal2: 2 months from Jun → Aug 2025
       expect(eta2!.getMonth()).toBe(7); // August
+    });
+  });
+});
+
+describe("computeZipfShares", () => {
+  describe("returns an empty Map when the goals list is empty", () => {
+    it("returns an empty Map for an empty goals array", () => {
+      expect(computeZipfShares([])).toEqual(new Map());
+    });
+  });
+
+  describe("returns a share of 1.0 for a single goal", () => {
+    it("single goal gets the full allocation", () => {
+      const goal = makeGoal({ id: "g1", priority: 1 });
+      const shares = computeZipfShares([goal]);
+      expect(shares.get("g1")).toBe(1);
+    });
+  });
+
+  describe("distributes shares proportionally to 1/priority", () => {
+    it("priority-1 gets twice the share of priority-2", () => {
+      // harmonic = 1/1 + 1/2 = 1.5; g1 share = 2/3, g2 share = 1/3
+      const g1 = makeGoal({ id: "g1", priority: 1 });
+      const g2 = makeGoal({ id: "g2", priority: 2 });
+      const shares = computeZipfShares([g1, g2]);
+      expect(shares.get("g1")).toBeCloseTo(2 / 3);
+      expect(shares.get("g2")).toBeCloseTo(1 / 3);
+    });
+
+    it("all shares sum to 1 across multiple goals", () => {
+      const goals = [
+        makeGoal({ id: "g1", priority: 1 }),
+        makeGoal({ id: "g2", priority: 2 }),
+        makeGoal({ id: "g3", priority: 3 }),
+      ];
+      const shares = computeZipfShares(goals);
+      const total = [...shares.values()].reduce((sum, s) => sum + s, 0);
+      expect(total).toBeCloseTo(1);
+    });
+  });
+});
+
+describe("computeGoalEtaFromShare", () => {
+  describe("returns undefined when there is no allocation or goal is funded", () => {
+    it("returns undefined when monthlyAllocation is 0", () => {
+      const goal = makeGoal({ targetAmount: 1000, fundedAmount: 0 });
+      expect(computeGoalEtaFromShare(goal, 1, 0, REF_DATE)).toBeUndefined();
+    });
+
+    it("returns undefined when the goal is already fully funded", () => {
+      const goal = makeGoal({ targetAmount: 1000, fundedAmount: 1000 });
+      expect(computeGoalEtaFromShare(goal, 1, 500, REF_DATE)).toBeUndefined();
+    });
+
+    it("returns undefined when the Zipf share is 0", () => {
+      const goal = makeGoal({ targetAmount: 1000, fundedAmount: 0 });
+      expect(computeGoalEtaFromShare(goal, 0, 500, REF_DATE)).toBeUndefined();
+    });
+  });
+
+  describe("computes the same ETA as computeGoalEta given the matching share", () => {
+    it("produces the same date for a single goal with share 1.0", () => {
+      const goal = makeGoal({
+        targetAmount: 1000,
+        fundedAmount: 0,
+        priority: 1,
+      });
+      const etaFromShare = computeGoalEtaFromShare(goal, 1.0, 500, REF_DATE);
+      const etaDirect = computeGoalEta(goal, [goal], 500, REF_DATE);
+      expect(etaFromShare?.getTime()).toBe(etaDirect?.getTime());
+    });
+
+    it("produces the same date for a priority-1 goal in a two-goal set", () => {
+      const goal1 = makeGoal({ id: "g1", priority: 1, targetAmount: 600 });
+      const goal2 = makeGoal({ id: "g2", priority: 2, targetAmount: 600 });
+      const allGoals = [goal1, goal2];
+      const shares = computeZipfShares(allGoals);
+
+      const etaFromShare = computeGoalEtaFromShare(
+        goal1,
+        shares.get("g1") ?? 0,
+        900,
+        REF_DATE,
+      );
+      const etaDirect = computeGoalEta(goal1, allGoals, 900, REF_DATE);
+      expect(etaFromShare?.getTime()).toBe(etaDirect?.getTime());
     });
   });
 });
