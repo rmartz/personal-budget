@@ -171,7 +171,7 @@ export function GoalPurchaseForm({
       <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
         <span>{GOAL_PURCHASE_FORM_COPY.expenseNote(ledgerName)}</span>
         <span className="font-mono font-medium text-foreground">
-          {currencyFormatter.format(targetAmount)}
+          {currencyFormatter.format(parseFloat(amountStr) || targetAmount)}
         </span>
       </div>
 

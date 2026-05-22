@@ -1,6 +1,8 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { currencyFormatter } from "@/lib/formatters";
+
 import { GOAL_PURCHASE_FORM_COPY } from "./copy";
 import { GoalPurchaseForm } from "./GoalPurchaseForm";
 
@@ -60,6 +62,32 @@ describe("GoalPurchaseForm — fields", () => {
       expect(
         screen.getByText(GOAL_PURCHASE_FORM_COPY.expenseNote("Travel Fund")),
       ).toBeDefined();
+    });
+
+    it("shows the formatted targetAmount in the expense note by default", () => {
+      render(
+        <GoalPurchaseForm
+          ledgerName="Travel Fund"
+          targetAmount={5000}
+          onSubmit={vi.fn()}
+        />,
+      );
+      expect(screen.getByText(currencyFormatter.format(5000))).toBeDefined();
+    });
+
+    it("updates the expense note preview when the user edits the amount", () => {
+      render(
+        <GoalPurchaseForm
+          ledgerName="Travel Fund"
+          targetAmount={5000}
+          onSubmit={vi.fn()}
+        />,
+      );
+      fireEvent.change(
+        screen.getByLabelText(GOAL_PURCHASE_FORM_COPY.amountLabel),
+        { target: { value: "1250.50" } },
+      );
+      expect(screen.getByText(currencyFormatter.format(1250.5))).toBeDefined();
     });
   });
 });
