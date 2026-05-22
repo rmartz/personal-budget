@@ -63,7 +63,13 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   const budgetLedger = ledgers.find((l) => l.id === goal.ledgerId);
 
   if (budgetLedger === undefined) {
-    return null;
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
+        <p className="text-center text-destructive">
+          {GOAL_PURCHASE_PAGE_COPY.ledgerNotFoundMessage}
+        </p>
+      </div>
+    );
   }
 
   const ledgerName = budgetLedger.name;
