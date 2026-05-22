@@ -104,6 +104,57 @@ describe("computeMonthlyDepositRate", () => {
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(240);
     });
   });
+
+  describe("excludes future-dated deposits", () => {
+    it("returns 0 when all deposits are after the reference date", () => {
+      // Only future deposits (Jul 2025) — nothing to base a rate on
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 6, 1) }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(0);
+    });
+
+    it("excludes future deposits from the total but includes past deposits", () => {
+      // Past: Jan $600; future: Jul $1200 (should be excluded).
+      // Window: Jan to Jun = 5 months → $120/month
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({
+          id: "tx-future",
+          amount: 1200,
+          date: new Date(2025, 6, 1),
+        }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(120);
+    });
+
+    it("uses the reference-date month itself as in-window (not future)", () => {
+      // Deposit on Jun 1 (same as REF_DATE) is not future — it counts.
+      // Window is clamped to min 1; $900 / 1 = $900
+      const transactions = [
+        makeTransaction({ amount: 900, date: new Date(2025, 5, 1) }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(900);
+    });
+
+    it("does not use a future deposit as the earliest-deposit anchor", () => {
+      // If the future deposit were included as the earliest, its earlier calendar
+      // month (Jul) would expand the window. With filtering, only the past deposit
+      // (Jan) sets the anchor: Jan to Jun = 5 months → $600/5 = $120/month.
+      // Without filtering: a future deposit after REF would not be "earlier" than
+      // Jan anyway — but we want to confirm future deposits don't slip through.
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({
+          id: "tx-future",
+          amount: 600,
+          date: new Date(2026, 0, 1), // Jan 2026 — clearly future
+        }),
+      ];
+      // Only Jan 2025 deposit counts: $600 over 5 months = $120/month
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(120);
+    });
+  });
 });
 
 describe("computeGoalEta", () => {

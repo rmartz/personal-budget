@@ -11,13 +11,19 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * calendar month of the reference date (exclusive of the start month — e.g.
  * January to June yields 5 months). The window is clamped to a minimum of 1
  * month so a single-month history still yields a meaningful rate.
+ *
+ * Only deposits on or before `referenceDate` are included — future-dated
+ * entries (possible via the deposit dialog) are excluded from both the sum
+ * and the earliest-deposit anchor, so they cannot inflate the projected rate.
  */
 export function computeMonthlyDepositRate(
   transactions: BudgetLedgerTransaction[],
   referenceDate: Date = new Date(),
 ): number {
   const deposits = transactions.filter(
-    (tx) => tx.type === BudgetLedgerTransactionType.Deposit,
+    (tx) =>
+      tx.type === BudgetLedgerTransactionType.Deposit &&
+      tx.date <= referenceDate,
   );
 
   if (deposits.length === 0) return 0;
