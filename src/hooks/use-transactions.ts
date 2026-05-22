@@ -14,21 +14,24 @@ export function useTransactions(uid: string, ledgerId: string) {
   const [transactions, setTransactions] = useState<BudgetLedgerTransaction[]>(
     [],
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadedForKey, setLoadedForKey] = useState("");
   const [error, setError] = useState<Error | undefined>(undefined);
+
+  const key = uid && ledgerId ? `${uid}:${ledgerId}` : "";
+  const isLoading = !!uid && !!ledgerId && loadedForKey !== key;
 
   useEffect(() => {
     if (!uid || !ledgerId) {
       setError(undefined);
       setTransactions([]);
-      setIsLoading(false);
+      setLoadedForKey("");
       return;
     }
 
     setError(undefined);
-    setIsLoading(true);
     const db = getDatabase(getClientApp());
     const txRef = ref(db, `users/${uid}/budgetLedgerTransactions/${ledgerId}`);
+    const currentKey = `${uid}:${ledgerId}`;
 
     const unsubscribe = onValue(
       txRef,
@@ -46,11 +49,11 @@ export function useTransactions(uid: string, ledgerId: string) {
             ),
           );
         }
-        setIsLoading(false);
+        setLoadedForKey(currentKey);
       },
       (err) => {
         setError(err);
-        setIsLoading(false);
+        setLoadedForKey(currentKey);
       },
     );
 
