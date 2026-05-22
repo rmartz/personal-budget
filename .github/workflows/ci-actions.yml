@@ -54,6 +54,9 @@ jobs:
   storybook-screenshots:
     name: Storybook Screenshots
     if: github.event_name == 'pull_request'
+    concurrency:
+      group: storybook-screenshots-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: write
