@@ -137,12 +137,10 @@ describe("computeMonthlyDepositRate", () => {
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(900);
     });
 
-    it("does not use a future deposit as the earliest-deposit anchor", () => {
-      // If the future deposit were included as the earliest, its earlier calendar
-      // month (Jul) would expand the window. With filtering, only the past deposit
-      // (Jan) sets the anchor: Jan to Jun = 5 months → $600/5 = $120/month.
-      // Without filtering: a future deposit after REF would not be "earlier" than
-      // Jan anyway — but we want to confirm future deposits don't slip through.
+    it("excludes a future-dated deposit from the sum and earliest-deposit anchor", () => {
+      // Jan 2026 deposit is after REF_DATE (Jun 2025) — it must not contribute
+      // to the sum or serve as the earliest-deposit anchor.
+      // Only Jan 2025 ($600) counts: window = 5 months → $120/month.
       const transactions = [
         makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
         makeTransaction({
