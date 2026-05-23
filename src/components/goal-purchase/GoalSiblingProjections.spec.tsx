@@ -111,10 +111,8 @@ describe("GoalSiblingProjections — table", () => {
   describe("excludes fully-funded siblings from the New ETA denominator", () => {
     it("shows concrete ETAs for unfunded siblings when a fully-funded sibling is present", () => {
       // "Vacation" is unfunded; "Already Funded" is fully funded.
-      // The unfunded sibling's ETA columns should show concrete dates.
-      // The fully-funded sibling correctly returns undefined for both ETAs
-      // (it needs no more funding), so exactly 2 placeholders total should appear —
-      // one per ETA column for "Already Funded" only.
+      // The funded sibling is filtered out of the table entirely.
+      // "Vacation" should show concrete ETAs (no placeholders).
       render(
         <GoalSiblingProjections
           monthlyAllocation={1200}
@@ -138,11 +136,14 @@ describe("GoalSiblingProjections — table", () => {
           ]}
         />,
       );
-      // Exactly 2 placeholders: one per ETA column for the fully-funded sibling only
+      // No placeholders — funded sibling is hidden, unfunded sibling has concrete ETAs
       const placeholders = screen.queryAllByText(
         GOAL_SIBLING_PROJECTIONS_COPY.etaPlaceholder,
       );
-      expect(placeholders.length).toBe(2);
+      expect(placeholders.length).toBe(0);
+      // Unfunded sibling still appears; funded sibling does not
+      expect(screen.getByText("Vacation")).toBeDefined();
+      expect(screen.queryByText("Already Funded")).toBeNull();
     });
   });
 
@@ -227,6 +228,53 @@ describe("GoalSiblingProjections — table", () => {
           siblingGoals={[]}
         />,
       );
+      expect(
+        screen.queryByText(GOAL_SIBLING_PROJECTIONS_COPY.columnGoal),
+      ).toBeNull();
+    });
+  });
+
+  describe("omits fully-funded sibling goals from the table", () => {
+    it("does not render a row for a fully-funded sibling goal", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={500}
+          purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
+          siblingGoals={[
+            makeGoal({
+              id: "g2",
+              name: "Already Funded",
+              targetAmount: 500,
+              fundedAmount: 500,
+            }),
+            makeGoal({ id: "g3", name: "Still Saving", priority: 2 }),
+          ]}
+        />,
+      );
+      // Funded sibling should not appear in the table
+      expect(screen.queryByText("Already Funded")).toBeNull();
+      // Unfunded sibling still appears
+      expect(screen.getByText("Still Saving")).toBeDefined();
+    });
+
+    it("hides the table entirely when all sibling goals are fully funded", () => {
+      render(
+        <GoalSiblingProjections
+          monthlyAllocation={500}
+          purchasedGoal={purchasedGoal}
+          referenceDate={referenceDate}
+          siblingGoals={[
+            makeGoal({
+              id: "g2",
+              name: "Fully Funded Sibling",
+              targetAmount: 500,
+              fundedAmount: 500,
+            }),
+          ]}
+        />,
+      );
+      // No unfunded siblings — table headers should be hidden
       expect(
         screen.queryByText(GOAL_SIBLING_PROJECTIONS_COPY.columnGoal),
       ).toBeNull();
