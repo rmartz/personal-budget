@@ -1,5 +1,6 @@
 export const GOAL_PURCHASE_PAGE_COPY = {
   errorMessage: "Failed to load goal. Please try again later.",
+  ledgerNotFoundMessage: "The associated ledger could not be found.",
 } as const;
 
 export const GOAL_PURCHASE_VIEW_COPY = {

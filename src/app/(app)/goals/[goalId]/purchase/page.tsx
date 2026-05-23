@@ -29,13 +29,22 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
     isLoading: goalLoading,
     error: goalError,
   } = useSavingsGoal(uid, goalId);
-  const { ledgers } = useLedgersSubscription(uid);
+  const { ledgers, isLoading: ledgersLoading } = useLedgersSubscription(uid);
   const ledgerId = goal?.ledgerId ?? "";
   const { savingsGoals: siblingGoals } = useSavingsGoals(uid, ledgerId);
-  const { transactions } = useTransactions(uid, ledgerId);
+  const { transactions, isLoading: transactionsLoading } = useTransactions(
+    uid,
+    ledgerId,
+  );
   const referenceDate = useMemo(() => new Date(), []);
 
-  if (authLoading || goalLoading || !user) {
+  if (
+    authLoading ||
+    goalLoading ||
+    ledgersLoading ||
+    transactionsLoading ||
+    !user
+  ) {
     return null;
   }
 
@@ -54,9 +63,20 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   }
 
   const budgetLedger = ledgers.find((l) => l.id === goal.ledgerId);
-  const ledgerName = budgetLedger?.name ?? goal.ledgerId;
+
+  if (budgetLedger === undefined) {
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
+        <p className="text-center text-destructive">
+          {GOAL_PURCHASE_PAGE_COPY.ledgerNotFoundMessage}
+        </p>
+      </div>
+    );
+  }
+
+  const ledgerName = budgetLedger.name;
   const { cashBalance: ledgerCashBalance } = calculateLedgerBalance({
-    cashCap: budgetLedger?.cashCap,
+    cashCap: budgetLedger.cashCap,
     transactions,
   });
   const monthlyAllocation = computeMonthlyDepositRate(

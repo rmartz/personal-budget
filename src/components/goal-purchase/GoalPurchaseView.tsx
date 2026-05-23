@@ -31,6 +31,7 @@ export function GoalPurchaseView({
   onSubmit,
 }: GoalPurchaseViewProps) {
   const hasInsufficientCash = goal.targetAmount > ledgerCashBalance;
+
   return (
     <div className="flex flex-col gap-6">
       <div>

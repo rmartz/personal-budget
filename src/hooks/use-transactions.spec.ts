@@ -41,6 +41,30 @@ describe("useTransactions", () => {
       const { result } = renderHook(() => useTransactions("", "ledger-1"));
       expect(result.current.transactions).toEqual([]);
     });
+
+    it("sets isLoading to false when ledgerId is empty", () => {
+      const { result } = renderHook(() => useTransactions("uid-1", ""));
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    it("sets isLoading to true when ledgerId transitions from empty to a real value", () => {
+      // Simulate the subscription never resolving (pending Firebase call)
+      mockOnValue.mockReturnValue(mockUnsubscribe);
+
+      let ledgerId = "";
+      const { result, rerender } = renderHook(() =>
+        useTransactions("uid-1", ledgerId),
+      );
+
+      // Initially empty ledgerId — isLoading should be false
+      expect(result.current.isLoading).toBe(false);
+
+      ledgerId = "ledger-1";
+      rerender();
+
+      // After ledgerId becomes real, isLoading must be true before the subscription resolves
+      expect(result.current.isLoading).toBe(true);
+    });
   });
 
   describe("subscription", () => {
