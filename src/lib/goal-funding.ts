@@ -108,8 +108,8 @@ export function computeGoalEta(
 ): Date | undefined {
   if (monthlyAllocation === 0) return undefined;
 
-  const shares = computeZipfShares(allGoals);
-  const share = shares.get(goal.id) ?? 0;
+  const harmonic = allGoals.reduce((sum, g) => sum + 1 / g.priority, 0);
+  const share = harmonic === 0 ? 0 : 1 / goal.priority / harmonic;
 
   return computeGoalEtaFromShare(goal, share, monthlyAllocation, referenceDate);
 }
