@@ -5,6 +5,7 @@ import { use, useMemo } from "react";
 
 import { GoalPurchaseView } from "@/components/goal-purchase";
 import { GOAL_PURCHASE_PAGE_COPY } from "@/components/goal-purchase/copy";
+import type { PurchaseFormData } from "@/components/goal-purchase/GoalPurchaseForm";
 import { useAuth } from "@/hooks/use-auth";
 import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 import { useSavingsGoal } from "@/hooks/use-savings-goal";
@@ -12,6 +13,7 @@ import { useSavingsGoals } from "@/hooks/use-savings-goals";
 import { useTransactions } from "@/hooks/use-transactions";
 import { computeMonthlyDepositRate } from "@/lib/goal-funding";
 import { calculateLedgerBalance } from "@/lib/reconciliation/ledger-balance";
+import { purchaseGoal } from "@/services/goal-purchase";
 
 interface GoalPurchasePageProps {
   params: Promise<{ goalId: string }>;
@@ -27,13 +29,22 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
     isLoading: goalLoading,
     error: goalError,
   } = useSavingsGoal(uid, goalId);
-  const { ledgers } = useLedgersSubscription(uid);
+  const { ledgers, isLoading: ledgersLoading } = useLedgersSubscription(uid);
   const ledgerId = goal?.ledgerId ?? "";
   const { savingsGoals: siblingGoals } = useSavingsGoals(uid, ledgerId);
-  const { transactions } = useTransactions(uid, ledgerId);
+  const { transactions, isLoading: transactionsLoading } = useTransactions(
+    uid,
+    ledgerId,
+  );
   const referenceDate = useMemo(() => new Date(), []);
 
-  if (authLoading || goalLoading || !user) {
+  if (
+    authLoading ||
+    goalLoading ||
+    ledgersLoading ||
+    transactionsLoading ||
+    !user
+  ) {
     return null;
   }
 
@@ -52,9 +63,20 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   }
 
   const budgetLedger = ledgers.find((l) => l.id === goal.ledgerId);
-  const ledgerName = budgetLedger?.name ?? goal.ledgerId;
+
+  if (budgetLedger === undefined) {
+    return (
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
+        <p className="text-center text-destructive">
+          {GOAL_PURCHASE_PAGE_COPY.ledgerNotFoundMessage}
+        </p>
+      </div>
+    );
+  }
+
+  const ledgerName = budgetLedger.name;
   const { cashBalance: ledgerCashBalance } = calculateLedgerBalance({
-    cashCap: budgetLedger?.cashCap,
+    cashCap: budgetLedger.cashCap,
     transactions,
   });
   const monthlyAllocation = computeMonthlyDepositRate(
@@ -63,8 +85,9 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   );
   const siblings = siblingGoals.filter((g) => g.id !== goal.id);
 
-  function handleSubmit() {
-    // TODO: Implement purchase recording in epic #14 (Goal Purchase Flow)
+  async function handleSubmit(data: PurchaseFormData) {
+    if (!goal) return;
+    await purchaseGoal(uid, goal, data);
     router.push("/goals");
   }
 

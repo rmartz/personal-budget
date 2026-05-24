@@ -1,5 +1,6 @@
 export const GOAL_PURCHASE_PAGE_COPY = {
   errorMessage: "Failed to load goal. Please try again later.",
+  ledgerNotFoundMessage: "The associated ledger could not be found.",
 } as const;
 
 export const GOAL_PURCHASE_VIEW_COPY = {
@@ -10,15 +11,18 @@ export const GOAL_PURCHASE_VIEW_COPY = {
 } as const;
 
 export const GOAL_PURCHASE_FORM_COPY = {
+  amountError: "Please enter a valid amount greater than zero.",
   amountLabel: "Amount actually spent",
   amountPrefix: "$",
   cancelButton: "Cancel",
+  dateError: "Please enter a valid date.",
   dateLabel: "Date",
   expenseNote: (ledgerName: string) =>
     `Will record an expense in ${ledgerName}`,
   noteLabel: "Note",
   notePlaceholder: "e.g. Studio Display refurb…",
   submitButton: "Mark purchased",
+  submitError: "Something went wrong. Please try again.",
 } as const;
 
 export const GOAL_PURCHASE_WARNING_COPY = {

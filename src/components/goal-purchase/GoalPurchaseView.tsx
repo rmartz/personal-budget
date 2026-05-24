@@ -6,6 +6,7 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
 import { currencyFormatter } from "@/lib/formatters";
 
 import { GOAL_PURCHASE_VIEW_COPY } from "./copy";
+import type { PurchaseFormData } from "./GoalPurchaseForm";
 import { GoalPurchaseForm } from "./GoalPurchaseForm";
 import { GoalPurchaseWarning } from "./GoalPurchaseWarning";
 import { GoalSiblingProjections } from "./GoalSiblingProjections";
@@ -17,7 +18,7 @@ export interface GoalPurchaseViewProps {
   monthlyAllocation: number;
   referenceDate: Date;
   siblingGoals: BudgetLedgerSavingsGoal[];
-  onSubmit: () => void;
+  onSubmit: (data: PurchaseFormData) => Promise<void> | void;
 }
 
 export function GoalPurchaseView({
@@ -30,6 +31,7 @@ export function GoalPurchaseView({
   onSubmit,
 }: GoalPurchaseViewProps) {
   const hasInsufficientCash = goal.targetAmount > ledgerCashBalance;
+
   return (
     <div className="flex flex-col gap-6">
       <div>
