@@ -186,6 +186,46 @@ describe("computeMonthlyDepositRate", () => {
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(120);
     });
   });
+
+  describe("clamps each deposit to cashCap when provided", () => {
+    it("limits each deposit to the cashCap before summing", () => {
+      // cashCap = 500; deposits of $800 and $600 → clamped to $500 each
+      // Total cash: $1000 over 5 months → $200/month
+      const transactions = [
+        makeTransaction({ amount: 800, date: new Date(2025, 0, 1) }),
+        makeTransaction({
+          id: "tx-2",
+          amount: 600,
+          date: new Date(2025, 3, 1),
+        }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE, 500)).toBe(200);
+    });
+
+    it("does not clamp deposits that are below cashCap", () => {
+      // cashCap = 1000; deposits of $600 and $400 are both under cap
+      // Total: $1000 over 5 months → $200/month (same as uncapped)
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({
+          id: "tx-2",
+          amount: 400,
+          date: new Date(2025, 3, 1),
+        }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE, 1000)).toBe(200);
+    });
+
+    it("behaves identically to no cashCap when cashCap is undefined", () => {
+      // $600 deposit, Jan to Jun = 5 months → $120/month with or without cap
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE, undefined)).toBe(
+        computeMonthlyDepositRate(transactions, REF_DATE),
+      );
+    });
+  });
 });
 
 describe("computeGoalEta", () => {

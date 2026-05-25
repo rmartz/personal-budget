@@ -20,10 +20,16 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * `referenceDate` carries a local time component. The comparison is
  * normalised to UTC midnight of the local calendar day so that a deposit
  * dated "today" is always included regardless of the caller's UTC offset.
+ *
+ * When `cashCap` is provided, each deposit's contribution is clamped to
+ * `Math.min(deposit.amount, cashCap)`, reflecting only the portion that flows
+ * into the cash split. Omit `cashCap` (or pass `undefined`) for ledgers with
+ * no cash cap.
  */
 export function computeMonthlyDepositRate(
   transactions: BudgetLedgerTransaction[],
   referenceDate: Date = new Date(),
+  cashCap?: number,
 ): number {
   const refDayUTC = Date.UTC(
     referenceDate.getFullYear(),
@@ -42,7 +48,11 @@ export function computeMonthlyDepositRate(
 
   if (deposits.length === 0) return 0;
 
-  const totalDeposits = deposits.reduce((sum, tx) => sum + tx.amount, 0);
+  const totalDeposits = deposits.reduce(
+    (sum, tx) =>
+      sum + (cashCap !== undefined ? Math.min(tx.amount, cashCap) : tx.amount),
+    0,
+  );
 
   const earliestDeposit = deposits.reduce((earliest, tx) =>
     tx.date < earliest.date ? tx : earliest,
