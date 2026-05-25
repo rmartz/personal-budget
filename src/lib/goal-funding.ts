@@ -42,7 +42,8 @@ export function computeMonthlyDepositRate(
  * sum to 1. The harmonic sum is computed once for the entire set, making this
  * O(n) regardless of how many per-goal projections are subsequently derived.
  *
- * Returns an empty Map when `goals` is empty (harmonic sum would be 0).
+ * Returns an empty Map when the harmonic sum is 0, which occurs when `goals`
+ * is empty or when all goals have non-finite priorities.
  */
 export function computeZipfShares(
   goals: BudgetLedgerSavingsGoal[],
@@ -74,7 +75,7 @@ export function computeGoalEtaFromShare(
   if (remaining <= 0) return undefined;
 
   const monthlyForGoal = monthlyAllocation * share;
-  if (monthlyForGoal === 0) return undefined;
+  if (!(monthlyForGoal > 0)) return undefined;
 
   const monthsNeeded = Math.ceil(remaining / monthlyForGoal);
 
