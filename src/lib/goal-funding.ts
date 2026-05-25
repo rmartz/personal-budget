@@ -11,10 +11,16 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * calendar month of the reference date (exclusive of the start month — e.g.
  * January to June yields 5 months). The window is clamped to a minimum of 1
  * month so a single-month history still yields a meaningful rate.
+ *
+ * When `cashCap` is provided, each deposit's contribution is clamped to
+ * `Math.min(deposit.amount, cashCap)`, reflecting only the portion that flows
+ * into the cash split. Omit `cashCap` (or pass `undefined`) for ledgers with
+ * no cash cap.
  */
 export function computeMonthlyDepositRate(
   transactions: BudgetLedgerTransaction[],
   referenceDate: Date = new Date(),
+  cashCap?: number,
 ): number {
   const deposits = transactions.filter(
     (tx) => tx.type === BudgetLedgerTransactionType.Deposit,
@@ -22,7 +28,11 @@ export function computeMonthlyDepositRate(
 
   if (deposits.length === 0) return 0;
 
-  const totalDeposits = deposits.reduce((sum, tx) => sum + tx.amount, 0);
+  const totalDeposits = deposits.reduce(
+    (sum, tx) =>
+      sum + (cashCap !== undefined ? Math.min(tx.amount, cashCap) : tx.amount),
+    0,
+  );
 
   const earliestDeposit = deposits.reduce((earliest, tx) =>
     tx.date < earliest.date ? tx : earliest,
