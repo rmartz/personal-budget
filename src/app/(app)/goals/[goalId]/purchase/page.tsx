@@ -5,6 +5,7 @@ import { use, useMemo } from "react";
 
 import { GoalPurchaseView } from "@/components/goal-purchase";
 import { GOAL_PURCHASE_PAGE_COPY } from "@/components/goal-purchase/copy";
+import type { PurchaseFormData } from "@/components/goal-purchase/GoalPurchaseForm";
 import { useAuth } from "@/hooks/use-auth";
 import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
 import { useSavingsGoal } from "@/hooks/use-savings-goal";
@@ -12,6 +13,7 @@ import { useSavingsGoals } from "@/hooks/use-savings-goals";
 import { useTransactions } from "@/hooks/use-transactions";
 import { computeMonthlyDepositRate } from "@/lib/goal-funding";
 import { calculateLedgerBalance } from "@/lib/reconciliation/ledger-balance";
+import { purchaseGoal } from "@/services/goal-purchase";
 
 interface GoalPurchasePageProps {
   params: Promise<{ goalId: string }>;
@@ -80,11 +82,13 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   const monthlyAllocation = computeMonthlyDepositRate(
     transactions,
     referenceDate,
+    budgetLedger.cashCap,
   );
   const siblings = siblingGoals.filter((g) => g.id !== goal.id);
 
-  function handleSubmit() {
-    // TODO: Implement purchase recording in epic #14 (Goal Purchase Flow)
+  async function handleSubmit(data: PurchaseFormData) {
+    if (!goal) return;
+    await purchaseGoal(uid, goal, data);
     router.push("/goals");
   }
 

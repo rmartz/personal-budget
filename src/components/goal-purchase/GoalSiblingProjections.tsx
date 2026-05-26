@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 import { monthYearFormatter } from "@/lib/formatters";
-import { computeGoalEta } from "@/lib/goal-funding";
+import { computeGoalEtaFromShare, computeZipfShares } from "@/lib/goal-funding";
 
 import { GOAL_SIBLING_PROJECTIONS_COPY } from "./copy";
 
@@ -27,6 +27,8 @@ export function GoalSiblingProjections({
   const unfundedSiblingGoals = siblingGoals.filter(
     (g) => g.fundedAmount < g.targetAmount,
   );
+  const priorShares = computeZipfShares(allGoalsBeforePurchase);
+  const newShares = computeZipfShares(unfundedSiblingGoals);
 
   return (
     <Card>
@@ -53,15 +55,15 @@ export function GoalSiblingProjections({
             </thead>
             <tbody>
               {siblingGoals.map((goal) => {
-                const priorEta = computeGoalEta(
+                const priorEta = computeGoalEtaFromShare(
                   goal,
-                  allGoalsBeforePurchase,
+                  priorShares.get(goal.id) ?? 0,
                   monthlyAllocation,
                   referenceDate,
                 );
-                const newEta = computeGoalEta(
+                const newEta = computeGoalEtaFromShare(
                   goal,
-                  unfundedSiblingGoals,
+                  newShares.get(goal.id) ?? 0,
                   monthlyAllocation,
                   referenceDate,
                 );
