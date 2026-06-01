@@ -18,37 +18,16 @@ jobs:
   create-release:
     name: Create Sentry Release
     runs-on: ubuntu-latest
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: ./.github/actions/setup
-
-      - name: Create Sentry release
-        run: |
-          pnpm exec sentry-cli releases new "${{ github.sha }}" \
-            --org reedmartz \
-            --project personal-budget
+      - uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Associate commits with release
-        run: |
-          pnpm exec sentry-cli releases set-commits "${{ github.sha }}" \
-            --auto \
-            --org reedmartz \
-            --project personal-budget
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Finalize release
-        run: |
-          pnpm exec sentry-cli releases finalize "${{ github.sha }}" \
-            --org reedmartz \
-            --project personal-budget
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: reedmartz
+          SENTRY_PROJECT: personal-budget
+        with:
+          version: ${{ github.sha }}
