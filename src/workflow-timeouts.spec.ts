@@ -3,11 +3,27 @@ import { resolve } from "path";
 import { describe, expect, it } from "vitest";
 import { parse } from "yaml";
 
-const STANDARD_TIMEOUT_MINUTES = 5;
-
-const TIMEOUT_OVERRIDES: Record<string, Record<string, number>> = {
-  "claude-code.yml": {
-    claude: 30,
+// Per-job timeout caps in minutes. Values are tuned from observed p95 + 1.5–2×
+// headroom so a hung job fails quickly while normal slow runs still complete.
+// Adding a new job to any workflow requires adding an entry here — the test
+// asserts every non-reusable-workflow caller job has an explicit expected cap.
+const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
+  "ci-actions.yml": {
+    build: 2,
+    format: 2,
+    lint: 2,
+    "storybook-build": 2,
+    "storybook-screenshots": 3,
+    tests: 3,
+  },
+  "pr-title-lint.yml": {
+    "pr-title": 1,
+  },
+  "secret-scan.yml": {
+    "validate-config": 2,
+  },
+  "sentry-release.yml": {
+    "create-release": 2,
   },
 };
 
@@ -38,15 +54,10 @@ function loadWorkflows(): WorkflowFile[] {
 describe("GitHub Actions workflow timeouts", () => {
   const workflows = loadWorkflows();
 
-  it("discovers all five expected workflow files", () => {
-    const fileNames = workflows.map((w) => w.fileName).sort();
-    expect(fileNames).toEqual([
-      "ci-actions.yml",
-      "claude-code.yml",
-      "pr-title-lint.yml",
-      "secret-scan.yml",
-      "sentry-release.yml",
-    ]);
+  it("only contains workflows registered in EXPECTED_TIMEOUT_MINUTES", () => {
+    const onDisk = workflows.map((w) => w.fileName).sort();
+    const registered = Object.keys(EXPECTED_TIMEOUT_MINUTES).sort();
+    expect(onDisk).toEqual(registered);
   });
 
   for (const workflow of workflows) {
@@ -58,12 +69,18 @@ describe("GitHub Actions workflow timeouts", () => {
         continue;
       }
 
-      const expectedTimeout =
-        TIMEOUT_OVERRIDES[workflow.fileName]?.[jobId] ??
-        STANDARD_TIMEOUT_MINUTES;
+      const expected = EXPECTED_TIMEOUT_MINUTES[workflow.fileName]?.[jobId];
 
-      it(`${workflow.fileName} job "${jobId}" has timeout-minutes: ${expectedTimeout}`, () => {
-        expect(job["timeout-minutes"]).toBe(expectedTimeout);
+      it(`${workflow.fileName} job "${jobId}" has a registered expected timeout`, () => {
+        expect(expected).toBeDefined();
+      });
+
+      if (expected === undefined) {
+        continue;
+      }
+
+      it(`${workflow.fileName} job "${jobId}" has timeout-minutes: ${expected}`, () => {
+        expect(job["timeout-minutes"]).toBe(expected);
       });
     }
   }
