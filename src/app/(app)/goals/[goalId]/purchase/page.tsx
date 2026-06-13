@@ -82,6 +82,7 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
   const monthlyAllocation = computeMonthlyDepositRate(
     transactions,
     referenceDate,
+    budgetLedger.cashCap,
   );
   const siblings = siblingGoals.filter((g) => g.id !== goal.id);
 

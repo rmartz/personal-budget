@@ -11,10 +11,16 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * calendar month of the reference date (exclusive of the start month — e.g.
  * January to June yields 5 months). The window is clamped to a minimum of 1
  * month so a single-month history still yields a meaningful rate.
+ *
+ * When `cashCap` is provided, each deposit's contribution is clamped to
+ * `Math.min(deposit.amount, cashCap)`, reflecting only the portion that flows
+ * into the cash split. Omit `cashCap` (or pass `undefined`) for ledgers with
+ * no cash cap.
  */
 export function computeMonthlyDepositRate(
   transactions: BudgetLedgerTransaction[],
   referenceDate: Date = new Date(),
+  cashCap?: number,
 ): number {
   const deposits = transactions.filter(
     (tx) => tx.type === BudgetLedgerTransactionType.Deposit,
@@ -22,7 +28,11 @@ export function computeMonthlyDepositRate(
 
   if (deposits.length === 0) return 0;
 
-  const totalDeposits = deposits.reduce((sum, tx) => sum + tx.amount, 0);
+  const totalDeposits = deposits.reduce(
+    (sum, tx) =>
+      sum + (cashCap !== undefined ? Math.min(tx.amount, cashCap) : tx.amount),
+    0,
+  );
 
   const earliestDeposit = deposits.reduce((earliest, tx) =>
     tx.date < earliest.date ? tx : earliest,
@@ -38,14 +48,52 @@ export function computeMonthlyDepositRate(
 }
 
 /**
- * Computes the Zipf weight for a goal with the given priority within an ordered
- * list of goals. Goals are allocated a share of the monthly budget proportional
- * to 1/priority, normalised so all shares sum to 1.
+ * Computes the Zipf weight for each goal in the set, normalised so all shares
+ * sum to 1. The harmonic sum is computed once for the entire set, making this
+ * O(n) regardless of how many per-goal projections are subsequently derived.
+ *
+ * Returns an empty Map when the harmonic sum is 0, which occurs when `goals`
+ * is empty or when all goals have non-finite priorities.
  */
-function zipfShare(priority: number, goals: BudgetLedgerSavingsGoal[]): number {
+export function computeZipfShares(
+  goals: BudgetLedgerSavingsGoal[],
+): Map<string, number> {
   const harmonic = goals.reduce((sum, g) => sum + 1 / g.priority, 0);
-  if (harmonic === 0) return 0;
-  return 1 / priority / harmonic;
+  if (harmonic === 0) return new Map();
+  return new Map(goals.map((g) => [g.id, 1 / g.priority / harmonic]));
+}
+
+/**
+ * Projects the date by which the given goal will be fully funded, given a
+ * precomputed Zipf share for that goal and the ledger's monthly allocation.
+ *
+ * Returns `undefined` when:
+ * - `monthlyAllocation` is 0 or `share` is 0 (cannot project without income)
+ * - The goal is already fully funded (`fundedAmount >= targetAmount`)
+ *
+ * Prefer this function in loops where multiple goals share the same denominator
+ * set — precompute shares with `computeZipfShares` and pass each goal's share
+ * here to keep the total work O(n) instead of O(n²).
+ */
+export function computeGoalEtaFromShare(
+  goal: BudgetLedgerSavingsGoal,
+  share: number,
+  monthlyAllocation: number,
+  referenceDate: Date = new Date(),
+): Date | undefined {
+  const remaining = goal.targetAmount - goal.fundedAmount;
+  if (remaining <= 0) return undefined;
+
+  const monthlyForGoal = monthlyAllocation * share;
+  if (!(monthlyForGoal > 0)) return undefined;
+
+  const monthsNeeded = Math.ceil(remaining / monthlyForGoal);
+
+  return new Date(
+    referenceDate.getFullYear(),
+    referenceDate.getMonth() + monthsNeeded,
+    1,
+  );
 }
 
 /**
@@ -58,6 +106,10 @@ function zipfShare(priority: number, goals: BudgetLedgerSavingsGoal[]): number {
  *
  * `allGoals` must include `goal` itself so that the Zipf denominator is
  * computed correctly across all competing goals.
+ *
+ * When projecting ETAs for multiple goals that share the same denominator set,
+ * prefer `computeZipfShares` + `computeGoalEtaFromShare` to avoid recomputing
+ * the harmonic sum for each goal.
  */
 export function computeGoalEta(
   goal: BudgetLedgerSavingsGoal,
@@ -67,19 +119,8 @@ export function computeGoalEta(
 ): Date | undefined {
   if (monthlyAllocation === 0) return undefined;
 
-  const remaining = goal.targetAmount - goal.fundedAmount;
-  if (remaining <= 0) return undefined;
+  const harmonic = allGoals.reduce((sum, g) => sum + 1 / g.priority, 0);
+  const share = harmonic === 0 ? 0 : 1 / goal.priority / harmonic;
 
-  const share = zipfShare(goal.priority, allGoals);
-  const monthlyForGoal = monthlyAllocation * share;
-
-  if (monthlyForGoal === 0) return undefined;
-
-  const monthsNeeded = Math.ceil(remaining / monthlyForGoal);
-
-  return new Date(
-    referenceDate.getFullYear(),
-    referenceDate.getMonth() + monthsNeeded,
-    1,
-  );
+  return computeGoalEtaFromShare(goal, share, monthlyAllocation, referenceDate);
 }
