@@ -12,6 +12,15 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * January to June yields 5 months). The window is clamped to a minimum of 1
  * month so a single-month history still yields a meaningful rate.
  *
+ * Only deposits on or before `referenceDate` are included — future-dated
+ * entries (possible via the deposit dialog) are excluded from both the sum
+ * and the earliest-deposit anchor, so they cannot inflate the projected rate.
+ *
+ * Deposit dates are stored as UTC midnight (from ISO date strings), while
+ * `referenceDate` carries a local time component. The comparison is
+ * normalised to UTC midnight of the local calendar day so that a deposit
+ * dated "today" is always included regardless of the caller's UTC offset.
+ *
  * When `cashCap` is provided, each deposit's contribution is clamped to
  * `Math.min(deposit.amount, cashCap)`, reflecting only the portion that flows
  * into the cash split. Omit `cashCap` (or pass `undefined`) for ledgers with
@@ -22,8 +31,19 @@ export function computeMonthlyDepositRate(
   referenceDate: Date = new Date(),
   cashCap?: number,
 ): number {
+  const refDayUTC = Date.UTC(
+    referenceDate.getFullYear(),
+    referenceDate.getMonth(),
+    referenceDate.getDate(),
+  );
   const deposits = transactions.filter(
-    (tx) => tx.type === BudgetLedgerTransactionType.Deposit,
+    (tx) =>
+      tx.type === BudgetLedgerTransactionType.Deposit &&
+      Date.UTC(
+        tx.date.getUTCFullYear(),
+        tx.date.getUTCMonth(),
+        tx.date.getUTCDate(),
+      ) <= refDayUTC,
   );
 
   if (deposits.length === 0) return 0;
