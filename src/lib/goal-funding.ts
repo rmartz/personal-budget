@@ -12,6 +12,13 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * January to June yields 5 months). The window is clamped to a minimum of 1
  * month so a single-month history still yields a meaningful rate.
  *
+ * The earliest deposit's month is read with UTC getters (deposit dates are
+ * stored as UTC midnight), matching the filter above, while the reference
+ * month uses local getters since `referenceDate` carries a local time. Reading
+ * the deposit with local getters would, in negative-offset timezones, place a
+ * UTC-midnight first-of-month date in the previous month and inflate the
+ * window by one month.
+ *
  * Only deposits on or before `referenceDate` are included — future-dated
  * entries (possible via the deposit dialog) are excluded from both the sum
  * and the earliest-deposit anchor, so they cannot inflate the projected rate.
@@ -60,7 +67,8 @@ export function computeMonthlyDepositRate(
 
   const refMonths = referenceDate.getFullYear() * 12 + referenceDate.getMonth();
   const startMonths =
-    earliestDeposit.date.getFullYear() * 12 + earliestDeposit.date.getMonth();
+    earliestDeposit.date.getUTCFullYear() * 12 +
+    earliestDeposit.date.getUTCMonth();
 
   const monthsElapsed = Math.max(1, refMonths - startMonths);
 
