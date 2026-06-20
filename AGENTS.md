@@ -86,6 +86,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 ## Documentation
 
 - Keep documentation in sync with the code — outdated docs are worse than no docs.
+- Reference docs under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with a YAML frontmatter block whose only required key is `type` (drawn from the vocabulary in [`docs/index.md`](docs/index.md) — `Schema`, `Reference`, `Guide`), plus the recommended `title`, `description`, `resource` (path to the asset the page documents), and `tags`. When adding a new `docs/` page, include the frontmatter and add a listing entry to `docs/index.md`.
 
 ## React / Next.js Standards
 
@@ -142,7 +143,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - **Never make a breaking schema change without a migration.** A breaking change is any modification to the Firebase Realtime DB path structure or field format that would cause existing stored data to be misread, ignored, or crash the application — for example: renaming a path segment, changing a field's type, removing a required field, or altering an enum's serialized value.
 - Before merging a breaking schema change, provide a migration script in `scripts/migrations/` that reads the old data shape and writes it in the new shape. The script must be idempotent (safe to run multiple times) and must not delete old data until the migration is verified complete.
 - Additive changes (new optional fields with safe defaults in `firebaseTo*()` helpers, new path segments that existing code ignores) are not breaking and do not require a migration.
-- Document the migration in `docs/database-schema.md` alongside the schema change.
+- Document the migration in `docs/database-schema.md` alongside the schema change, keeping its OKF frontmatter (see the Documentation section) accurate.
 
 ## GitHub Issues
 
