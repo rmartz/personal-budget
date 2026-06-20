@@ -15,6 +15,10 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     "storybook-build": 2,
     "storybook-screenshots": 3,
     tests: 3,
+    "type-check": 2,
+  },
+  "file-length.yml": {
+    check: 2,
   },
   "pr-title-lint.yml": {
     "pr-title": 1,
@@ -66,6 +70,7 @@ describe("GitHub Actions workflow timeouts", () => {
       // reusable workflow (jobs with `uses:` instead of `runs-on`/`steps`).
       // The reusable workflow controls its own timeout.
       if (job.uses !== undefined) {
+        expect(job["timeout-minutes"]).toBeUndefined();
         continue;
       }
 
