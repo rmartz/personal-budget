@@ -110,6 +110,88 @@ describe("computeMonthlyDepositRate", () => {
     });
   });
 
+  describe("excludes future-dated deposits", () => {
+    it("returns 0 when all deposits are after the reference date", () => {
+      // Only future deposits (Jul 2025) — nothing to base a rate on
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 6, 1) }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(0);
+    });
+
+    it("excludes future deposits from the total but includes past deposits", () => {
+      // Past: Jan $600; future: Jul $1200 (should be excluded).
+      // Window: Jan to Jun = 5 months → $120/month
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({
+          id: "tx-future",
+          amount: 1200,
+          date: new Date(2025, 6, 1),
+        }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(120);
+    });
+
+    it("uses the reference-date month itself as in-window (not future)", () => {
+      // Deposit on Jun 1 (same as REF_DATE) is not future — it counts.
+      // Window is clamped to min 1; $900 / 1 = $900
+      const transactions = [
+        makeTransaction({ amount: 900, date: new Date(2025, 5, 1) }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(900);
+    });
+
+    it("includes a UTC-midnight deposit on the same local calendar day as referenceDate", () => {
+      // Deposit dates travel through the system as UTC midnight (new Date("YYYY-MM-DD")).
+      // A same-day deposit must be included even when referenceDate has a time component,
+      // which requires normalising the comparison to local-date UTC midnight.
+      const refDateWithTime = new Date(2025, 5, 15, 12, 0, 0); // June 15 at noon local
+      const sameDayDeposit = new Date("2025-06-15"); // UTC midnight June 15
+      const transactions = [
+        makeTransaction({ amount: 300, date: sameDayDeposit }),
+      ];
+      // $300 over min 1 month = $300/month
+      expect(computeMonthlyDepositRate(transactions, refDateWithTime)).toBe(
+        300,
+      );
+    });
+
+    it("excludes a UTC-midnight deposit dated the next local calendar day", () => {
+      // A deposit dated June 16 (UTC midnight) must be excluded when referenceDate is
+      // June 15 (any local time), because June 16 is a future date relative to June 15.
+      const refDateWithTime = new Date(2025, 5, 15, 12, 0, 0); // June 15 at noon local
+      const transactions = [
+        makeTransaction({ amount: 300, date: new Date("2025-06-15") }),
+        makeTransaction({
+          id: "tx-next",
+          amount: 600,
+          date: new Date("2025-06-16"),
+        }),
+      ];
+      // Only June 15 deposit ($300) counts — June 16 is excluded
+      expect(computeMonthlyDepositRate(transactions, refDateWithTime)).toBe(
+        300,
+      );
+    });
+
+    it("excludes a future-dated deposit from the sum and earliest-deposit anchor", () => {
+      // Jan 2026 deposit is after REF_DATE (Jun 2025) — it must not contribute
+      // to the sum or serve as the earliest-deposit anchor.
+      // Only Jan 2025 ($600) counts: window = 5 months → $120/month.
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({
+          id: "tx-future",
+          amount: 600,
+          date: new Date(2026, 0, 1), // Jan 2026 — clearly future
+        }),
+      ];
+      // Only Jan 2025 deposit counts: $600 over 5 months = $120/month
+      expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(120);
+    });
+  });
+
   describe("clamps each deposit to cashCap when provided", () => {
     it("limits each deposit to the cashCap before summing", () => {
       // cashCap = 500; deposits of $800 and $600 → clamped to $500 each

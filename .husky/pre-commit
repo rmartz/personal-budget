@@ -1,1 +1,1 @@
-pnpm exec lint-staged && pnpm run secrets-check
+pnpm exec lint-staged && pnpm run secrets-check && node scripts/check-file-length.mjs --staged

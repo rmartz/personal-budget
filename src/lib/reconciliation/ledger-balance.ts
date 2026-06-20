@@ -37,8 +37,10 @@ export function calculateLedgerBalance({
   startingInvestmentBalance = 0,
   transactions,
 }: LedgerBalanceInput): LedgerBalanceResult {
+  const dayOf = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const sorted = [...transactions].sort((a, b) => {
-    const dateDiff = a.date.getTime() - b.date.getTime();
+    const dateDiff = dayOf(a.date) - dayOf(b.date);
     if (dateDiff !== 0) return dateDiff;
     // Same day: deposits before expenses so same-day deposits can fund same-day expenses
     if (
