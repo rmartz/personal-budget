@@ -66,10 +66,12 @@ describe("A new Sentry release is created for every production deployment", () =
     expect(push["branches"]).toContain("main");
   });
 
-  it("workflow has a step that calls sentry-cli releases new", () => {
+  it("workflow has a step that uses getsentry/action-release", () => {
     const steps = allSteps(loadWorkflow());
     const step = steps.find(
-      (s) => typeof s["run"] === "string" && s["run"].includes("releases new"),
+      (s) =>
+        typeof s["uses"] === "string" &&
+        s["uses"].startsWith("getsentry/action-release"),
     );
     expect(step).toBeDefined();
   });
@@ -77,33 +79,39 @@ describe("A new Sentry release is created for every production deployment", () =
   it("release version is set to the git SHA", () => {
     const steps = allSteps(loadWorkflow());
     const step = steps.find(
-      (s) => typeof s["run"] === "string" && s["run"].includes("releases new"),
+      (s) =>
+        typeof s["uses"] === "string" &&
+        s["uses"].startsWith("getsentry/action-release"),
     );
-    expect(step?.["run"]).toContain("github.sha");
+    const withConfig = step?.["with"] as Record<string, unknown> | undefined;
+    expect(withConfig?.["version"]).toContain("github.sha");
   });
 });
 
 // ─── Criterion 2: Commits associated with the release ────────────────────────
 
 describe("Commits are associated with the release", () => {
-  it("workflow has a step that calls sentry-cli releases set-commits --auto", () => {
+  it("action is configured with SENTRY_AUTH_TOKEN", () => {
     const steps = allSteps(loadWorkflow());
     const step = steps.find(
       (s) =>
-        typeof s["run"] === "string" &&
-        s["run"].includes("set-commits") &&
-        s["run"].includes("--auto"),
+        typeof s["uses"] === "string" &&
+        s["uses"].startsWith("getsentry/action-release"),
     );
-    expect(step).toBeDefined();
+    const env = step?.["env"] as Record<string, unknown> | undefined;
+    expect(env?.["SENTRY_AUTH_TOKEN"]).toBeDefined();
   });
 
-  it("workflow finalizes the release after commit association", () => {
+  it("action is configured with SENTRY_ORG and SENTRY_PROJECT", () => {
     const steps = allSteps(loadWorkflow());
-    const finalizeStep = steps.find(
+    const step = steps.find(
       (s) =>
-        typeof s["run"] === "string" && s["run"].includes("releases finalize"),
+        typeof s["uses"] === "string" &&
+        s["uses"].startsWith("getsentry/action-release"),
     );
-    expect(finalizeStep).toBeDefined();
+    const env = step?.["env"] as Record<string, unknown> | undefined;
+    expect(env?.["SENTRY_ORG"]).toBeDefined();
+    expect(env?.["SENTRY_PROJECT"]).toBeDefined();
   });
 });
 
