@@ -12,9 +12,9 @@ import { getClientApp } from "@/lib/firebase/client";
 import {
   type BudgetLedgerTransaction,
   budgetLedgerTransactionToFirebase,
-  type FirebaseBudgetLedgerTransaction,
   firebaseToBudgetLedgerTransaction,
 } from "@/lib/firebase/schema/budget-ledger-transactions";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 
 function db() {
   return getDatabase(getClientApp());
@@ -36,11 +36,8 @@ export async function getTransactions(
   if (!snapshot.exists()) {
     return [];
   }
-  const data = snapshot.val() as Record<
-    string,
-    FirebaseBudgetLedgerTransaction
-  >;
-  return Object.entries(data).map(([id, entry]) =>
+  const data = snapshot.val() as Record<string, unknown>;
+  return parseCollection(data, (id, entry) =>
     firebaseToBudgetLedgerTransaction(id, ledgerId, entry),
   );
 }

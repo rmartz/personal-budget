@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { getClientApp } from "@/lib/firebase/client";
 import {
   type BudgetLedger,
-  type FirebaseBudgetLedger,
   firebaseToBudgetLedger,
 } from "@/lib/firebase/schema/budget-ledgers";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 
 export function useLedgersSubscription(uid: string) {
   const [ledgers, setLedgers] = useState<BudgetLedger[]>([]);
@@ -31,12 +31,8 @@ export function useLedgersSubscription(uid: string) {
         if (!snapshot.exists()) {
           setLedgers([]);
         } else {
-          const data = snapshot.val() as Record<string, FirebaseBudgetLedger>;
-          setLedgers(
-            Object.entries(data).map(([id, entry]) =>
-              firebaseToBudgetLedger(id, entry),
-            ),
-          );
+          const data = snapshot.val() as Record<string, unknown>;
+          setLedgers(parseCollection(data, firebaseToBudgetLedger));
         }
         setIsLoading(false);
       },

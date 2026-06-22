@@ -10,6 +10,7 @@ import {
 } from "firebase/database";
 
 import { getClientApp } from "@/lib/firebase/client";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
   type BudgetLedgerSavingsGoal,
   budgetLedgerSavingsGoalToFirebase,
@@ -37,11 +38,8 @@ export async function getSavingsGoals(
   if (!snapshot.exists()) {
     return [];
   }
-  const data = snapshot.val() as Record<
-    string,
-    FirebaseBudgetLedgerSavingsGoal
-  >;
-  return Object.entries(data).map(([id, entry]) =>
+  const data = snapshot.val() as Record<string, unknown>;
+  return parseCollection(data, (id, entry) =>
     firebaseToBudgetLedgerSavingsGoal(id, ledgerId, entry),
   );
 }

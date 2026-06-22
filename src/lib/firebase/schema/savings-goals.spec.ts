@@ -64,4 +64,24 @@ describe("firebaseToBudgetLedgerSavingsGoal", () => {
     expect(result.fundedAmount).toBe(original.fundedAmount);
     expect(result.priority).toBe(original.priority);
   });
+
+  it("defaults fundedAmount to 0 when absent from a pre-migration record", () => {
+    const result = firebaseToBudgetLedgerSavingsGoal("goal-1", "ledger-1", {
+      name: "Legacy",
+      targetAmount: 1000,
+      priority: 2,
+    });
+    expect(result.fundedAmount).toBe(0);
+  });
+
+  it("throws on a schema mismatch instead of producing undefined", () => {
+    expect(() =>
+      firebaseToBudgetLedgerSavingsGoal("goal-1", "ledger-1", {
+        name: "Broken",
+        targetAmount: 1000,
+        fundedAmount: "not-a-number",
+        priority: 1,
+      }),
+    ).toThrow();
+  });
 });

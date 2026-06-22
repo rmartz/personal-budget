@@ -1,24 +1,30 @@
+import { z } from "zod";
+
 import { Posture } from "@/lib/firebase/schema/investments";
 
-export interface FirebaseUserSettings {
-  reconciliationPosture?: string;
-}
+const FirebaseUserSettingsSchema = z.object({
+  reconciliationPosture: z.string().optional(),
+});
+
+export type FirebaseUserSettings = z.infer<typeof FirebaseUserSettingsSchema>;
 
 export interface UserSettings {
   reconciliationPosture: Posture;
 }
 
-const VALID_POSTURES: ReadonlySet<string> = new Set(Object.values(Posture));
+// User settings must never crash the app on a bad value: an unknown or absent
+// posture falls back to Balanced rather than throwing.
+const ReconciliationPostureSchema = z
+  .enum(Posture)
+  .catch(Posture.Balanced)
+  .default(Posture.Balanced);
 
-export function firebaseToUserSettings(
-  data: FirebaseUserSettings,
-): UserSettings {
+export function firebaseToUserSettings(data: unknown): UserSettings {
+  const parsed = FirebaseUserSettingsSchema.parse(data);
   return {
-    reconciliationPosture:
-      data.reconciliationPosture !== undefined &&
-      VALID_POSTURES.has(data.reconciliationPosture)
-        ? (data.reconciliationPosture as Posture)
-        : Posture.Balanced,
+    reconciliationPosture: ReconciliationPostureSchema.parse(
+      parsed.reconciliationPosture,
+    ),
   };
 }
 
