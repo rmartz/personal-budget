@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import {
   type BudgetLedgerTransaction,
@@ -20,7 +20,7 @@ function makeTransaction(
     id: "tx-1",
     ledgerId: "ledger-1",
     type: BudgetLedgerTransactionType.Deposit,
-    date: new Date(2025, 0, 1), // Jan 1, 2025 local
+    date: new Date("2025-01-01"), // Jan 1, 2025 UTC midnight (matches production)
     amount: 500,
     description: "Test deposit",
     ...overrides,
@@ -66,16 +66,16 @@ describe("computeMonthlyDepositRate", () => {
     it("divides total deposits by calendar months from first deposit to reference", () => {
       // Jan to Jun = 5 calendar months; total = $1500 → $300/month
       const transactions = [
-        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
         makeTransaction({
           id: "tx-2",
           amount: 600,
-          date: new Date(2025, 2, 1),
+          date: new Date("2025-03-01"),
         }),
         makeTransaction({
           id: "tx-3",
           amount: 300,
-          date: new Date(2025, 4, 1),
+          date: new Date("2025-05-01"),
         }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(300);
@@ -84,7 +84,7 @@ describe("computeMonthlyDepositRate", () => {
     it("uses a minimum window of 1 month when all deposits are in the reference month", () => {
       // All deposits in Jun 2025 → 0 elapsed months → clamped to 1
       const transactions = [
-        makeTransaction({ amount: 900, date: new Date(2025, 5, 1) }),
+        makeTransaction({ amount: 900, date: new Date("2025-06-01") }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(900);
     });
@@ -93,17 +93,17 @@ describe("computeMonthlyDepositRate", () => {
       // Deposits: Jan $600 + Apr $600 = $1200; expenses excluded from total.
       // Window: Jan to Jun = 5 months → $240/month
       const transactions = [
-        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
         makeTransaction({
           id: "tx-expense",
           type: BudgetLedgerTransactionType.Expense,
           amount: 999,
-          date: new Date(2025, 1, 1),
+          date: new Date("2025-02-01"),
         }),
         makeTransaction({
           id: "tx-2",
           amount: 600,
-          date: new Date(2025, 3, 1),
+          date: new Date("2025-04-01"),
         }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(240);
@@ -114,7 +114,7 @@ describe("computeMonthlyDepositRate", () => {
     it("returns 0 when all deposits are after the reference date", () => {
       // Only future deposits (Jul 2025) — nothing to base a rate on
       const transactions = [
-        makeTransaction({ amount: 600, date: new Date(2025, 6, 1) }),
+        makeTransaction({ amount: 600, date: new Date("2025-07-01") }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(0);
     });
@@ -123,11 +123,11 @@ describe("computeMonthlyDepositRate", () => {
       // Past: Jan $600; future: Jul $1200 (should be excluded).
       // Window: Jan to Jun = 5 months → $120/month
       const transactions = [
-        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
         makeTransaction({
           id: "tx-future",
           amount: 1200,
-          date: new Date(2025, 6, 1),
+          date: new Date("2025-07-01"),
         }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(120);
@@ -137,7 +137,7 @@ describe("computeMonthlyDepositRate", () => {
       // Deposit on Jun 1 (same as REF_DATE) is not future — it counts.
       // Window is clamped to min 1; $900 / 1 = $900
       const transactions = [
-        makeTransaction({ amount: 900, date: new Date(2025, 5, 1) }),
+        makeTransaction({ amount: 900, date: new Date("2025-06-01") }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE)).toBe(900);
     });
@@ -180,11 +180,11 @@ describe("computeMonthlyDepositRate", () => {
       // to the sum or serve as the earliest-deposit anchor.
       // Only Jan 2025 ($600) counts: window = 5 months → $120/month.
       const transactions = [
-        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
         makeTransaction({
           id: "tx-future",
           amount: 600,
-          date: new Date(2026, 0, 1), // Jan 2026 — clearly future
+          date: new Date("2026-01-01"), // Jan 2026 — clearly future
         }),
       ];
       // Only Jan 2025 deposit counts: $600 over 5 months = $120/month
@@ -197,11 +197,11 @@ describe("computeMonthlyDepositRate", () => {
       // cashCap = 500; deposits of $800 and $600 → clamped to $500 each
       // Total cash: $1000 over 5 months → $200/month
       const transactions = [
-        makeTransaction({ amount: 800, date: new Date(2025, 0, 1) }),
+        makeTransaction({ amount: 800, date: new Date("2025-01-01") }),
         makeTransaction({
           id: "tx-2",
           amount: 600,
-          date: new Date(2025, 3, 1),
+          date: new Date("2025-04-01"),
         }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE, 500)).toBe(200);
@@ -211,11 +211,11 @@ describe("computeMonthlyDepositRate", () => {
       // cashCap = 1000; deposits of $600 and $400 are both under cap
       // Total: $1000 over 5 months → $200/month (same as uncapped)
       const transactions = [
-        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
         makeTransaction({
           id: "tx-2",
           amount: 400,
-          date: new Date(2025, 3, 1),
+          date: new Date("2025-04-01"),
         }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE, 1000)).toBe(200);
@@ -224,11 +224,36 @@ describe("computeMonthlyDepositRate", () => {
     it("behaves identically to no cashCap when cashCap is undefined", () => {
       // $600 deposit, Jan to Jun = 5 months → $120/month with or without cap
       const transactions = [
-        makeTransaction({ amount: 600, date: new Date(2025, 0, 1) }),
+        makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE, undefined)).toBe(
         computeMonthlyDepositRate(transactions, REF_DATE),
       );
+    });
+  });
+
+  describe("derives the window from UTC months regardless of local timezone", () => {
+    const originalTZ = process.env["TZ"];
+    afterEach(() => {
+      if (originalTZ === undefined) {
+        delete process.env["TZ"];
+      } else {
+        process.env["TZ"] = originalTZ;
+      }
+    });
+
+    it("counts the earliest deposit's UTC month in a negative-offset timezone", () => {
+      // Deposit dates are stored as UTC midnight. In UTC-7, local-time getters on
+      // a UTC-midnight Jan 1 read the prior Dec 31, inflating the elapsed window by
+      // a month and lowering the rate. Pinning the timezone makes the regression
+      // deterministic even though CI itself runs in UTC.
+      process.env["TZ"] = "America/Denver";
+      const transactions = [
+        makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
+      ];
+      const referenceDate = new Date(2025, 5, 15); // local June 15
+      // Jan → Jun = 5 months; $600 / 5 = $120 (a local-getter regression yields $100)
+      expect(computeMonthlyDepositRate(transactions, referenceDate)).toBe(120);
     });
   });
 });
