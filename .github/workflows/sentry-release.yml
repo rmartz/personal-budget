@@ -18,6 +18,7 @@ jobs:
   create-release:
     name: Create Sentry Release
     runs-on: ubuntu-latest
+    timeout-minutes: 2
 
     steps:
       - uses: actions/checkout@v7
