@@ -4,23 +4,41 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Let new releases age 7 days before Dependabot proposes them, reducing
+    # exposure to compromised/yanked packages from supply-chain attacks.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"
+    # Group only minor and patch bumps so routine version churn arrives in one
+    # batched PR per dependency type. Major bumps match no group and are raised
+    # as individual PRs, since they more often need code changes and warrant
+    # isolated review.
     groups:
       dev-dependencies:
         dependency-type: development
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
       production-dependencies:
         dependency-type: production
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    # Same 7-day cooldown for action updates — a compromised action tag is a
+    # direct supply-chain risk to CI.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"

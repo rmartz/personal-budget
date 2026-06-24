@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { getClientApp } from "@/lib/firebase/client";
 import {
   type BudgetLedgerSavingsGoal,
-  type FirebaseBudgetLedgerSavingsGoal,
   firebaseToBudgetLedgerSavingsGoal,
 } from "@/lib/firebase/schema/savings-goals";
 
@@ -48,7 +47,7 @@ export function useSavingsGoal(
         } else {
           const data = snapshot.val() as Record<
             string,
-            Record<string, FirebaseBudgetLedgerSavingsGoal>
+            Record<string, unknown>
           >;
           let found: BudgetLedgerSavingsGoal | undefined;
           for (const [ledgerId, ledgerGoals] of Object.entries(data)) {

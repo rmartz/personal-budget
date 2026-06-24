@@ -4,8 +4,8 @@ import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 
 import { getClientApp } from "@/lib/firebase/client";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
-  type FirebaseReconciliationExpense,
   firebaseToReconciliationExpense,
   type ReconciliationExpense,
 } from "@/lib/firebase/schema/reconciliation-expenses";
@@ -33,14 +33,9 @@ export function useReconciliationExpenses(uid: string) {
         if (!snapshot.exists()) {
           setReconciliationExpenses([]);
         } else {
-          const data = snapshot.val() as Record<
-            string,
-            FirebaseReconciliationExpense
-          >;
+          const data = snapshot.val() as Record<string, unknown>;
           setReconciliationExpenses(
-            Object.entries(data).map(([id, entry]) =>
-              firebaseToReconciliationExpense(id, entry),
-            ),
+            parseCollection(data, firebaseToReconciliationExpense),
           );
         }
         setIsLoading(false);
