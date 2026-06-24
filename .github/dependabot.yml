@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Let new releases age 7 days before Dependabot proposes them, reducing
+    # exposure to compromised/yanked packages from supply-chain attacks.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -21,6 +25,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Same 7-day cooldown for action updates — a compromised action tag is a
+    # direct supply-chain risk to CI.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"
