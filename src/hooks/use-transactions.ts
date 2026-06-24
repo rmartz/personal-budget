@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { getClientApp } from "@/lib/firebase/client";
 import {
   type BudgetLedgerTransaction,
-  type FirebaseBudgetLedgerTransaction,
   firebaseToBudgetLedgerTransaction,
 } from "@/lib/firebase/schema/budget-ledger-transactions";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 
 export function useTransactions(uid: string, ledgerId: string) {
   const [transactions, setTransactions] = useState<BudgetLedgerTransaction[]>(
@@ -39,12 +39,9 @@ export function useTransactions(uid: string, ledgerId: string) {
         if (!snapshot.exists()) {
           setTransactions([]);
         } else {
-          const data = snapshot.val() as Record<
-            string,
-            FirebaseBudgetLedgerTransaction
-          >;
+          const data = snapshot.val() as Record<string, unknown>;
           setTransactions(
-            Object.entries(data).map(([id, entry]) =>
+            parseCollection(data, (id, entry) =>
               firebaseToBudgetLedgerTransaction(id, ledgerId, entry),
             ),
           );

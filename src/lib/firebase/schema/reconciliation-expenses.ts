@@ -1,13 +1,19 @@
+import { z } from "zod";
+
 export enum ReconciliationExpenseType {
   RunningBalance = "running-balance",
   StatementBalance = "statement-balance",
 }
 
-export interface FirebaseReconciliationExpense {
-  name: string;
-  type: ReconciliationExpenseType;
-  typicalAmount: number;
-}
+const FirebaseReconciliationExpenseSchema = z.object({
+  name: z.string(),
+  type: z.enum(ReconciliationExpenseType),
+  typicalAmount: z.number(),
+});
+
+export type FirebaseReconciliationExpense = z.infer<
+  typeof FirebaseReconciliationExpenseSchema
+>;
 
 export interface ReconciliationExpense {
   id: string;
@@ -28,12 +34,13 @@ export function reconciliationExpenseToFirebase(
 
 export function firebaseToReconciliationExpense(
   id: string,
-  data: FirebaseReconciliationExpense,
+  data: unknown,
 ): ReconciliationExpense {
+  const parsed = FirebaseReconciliationExpenseSchema.parse(data);
   return {
     id,
-    name: data.name,
-    type: data.type,
-    typicalAmount: data.typicalAmount,
+    name: parsed.name,
+    type: parsed.type,
+    typicalAmount: parsed.typicalAmount,
   };
 }

@@ -1,8 +1,14 @@
-export interface FirebaseAnnuityPayment {
-  amount: number;
-  date: string;
-  notes?: string;
-}
+import { z } from "zod";
+
+const FirebaseAnnuityPaymentSchema = z.object({
+  amount: z.number(),
+  date: z.string(),
+  notes: z.string().optional(),
+});
+
+export type FirebaseAnnuityPayment = z.infer<
+  typeof FirebaseAnnuityPaymentSchema
+>;
 
 export interface AnnuityPayment {
   id: string;
@@ -25,13 +31,14 @@ export function annuityPaymentToFirebase(
 export function firebaseToAnnuityPayment(
   id: string,
   annuityId: string,
-  data: FirebaseAnnuityPayment,
+  data: unknown,
 ): AnnuityPayment {
+  const parsed = FirebaseAnnuityPaymentSchema.parse(data);
   return {
     id,
     annuityId,
-    amount: data.amount,
-    date: new Date(data.date),
-    notes: data.notes,
+    amount: parsed.amount,
+    date: new Date(parsed.date),
+    notes: parsed.notes,
   };
 }

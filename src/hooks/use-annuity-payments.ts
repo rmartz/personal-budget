@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { getClientApp } from "@/lib/firebase/client";
 import {
   type AnnuityPayment,
-  type FirebaseAnnuityPayment,
   firebaseToAnnuityPayment,
 } from "@/lib/firebase/schema/annuity-payments";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 
 export function useAnnuityPayments(uid: string, annuityId: string) {
   const [payments, setPayments] = useState<AnnuityPayment[]>([]);
@@ -35,9 +35,9 @@ export function useAnnuityPayments(uid: string, annuityId: string) {
         if (!snapshot.exists()) {
           setPayments([]);
         } else {
-          const data = snapshot.val() as Record<string, FirebaseAnnuityPayment>;
+          const data = snapshot.val() as Record<string, unknown>;
           setPayments(
-            Object.entries(data).map(([id, entry]) =>
+            parseCollection(data, (id, entry) =>
               firebaseToAnnuityPayment(id, annuityId, entry),
             ),
           );

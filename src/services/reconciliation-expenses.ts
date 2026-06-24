@@ -9,6 +9,7 @@ import {
 } from "firebase/database";
 
 import { getClientApp } from "@/lib/firebase/client";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
   type FirebaseReconciliationExpense,
   firebaseToReconciliationExpense,
@@ -35,10 +36,8 @@ export async function getReconciliationExpenses(
   if (!snapshot.exists()) {
     return [];
   }
-  const data = snapshot.val() as Record<string, FirebaseReconciliationExpense>;
-  return Object.entries(data).map(([id, entry]) =>
-    firebaseToReconciliationExpense(id, entry),
-  );
+  const data = snapshot.val() as Record<string, unknown>;
+  return parseCollection(data, firebaseToReconciliationExpense);
 }
 
 export async function createReconciliationExpense(
