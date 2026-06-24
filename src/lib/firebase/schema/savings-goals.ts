@@ -1,9 +1,15 @@
-export interface FirebaseBudgetLedgerSavingsGoal {
-  name: string;
-  targetAmount: number;
-  fundedAmount: number;
-  priority: number;
-}
+import { z } from "zod";
+
+const FirebaseBudgetLedgerSavingsGoalSchema = z.object({
+  name: z.string(),
+  targetAmount: z.number(),
+  fundedAmount: z.number().default(0),
+  priority: z.number(),
+});
+
+export type FirebaseBudgetLedgerSavingsGoal = z.infer<
+  typeof FirebaseBudgetLedgerSavingsGoalSchema
+>;
 
 export interface BudgetLedgerSavingsGoal {
   id: string;
@@ -28,14 +34,15 @@ export function budgetLedgerSavingsGoalToFirebase(
 export function firebaseToBudgetLedgerSavingsGoal(
   id: string,
   ledgerId: string,
-  data: FirebaseBudgetLedgerSavingsGoal,
+  data: unknown,
 ): BudgetLedgerSavingsGoal {
+  const parsed = FirebaseBudgetLedgerSavingsGoalSchema.parse(data);
   return {
     id,
     ledgerId,
-    name: data.name,
-    targetAmount: data.targetAmount,
-    fundedAmount: data.fundedAmount,
-    priority: data.priority,
+    name: parsed.name,
+    targetAmount: parsed.targetAmount,
+    fundedAmount: parsed.fundedAmount,
+    priority: parsed.priority,
   };
 }

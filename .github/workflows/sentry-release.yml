@@ -18,13 +18,14 @@ jobs:
   create-release:
     name: Create Sentry Release
     runs-on: ubuntu-latest
+    timeout-minutes: 2
 
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: getsentry/action-release@v1
+      - uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: reedmartz

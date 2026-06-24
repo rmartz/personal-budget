@@ -1,17 +1,21 @@
+import { z } from "zod";
+
 export enum AnnuityMonthlyMode {
   Flat = "flat",
   PVDerived = "pv-derived",
 }
 
-export interface FirebaseAnnuity {
-  annualRatePercent?: number;
-  durationMonths: number | null;
-  monthlyAmount: number;
-  monthlyMode?: AnnuityMonthlyMode;
-  name: string;
-  presentValue?: number;
-  startDate: string;
-}
+const FirebaseAnnuitySchema = z.object({
+  annualRatePercent: z.number().optional(),
+  durationMonths: z.number().nullable(),
+  monthlyAmount: z.number(),
+  monthlyMode: z.enum(AnnuityMonthlyMode).optional(),
+  name: z.string(),
+  presentValue: z.number().optional(),
+  startDate: z.string(),
+});
+
+export type FirebaseAnnuity = z.infer<typeof FirebaseAnnuitySchema>;
 
 export interface Annuity {
   annualRatePercent?: number;
@@ -38,15 +42,16 @@ export function annuityToFirebase(
   };
 }
 
-export function firebaseToAnnuity(id: string, data: FirebaseAnnuity): Annuity {
+export function firebaseToAnnuity(id: string, data: unknown): Annuity {
+  const parsed = FirebaseAnnuitySchema.parse(data);
   return {
-    annualRatePercent: data.annualRatePercent,
-    durationMonths: data.durationMonths ?? undefined,
+    annualRatePercent: parsed.annualRatePercent,
+    durationMonths: parsed.durationMonths ?? undefined,
     id,
-    monthlyAmount: data.monthlyAmount,
-    monthlyMode: data.monthlyMode ?? AnnuityMonthlyMode.Flat,
-    name: data.name,
-    presentValue: data.presentValue,
-    startDate: new Date(data.startDate),
+    monthlyAmount: parsed.monthlyAmount,
+    monthlyMode: parsed.monthlyMode ?? AnnuityMonthlyMode.Flat,
+    name: parsed.name,
+    presentValue: parsed.presentValue,
+    startDate: new Date(parsed.startDate),
   };
 }
