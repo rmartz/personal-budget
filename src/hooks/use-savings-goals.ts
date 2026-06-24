@@ -4,9 +4,9 @@ import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 
 import { getClientApp } from "@/lib/firebase/client";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
   type BudgetLedgerSavingsGoal,
-  type FirebaseBudgetLedgerSavingsGoal,
   firebaseToBudgetLedgerSavingsGoal,
 } from "@/lib/firebase/schema/savings-goals";
 
@@ -36,12 +36,9 @@ export function useSavingsGoals(uid: string, ledgerId: string) {
         if (!snapshot.exists()) {
           setSavingsGoals([]);
         } else {
-          const data = snapshot.val() as Record<
-            string,
-            FirebaseBudgetLedgerSavingsGoal
-          >;
+          const data = snapshot.val() as Record<string, unknown>;
           setSavingsGoals(
-            Object.entries(data).map(([id, entry]) =>
+            parseCollection(data, (id, entry) =>
               firebaseToBudgetLedgerSavingsGoal(id, ledgerId, entry),
             ),
           );

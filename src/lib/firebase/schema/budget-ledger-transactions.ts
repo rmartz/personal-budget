@@ -1,14 +1,20 @@
+import { z } from "zod";
+
 export enum BudgetLedgerTransactionType {
   Deposit = "deposit",
   Expense = "expense",
 }
 
-export interface FirebaseBudgetLedgerTransaction {
-  type: BudgetLedgerTransactionType;
-  date: string;
-  amount: number;
-  description: string;
-}
+const FirebaseBudgetLedgerTransactionSchema = z.object({
+  type: z.enum(BudgetLedgerTransactionType),
+  date: z.string(),
+  amount: z.number(),
+  description: z.string(),
+});
+
+export type FirebaseBudgetLedgerTransaction = z.infer<
+  typeof FirebaseBudgetLedgerTransactionSchema
+>;
 
 export interface BudgetLedgerTransaction {
   id: string;
@@ -33,14 +39,15 @@ export function budgetLedgerTransactionToFirebase(
 export function firebaseToBudgetLedgerTransaction(
   id: string,
   ledgerId: string,
-  data: FirebaseBudgetLedgerTransaction,
+  data: unknown,
 ): BudgetLedgerTransaction {
+  const parsed = FirebaseBudgetLedgerTransactionSchema.parse(data);
   return {
     id,
     ledgerId,
-    type: data.type,
-    date: new Date(data.date),
-    amount: data.amount,
-    description: data.description,
+    type: parsed.type,
+    date: new Date(parsed.date),
+    amount: parsed.amount,
+    description: parsed.description,
   };
 }

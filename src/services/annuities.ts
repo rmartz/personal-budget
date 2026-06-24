@@ -15,6 +15,7 @@ import {
   type FirebaseAnnuity,
   firebaseToAnnuity,
 } from "@/lib/firebase/schema/annuities";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 
 function db() {
   return getDatabase(getClientApp());
@@ -33,10 +34,8 @@ export async function getAnnuities(uid: string): Promise<Annuity[]> {
   if (!snapshot.exists()) {
     return [];
   }
-  const data = snapshot.val() as Record<string, FirebaseAnnuity>;
-  return Object.entries(data).map(([id, entry]) =>
-    firebaseToAnnuity(id, entry),
-  );
+  const data = snapshot.val() as Record<string, unknown>;
+  return parseCollection(data, firebaseToAnnuity);
 }
 
 export async function createAnnuity(

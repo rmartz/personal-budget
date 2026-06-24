@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export enum ReconciliationAccountTier {
   Investment = "investment",
   LongTerm = "long-term",
@@ -5,11 +7,15 @@ export enum ReconciliationAccountTier {
   ShortTerm = "short-term",
 }
 
-export interface FirebaseReconciliationAccount {
-  name: string;
-  tier: ReconciliationAccountTier;
-  targetFloat?: number;
-}
+const FirebaseReconciliationAccountSchema = z.object({
+  name: z.string(),
+  tier: z.enum(ReconciliationAccountTier),
+  targetFloat: z.number().optional(),
+});
+
+export type FirebaseReconciliationAccount = z.infer<
+  typeof FirebaseReconciliationAccountSchema
+>;
 
 export interface ReconciliationAccount {
   id: string;
@@ -32,14 +38,15 @@ export function reconciliationAccountToFirebase(
 
 export function firebaseToReconciliationAccount(
   id: string,
-  data: FirebaseReconciliationAccount,
+  data: unknown,
 ): ReconciliationAccount {
+  const parsed = FirebaseReconciliationAccountSchema.parse(data);
   return {
     id,
-    name: data.name,
-    tier: data.tier,
-    ...(data.targetFloat !== undefined
-      ? { targetFloat: data.targetFloat }
+    name: parsed.name,
+    tier: parsed.tier,
+    ...(parsed.targetFloat !== undefined
+      ? { targetFloat: parsed.targetFloat }
       : {}),
   };
 }
