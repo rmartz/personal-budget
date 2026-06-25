@@ -4,6 +4,80 @@ import {
 } from "@/lib/firebase/schema/budget-ledger-transactions";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
 
+import { applyDepositSplit } from "./reconciliation/deposit-split";
+import { applyExpenseDeduction } from "./reconciliation/expense-deduction";
+
+/**
+ * Sums the exact cash-allocated portion of each in-window deposit by replaying
+ * the transactions chronologically through the same cash/investment split logic
+ * the ledger uses (`applyDepositSplit` / `applyExpenseDeduction`), tracking a
+ * running cash balance throughout.
+ *
+ * When `cashCap` is undefined, every deposit flows entirely into cash, so the
+ * sum equals the raw in-window deposit total. When a cap is set, each deposit's
+ * cash portion is `Math.min(amount, cashCap - cashBalance)` — the true split,
+ * not the `Math.min(amount, cashCap)` upper bound. Expenses draw cash down
+ * first, freeing cap space for subsequent deposits, so the running balance
+ * faithfully mirrors the ledger's reconciled state.
+ *
+ * `inWindowIds` restricts the cash-portion accumulation to deposits within the
+ * projection window, while the replay itself processes every transaction passed
+ * in so the running balance reflects all activity preceding each in-window
+ * deposit.
+ */
+function sumWindowedCashDeposits(
+  transactions: BudgetLedgerTransaction[],
+  inWindowIds: Set<string>,
+  cashCap: number | undefined,
+): number {
+  const sorted = [...transactions].sort((a, b) => {
+    const dateDiff = a.date.getTime() - b.date.getTime();
+    if (dateDiff !== 0) return dateDiff;
+    // Same day: deposits before expenses so same-day deposits fund same-day expenses
+    if (
+      a.type === BudgetLedgerTransactionType.Deposit &&
+      b.type === BudgetLedgerTransactionType.Expense
+    )
+      return -1;
+    if (
+      a.type === BudgetLedgerTransactionType.Expense &&
+      b.type === BudgetLedgerTransactionType.Deposit
+    )
+      return 1;
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  });
+
+  let cashBalance = 0;
+  let investmentBalance = 0;
+  let windowedCash = 0;
+
+  for (const tx of sorted) {
+    if (tx.type === BudgetLedgerTransactionType.Deposit) {
+      const next = applyDepositSplit({
+        cashBalance,
+        cashCap,
+        depositAmount: tx.amount,
+        investmentBalance,
+      });
+      if (inWindowIds.has(tx.id)) {
+        windowedCash += next.cashBalance - cashBalance;
+      }
+      cashBalance = next.cashBalance;
+      investmentBalance = next.investmentBalance;
+    } else {
+      const next = applyExpenseDeduction({
+        cashBalance,
+        expenseAmount: tx.amount,
+        investmentBalance,
+      });
+      cashBalance = Math.max(0, next.cashBalance);
+      investmentBalance = Math.max(0, next.investmentBalance);
+    }
+  }
+
+  return windowedCash;
+}
+
 /**
  * Computes the average monthly deposit amount from a transaction history.
  *
@@ -28,10 +102,14 @@ import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goal
  * normalised to UTC midnight of the local calendar day so that a deposit
  * dated "today" is always included regardless of the caller's UTC offset.
  *
- * When `cashCap` is provided, each deposit's contribution is clamped to
- * `Math.min(deposit.amount, cashCap)`, reflecting only the portion that flows
- * into the cash split. Omit `cashCap` (or pass `undefined`) for ledgers with
- * no cash cap.
+ * When `cashCap` is provided, the rate reflects only the exact cash-allocated
+ * portion of each deposit — derived by replaying the full transaction history
+ * through the ledger's cash/investment split (`applyDepositSplit`) and tracking
+ * a running cash balance. This is the true split (`Math.min(amount, cashCap -
+ * cashBalance)`), not the `Math.min(amount, cashCap)` upper bound, so a
+ * persistently-high cash balance no longer overstates the projected rate. Omit
+ * `cashCap` (or pass `undefined`) for ledgers with no cash cap, in which case
+ * deposits contribute their full amount.
  */
 export function computeMonthlyDepositRate(
   transactions: BudgetLedgerTransaction[],
@@ -43,22 +121,24 @@ export function computeMonthlyDepositRate(
     referenceDate.getMonth(),
     referenceDate.getDate(),
   );
+  const isInWindow = (tx: BudgetLedgerTransaction): boolean =>
+    Date.UTC(
+      tx.date.getUTCFullYear(),
+      tx.date.getUTCMonth(),
+      tx.date.getUTCDate(),
+    ) <= refDayUTC;
+
   const deposits = transactions.filter(
-    (tx) =>
-      tx.type === BudgetLedgerTransactionType.Deposit &&
-      Date.UTC(
-        tx.date.getUTCFullYear(),
-        tx.date.getUTCMonth(),
-        tx.date.getUTCDate(),
-      ) <= refDayUTC,
+    (tx) => tx.type === BudgetLedgerTransactionType.Deposit && isInWindow(tx),
   );
 
   if (deposits.length === 0) return 0;
 
-  const totalDeposits = deposits.reduce(
-    (sum, tx) =>
-      sum + (cashCap !== undefined ? Math.min(tx.amount, cashCap) : tx.amount),
-    0,
+  const inWindowIds = new Set(deposits.map((tx) => tx.id));
+  const totalCashDeposits = sumWindowedCashDeposits(
+    transactions.filter(isInWindow),
+    inWindowIds,
+    cashCap,
   );
 
   const earliestDeposit = deposits.reduce((earliest, tx) =>
@@ -72,7 +152,7 @@ export function computeMonthlyDepositRate(
 
   const monthsElapsed = Math.max(1, refMonths - startMonths);
 
-  return totalDeposits / monthsElapsed;
+  return totalCashDeposits / monthsElapsed;
 }
 
 /**

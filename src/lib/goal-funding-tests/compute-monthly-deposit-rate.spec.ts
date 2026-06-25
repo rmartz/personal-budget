@@ -153,10 +153,12 @@ describe("computeMonthlyDepositRate", () => {
     });
   });
 
-  describe("clamps each deposit to cashCap when provided", () => {
-    it("limits each deposit to the cashCap before summing", () => {
-      // cashCap = 500; deposits of $800 and $600 → clamped to $500 each
-      // Total cash: $1000 over 5 months → $200/month
+  describe("uses the exact cash split against the running cap", () => {
+    it("counts only the cash portion once the cap is reached", () => {
+      // cashCap = 500. The $800 deposit fills the cap ($500 to cash); the later
+      // $600 deposit finds the cap already full and adds $0 to cash — the exact
+      // split, not the $500-per-deposit upper bound the old clamp assumed.
+      // Total cash: $500 over 5 months → $100/month.
       const transactions = [
         makeTransaction({ amount: 800, date: new Date("2025-01-01") }),
         makeTransaction({
@@ -165,12 +167,12 @@ describe("computeMonthlyDepositRate", () => {
           date: new Date("2025-04-01"),
         }),
       ];
-      expect(computeMonthlyDepositRate(transactions, REF_DATE, 500)).toBe(200);
+      expect(computeMonthlyDepositRate(transactions, REF_DATE, 500)).toBe(100);
     });
 
-    it("does not clamp deposits that are below cashCap", () => {
-      // cashCap = 1000; deposits of $600 and $400 are both under cap
-      // Total: $1000 over 5 months → $200/month (same as uncapped)
+    it("counts the full deposit while cash stays under the cap", () => {
+      // cashCap = 1000; $600 then $400 keep the running cash balance at/under the
+      // cap, so both flow fully into cash. Total: $1000 over 5 months → $200/month.
       const transactions = [
         makeTransaction({ amount: 600, date: new Date("2025-01-01") }),
         makeTransaction({
@@ -180,6 +182,29 @@ describe("computeMonthlyDepositRate", () => {
         }),
       ];
       expect(computeMonthlyDepositRate(transactions, REF_DATE, 1000)).toBe(200);
+    });
+
+    it("frees cap space when an expense draws cash down", () => {
+      // cashCap = 500. Jan $500 fills the cap; the Feb $200 expense draws cash to
+      // $300, freeing $200 of cap space; Mar $400 then contributes $200 to cash.
+      // Windowed cash: $500 + $200 = $700 over 5 months → $140/month. Without the
+      // expense the Mar deposit would have added $0 — the running balance is what
+      // makes the split exact.
+      const transactions = [
+        makeTransaction({ amount: 500, date: new Date("2025-01-01") }),
+        makeTransaction({
+          id: "tx-expense",
+          type: BudgetLedgerTransactionType.Expense,
+          amount: 200,
+          date: new Date("2025-02-01"),
+        }),
+        makeTransaction({
+          id: "tx-2",
+          amount: 400,
+          date: new Date("2025-03-01"),
+        }),
+      ];
+      expect(computeMonthlyDepositRate(transactions, REF_DATE, 500)).toBe(140);
     });
 
     it("behaves identically to no cashCap when cashCap is undefined", () => {
