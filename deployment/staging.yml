@@ -3,10 +3,10 @@
 # Staging Firebase project (personal-budget-staging-a99af), separate from
 # production. Its Realtime Database exists and its URL is populated below.
 #
-# After changing values here, sync them to Vercel's Preview environment with
-# `pnpm exec sync-env --env=staging` so previews use the staging project rather
-# than production. The staging RTDB should carry the same security rules as
-# production (firebase/database.rules.json).
+# After changing values here, sync them to Vercel's Preview environment with the
+# local env tooling (envctl, forthcoming) so previews use the staging project
+# rather than production. The staging RTDB should carry the same security rules
+# as production (firebase/database.rules.json).
 #
 # Only non-sensitive variables belong here. All keys are validated against
 # deployment/schema.yml — sensitive variables (private keys, auth tokens, DSNs)
