@@ -1,17 +1,21 @@
 # Public environment variables for the staging environment.
 #
-# ── DISABLED ──────────────────────────────────────────────────────────────────
-# Staging is not listed in deployment/environments.yml and is not part of the
-# active rotation or validation cycle. The dedicated staging Firebase project
-# (personal-budget-staging-a99af) cannot have a Realtime Database created due
-# to a Firebase console bug. Preview deployments currently use the production
-# Firebase project.
+# ── PENDING RTDB (#319) ───────────────────────────────────────────────────────
+# Staging is re-enabled in deployment/environments.yml. The one remaining manual
+# step is creating the Realtime Database in the staging Firebase project
+# (personal-budget-staging-a99af) and filling the two *_DATABASE_URL values below.
 #
-# To re-enable staging:
-#   1. Create the RTDB in the staging Firebase project
-#   2. Populate NEXT_PUBLIC_FIREBASE_DATABASE_URL and FIREBASE_DATABASE_URL below
-#   3. Re-add staging to deployment/environments.yml and set single_environment: false
-#   4. Run: pnpm exec sync-env --env=staging
+# The previous "Firebase console bug" note was never a confirmed Firebase
+# limitation — RTDB creation should simply be retried in the console.
+#
+# To finish:
+#   1. Create the RTDB in the staging Firebase project (Firebase console)
+#   2. Fill NEXT_PUBLIC_FIREBASE_DATABASE_URL and FIREBASE_DATABASE_URL below.
+#      Likely https://personal-budget-staging-a99af-default-rtdb.firebaseio.com,
+#      or a region URL like ...-default-rtdb.<region>.firebasedatabase.app —
+#      use the exact value the console shows.
+#   3. Run: pnpm exec sync-env --env=staging
+#   4. Point the Vercel Preview environment at the staging Firebase config
 # ──────────────────────────────────────────────────────────────────────────────
 #
 # Only non-sensitive variables belong here. All keys are validated against
@@ -28,11 +32,13 @@ variables:
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "personal-budget-staging-a99af.firebasestorage.app"
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "655402175210"
   NEXT_PUBLIC_FIREBASE_APP_ID: "1:655402175210:web:e8b1339a4e630335b9a593"
+  # TODO(#319): fill after creating the staging RTDB (see header). Until then,
+  # config validation and staging deploys will not fully succeed.
   NEXT_PUBLIC_FIREBASE_DATABASE_URL: ""
 
   # Firebase Admin SDK — project identifier only, not a credential
-  # NEXT_PUBLIC_FIREBASE_DATABASE_URL is empty — staging project may not have Realtime DB enabled
   FIREBASE_PROJECT_ID: "personal-budget-staging-a99af"
+  # TODO(#319): fill with the same RTDB URL as NEXT_PUBLIC_FIREBASE_DATABASE_URL above.
   FIREBASE_DATABASE_URL: ""
 
   # Sentry — slugs only, not credentials

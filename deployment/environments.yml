@@ -11,9 +11,15 @@
 
 active:
   - production
+  - staging
 
-# Staging is temporarily disabled — the dedicated staging Firebase project
-# (personal-budget-staging-a99af) cannot have a Realtime Database created due
-# to a Firebase console bug. Re-add staging here and set single_environment: false
-# once the staging RTDB is available.
-single_environment: true
+# Staging re-enabled (#319). The dedicated staging Firebase project
+# (personal-budget-staging-a99af) needs its Realtime Database created in the
+# Firebase console, after which NEXT_PUBLIC_FIREBASE_DATABASE_URL and
+# FIREBASE_DATABASE_URL must be filled in deployment/staging.yml. The earlier
+# "Firebase console bug" note was never a confirmed Firebase limitation —
+# RTDB creation should simply be retried.
+#
+# TODO(#319): until the staging RTDB URL is populated, config validation and
+# staging deploys will not fully succeed. This is the only remaining manual step.
+single_environment: false
