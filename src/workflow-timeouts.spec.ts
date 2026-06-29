@@ -10,6 +10,7 @@ import { parse } from "yaml";
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "ci-actions.yml": {
     build: 2,
+    "detect-changes": 1,
     format: 2,
     lint: 2,
     "storybook-build": 2,
