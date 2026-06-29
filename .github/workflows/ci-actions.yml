@@ -12,12 +12,31 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 2
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test
+      # Headless Vitest projects only — no browser, so no Playwright install.
+      - run: pnpm exec vitest run --project node --project hooks --project components
+
+  storybook-tests:
+    name: Storybook Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Install Playwright Chromium
+        # Retry to ride out transient apt/CDN failures during --with-deps.
+        run: |
+          for attempt in 1 2 3; do
+            pnpm exec playwright install --with-deps chromium && exit 0
+            echo "playwright install attempt $attempt failed; retrying..." >&2
+            sleep 5
+          done
+          echo "playwright install failed after 3 attempts" >&2
+          exit 1
+      - run: pnpm exec vitest run --project storybook
 
   lint:
     name: Lint
