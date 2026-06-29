@@ -86,6 +86,11 @@ jobs:
   storybook-screenshots:
     name: Storybook Screenshots
     if: github.event_name == 'pull_request'
+    # Advisory only: PR-preview decoration built on a flaky third-party beta
+    # action. A hang or failure must report neutral, never block merge. The
+    # correctness gates (Tests, Storybook Tests, Lint, Format, Type Check,
+    # Build) remain hard-gating.
+    continue-on-error: true
     concurrency:
       group: storybook-screenshots-${{ github.event.pull_request.number }}
       cancel-in-progress: true
