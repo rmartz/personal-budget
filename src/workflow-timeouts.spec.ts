@@ -29,6 +29,7 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     "create-release": 2,
   },
   "validate-config.yml": {
+    "detect-changes": 1,
     "validate-config": 2,
   },
 };
