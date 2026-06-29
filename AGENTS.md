@@ -15,10 +15,13 @@ pnpm test             # Run tests with Vitest
 pnpm tsc              # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
-pnpm run env:pull     # Pull .env.local from Vercel
 pnpm run env:validate # Validate deployment config files against schema
-pnpm run secrets-check # Config validation + gitleaks scan (also runs pre-commit)
 ```
+
+Local environment-config management (pulling `.env.local`, syncing values to
+Vercel) previously ran through `vercel-deploy-scripts`; it is being replaced by a
+local `envctl` CLI (forthcoming). `pnpm run env:validate` is the one env command
+that remains in `package.json` (a local script with no external dependency).
 
 ## Worktree Setup
 
@@ -28,10 +31,9 @@ After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `p
 
 Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
 
-- To sync public config values to Vercel: `pnpm exec sync-env` (all environments) or `pnpm exec sync-env --env=<staging|production>`
-- To rotate all secrets (Firebase + Sentry): `pnpm exec sync-env --rotate-keys --env=<staging|production>`
-- To validate config files against schema locally: `pnpm run env:validate`
-- Secrets checks run automatically on every commit via `.husky/pre-commit`; also enforced in CI via `.github/workflows/secret-scan.yml`
+- To validate config files against schema locally: `pnpm run env:validate` (also runs in the pre-commit hook and the CI `validate-config` job).
+- Syncing config values to Vercel and pulling a local `.env.local` were provided by `vercel-deploy-scripts` (now removed); a local `envctl` CLI will replace them (forthcoming, local-only — not wired into CI).
+- Secret scanning (gitleaks) runs in CI via `.github/workflows/secret-scan.yml`. With `vercel-deploy-scripts` removed, the pre-commit hook no longer runs gitleaks locally — only config validation; CI remains the enforcing secret-scan gate.
 
 ## TypeScript
 
@@ -45,6 +47,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
 - **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files.
 - **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file — e.g., a context wrapper, structural template, or props alias. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests (e.g., list items, row components, panels, form sections). All component props must be defined as an explicitly named interface (e.g., `interface UserListProps`), never inline in the function signature.
+- **In-scope splitting of substantially-modified oversized files**: When a PR substantially modifies a file and that change pushes it past the recommended split threshold (more than 20% over the line limit — i.e. ~240 lines for source, ~360 for tests), splitting that file by logical concern is **in scope for the same PR**, not a separate change to defer. If the `/review` skill observes such a file that was _not_ split, it decides — based on how substantial the modification was — whether to require the split within that PR or to defer it to a follow-on `Tech Debt` ticket. Require the split in-PR when the file was substantially reworked; defer to a ticket when the change to the oversized file was incidental or small relative to its size. Either way the unsplit oversized file should not pass silently — it is flagged for a decision.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain.
 - Add a barrel `index.ts` when a component or module directory exposes a public API or already
   follows a barrel pattern; do not require one for every directory (e.g. ShadCN-generated
@@ -86,6 +89,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 ## Documentation
 
 - Keep documentation in sync with the code — outdated docs are worse than no docs.
+- Reference docs under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with a YAML frontmatter block whose only required key is `type` (drawn from the vocabulary in [`docs/index.md`](docs/index.md) — `Schema`, `Reference`, `Guide`), plus the recommended `title`, `description`, `resource` (path to the asset the page documents), and `tags`. When adding a new `docs/` page, include the frontmatter and add a listing entry to `docs/index.md`.
 
 ## React / Next.js Standards
 
@@ -142,7 +146,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - **Never make a breaking schema change without a migration.** A breaking change is any modification to the Firebase Realtime DB path structure or field format that would cause existing stored data to be misread, ignored, or crash the application — for example: renaming a path segment, changing a field's type, removing a required field, or altering an enum's serialized value.
 - Before merging a breaking schema change, provide a migration script in `scripts/migrations/` that reads the old data shape and writes it in the new shape. The script must be idempotent (safe to run multiple times) and must not delete old data until the migration is verified complete.
 - Additive changes (new optional fields with safe defaults in `firebaseTo*()` helpers, new path segments that existing code ignores) are not breaking and do not require a migration.
-- Document the migration in `docs/database-schema.md` alongside the schema change.
+- Document the migration in `docs/database-schema.md` alongside the schema change, keeping its OKF frontmatter (see the Documentation section) accurate.
 
 ## GitHub Issues
 

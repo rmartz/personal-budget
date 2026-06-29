@@ -1,7 +1,11 @@
-export interface FirebaseBudgetLedger {
-  name: string;
-  cashCap: number | null;
-}
+import { z } from "zod";
+
+const FirebaseBudgetLedgerSchema = z.object({
+  name: z.string(),
+  cashCap: z.number().nullable(),
+});
+
+export type FirebaseBudgetLedger = z.infer<typeof FirebaseBudgetLedgerSchema>;
 
 export interface BudgetLedger {
   id: string;
@@ -20,11 +24,12 @@ export function budgetLedgerToFirebase(
 
 export function firebaseToBudgetLedger(
   id: string,
-  data: FirebaseBudgetLedger,
+  data: unknown,
 ): BudgetLedger {
+  const parsed = FirebaseBudgetLedgerSchema.parse(data);
   return {
     id,
-    name: data.name,
-    cashCap: data.cashCap ?? undefined,
+    name: parsed.name,
+    cashCap: parsed.cashCap ?? undefined,
   };
 }

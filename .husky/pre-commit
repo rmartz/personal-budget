@@ -1,1 +1,7 @@
-pnpm exec lint-staged && pnpm run secrets-check
+#!/bin/sh
+# Skip in git worktrees — .git is a file there (not a directory).
+# Agent worktrees get claude/hooks/pre-commit via core.hooksPath instead.
+if [ -f ".git" ]; then
+  exit 0
+fi
+pnpm exec lint-staged && pnpm run env:validate && node scripts/check-file-length.mjs --staged

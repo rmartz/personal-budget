@@ -1,18 +1,12 @@
 # Public environment variables for the staging environment.
 #
-# ── DISABLED ──────────────────────────────────────────────────────────────────
-# Staging is not listed in deployment/environments.yml and is not part of the
-# active rotation or validation cycle. The dedicated staging Firebase project
-# (personal-budget-staging-a99af) cannot have a Realtime Database created due
-# to a Firebase console bug. Preview deployments currently use the production
-# Firebase project.
+# Staging Firebase project (personal-budget-staging-a99af), separate from
+# production. Its Realtime Database exists and its URL is populated below.
 #
-# To re-enable staging:
-#   1. Create the RTDB in the staging Firebase project
-#   2. Populate NEXT_PUBLIC_FIREBASE_DATABASE_URL and FIREBASE_DATABASE_URL below
-#   3. Re-add staging to deployment/environments.yml and set single_environment: false
-#   4. Run: pnpm exec sync-env --env=staging
-# ──────────────────────────────────────────────────────────────────────────────
+# After changing values here, sync them to Vercel's Preview environment with
+# `pnpm exec sync-env --env=staging` so previews use the staging project rather
+# than production. The staging RTDB should carry the same security rules as
+# production (firebase/database.rules.json).
 #
 # Only non-sensitive variables belong here. All keys are validated against
 # deployment/schema.yml — sensitive variables (private keys, auth tokens, DSNs)
@@ -28,12 +22,11 @@ variables:
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "personal-budget-staging-a99af.firebasestorage.app"
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "655402175210"
   NEXT_PUBLIC_FIREBASE_APP_ID: "1:655402175210:web:e8b1339a4e630335b9a593"
-  NEXT_PUBLIC_FIREBASE_DATABASE_URL: ""
+  NEXT_PUBLIC_FIREBASE_DATABASE_URL: "https://personal-budget-staging-a99af-default-rtdb.firebaseio.com"
 
   # Firebase Admin SDK — project identifier only, not a credential
-  # NEXT_PUBLIC_FIREBASE_DATABASE_URL is empty — staging project may not have Realtime DB enabled
   FIREBASE_PROJECT_ID: "personal-budget-staging-a99af"
-  FIREBASE_DATABASE_URL: ""
+  FIREBASE_DATABASE_URL: "https://personal-budget-staging-a99af-default-rtdb.firebaseio.com"
 
   # Sentry — slugs only, not credentials
   SENTRY_ORG: "reedmartz"

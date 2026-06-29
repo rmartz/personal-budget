@@ -1,3 +1,11 @@
+---
+type: Schema
+title: Firebase Realtime Database Schema
+description: Path structure, field formats, and security rules for all user data in the Firebase Realtime Database.
+resource: firebase/database.rules.json
+tags: [firebase, schema, persistence, security-rules]
+---
+
 # Firebase Realtime Database Schema
 
 ## Multi-User Extensibility

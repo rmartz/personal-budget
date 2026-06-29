@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { getClientApp } from "@/lib/firebase/client";
 import {
   type Annuity,
-  type FirebaseAnnuity,
   firebaseToAnnuity,
 } from "@/lib/firebase/schema/annuities";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 
 export function useAnnuities(uid: string) {
   const [annuities, setAnnuities] = useState<Annuity[]>([]);
@@ -31,12 +31,8 @@ export function useAnnuities(uid: string) {
         if (!snapshot.exists()) {
           setAnnuities([]);
         } else {
-          const data = snapshot.val() as Record<string, FirebaseAnnuity>;
-          setAnnuities(
-            Object.entries(data).map(([id, entry]) =>
-              firebaseToAnnuity(id, entry),
-            ),
-          );
+          const data = snapshot.val() as Record<string, unknown>;
+          setAnnuities(parseCollection(data, firebaseToAnnuity));
         }
         setIsLoading(false);
       },

@@ -4,8 +4,8 @@ import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 
 import { getClientApp } from "@/lib/firebase/client";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
-  type FirebaseReconciliationAccount,
   firebaseToReconciliationAccount,
   type ReconciliationAccount,
 } from "@/lib/firebase/schema/reconciliation-accounts";
@@ -33,14 +33,9 @@ export function useReconciliationAccounts(uid: string) {
         if (!snapshot.exists()) {
           setReconciliationAccounts([]);
         } else {
-          const data = snapshot.val() as Record<
-            string,
-            FirebaseReconciliationAccount
-          >;
+          const data = snapshot.val() as Record<string, unknown>;
           setReconciliationAccounts(
-            Object.entries(data).map(([id, entry]) =>
-              firebaseToReconciliationAccount(id, entry),
-            ),
+            parseCollection(data, firebaseToReconciliationAccount),
           );
         }
         setIsLoading(false);

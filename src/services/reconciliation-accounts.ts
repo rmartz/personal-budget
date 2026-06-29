@@ -9,6 +9,7 @@ import {
 } from "firebase/database";
 
 import { getClientApp } from "@/lib/firebase/client";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
   type FirebaseReconciliationAccount,
   firebaseToReconciliationAccount,
@@ -35,10 +36,8 @@ export async function getReconciliationAccounts(
   if (!snapshot.exists()) {
     return [];
   }
-  const data = snapshot.val() as Record<string, FirebaseReconciliationAccount>;
-  return Object.entries(data).map(([id, entry]) =>
-    firebaseToReconciliationAccount(id, entry),
-  );
+  const data = snapshot.val() as Record<string, unknown>;
+  return parseCollection(data, firebaseToReconciliationAccount);
 }
 
 export async function createReconciliationAccount(
