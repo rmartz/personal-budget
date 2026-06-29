@@ -198,39 +198,21 @@ function resolveStoryFileForChangedFile(repoRoot, changedFilePath) {
     return undefined;
   }
 
-  const absolutePath = join(repoRoot, normalizedPath);
-
+  // Only screenshot when the story (Storybook test) file itself changed: a story
+  // change is when intended behavior changed, which is what a screenshot should
+  // validate. A change to a component (or any non-story file) is a potential
+  // *regression* — caught by the always-run Storybook Tests job, not by emitting
+  // a screenshot to eyeball. So a non-story change maps to no story.
   if (
-    normalizedPath.endsWith(".stories.tsx") ||
-    normalizedPath.endsWith(".stories.ts")
-  ) {
-    return existsSync(absolutePath) ? normalizedPath : undefined;
-  }
-
-  if (!/\.(tsx?|jsx?)$/.test(normalizedPath)) {
-    return undefined;
-  }
-
-  if (
-    normalizedPath.endsWith(".spec.ts") ||
-    normalizedPath.endsWith(".spec.tsx")
+    !normalizedPath.endsWith(".stories.tsx") &&
+    !normalizedPath.endsWith(".stories.ts")
   ) {
     return undefined;
   }
 
-  const withoutExtension = normalizedPath.replace(/\.[^.]+$/, "");
-  const storyCandidates = [
-    `${withoutExtension}.stories.tsx`,
-    `${withoutExtension}.stories.ts`,
-  ];
-
-  for (const candidate of storyCandidates) {
-    if (existsSync(join(repoRoot, candidate))) {
-      return candidate;
-    }
-  }
-
-  return undefined;
+  return existsSync(join(repoRoot, normalizedPath))
+    ? normalizedPath
+    : undefined;
 }
 
 function buildConfigYaml(screenshots) {
