@@ -31,9 +31,9 @@ After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `p
 
 Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
 
-- To validate config files against schema locally: `pnpm run env:validate` (also runs in the pre-commit hook and the CI `validate-config` job).
+- To validate config files against schema locally: `pnpm run env:validate` (also runs in the pre-commit hook and the CI `Validate Config` workflow).
 - Syncing config values to Vercel and pulling a local `.env.local` were provided by `vercel-deploy-scripts` (now removed); a local `envctl` CLI will replace them (forthcoming, local-only — not wired into CI).
-- Secret scanning (gitleaks) runs in CI via `.github/workflows/secret-scan.yml`. With `vercel-deploy-scripts` removed, the pre-commit hook no longer runs gitleaks locally — only config validation; CI remains the enforcing secret-scan gate.
+- Secret scanning (gitleaks) was provided by `vercel-deploy-scripts` and has been removed with it — there is currently **no** gitleaks scan locally or in CI. Restoring secret scanning is expected to come with the new env tooling. Until then, take extra care not to commit secrets (`.gitleaks.toml` is retained for when scanning returns).
 
 ## TypeScript
 

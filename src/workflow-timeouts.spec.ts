@@ -23,11 +23,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
-  "secret-scan.yml": {
-    "validate-config": 2,
-  },
   "sentry-release.yml": {
     "create-release": 2,
+  },
+  "validate-config.yml": {
+    "validate-config": 2,
   },
 };
 
