@@ -13,13 +13,8 @@ active:
   - production
   - staging
 
-# Staging re-enabled (#319). The dedicated staging Firebase project
-# (personal-budget-staging-a99af) needs its Realtime Database created in the
-# Firebase console, after which NEXT_PUBLIC_FIREBASE_DATABASE_URL and
-# FIREBASE_DATABASE_URL must be filled in deployment/staging.yml. The earlier
-# "Firebase console bug" note was never a confirmed Firebase limitation —
-# RTDB creation should simply be retried.
-#
-# TODO(#319): until the staging RTDB URL is populated, config validation and
-# staging deploys will not fully succeed. This is the only remaining manual step.
+# Staging re-enabled (#319): the staging Firebase project
+# (personal-budget-staging-a99af) has its Realtime Database created and its URL
+# populated in deployment/staging.yml. Run `pnpm exec sync-env --env=staging` to
+# push the staging config to Vercel's Preview environment.
 single_environment: false
