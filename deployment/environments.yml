@@ -11,9 +11,10 @@
 
 active:
   - production
+  - staging
 
-# Staging is temporarily disabled — the dedicated staging Firebase project
-# (personal-budget-staging-a99af) cannot have a Realtime Database created due
-# to a Firebase console bug. Re-add staging here and set single_environment: false
-# once the staging RTDB is available.
-single_environment: true
+# Staging re-enabled (#319): the staging Firebase project
+# (personal-budget-staging-a99af) has its Realtime Database created and its URL
+# populated in deployment/staging.yml. Run `pnpm exec sync-env --env=staging` to
+# push the staging config to Vercel's Preview environment.
+single_environment: false
