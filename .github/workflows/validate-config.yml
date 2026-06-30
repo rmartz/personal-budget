@@ -9,8 +9,45 @@ permissions:
   contents: read
 
 jobs:
+  # Whether this PR touches the deployment-config validation's inputs: the
+  # deployment/** files (configs + schema) or the validator script itself. An
+  # allowlist is safe here because the validation result is a pure function of
+  # exactly these inputs — nothing else can change its verdict. On push it is
+  # always true.
+  detect-changes:
+    name: Detect config changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      config_changed: ${{ steps.filter.outputs.config_changed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: filter
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "config_changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          config_changed=false
+          while IFS= read -r file; do
+            case "$file" in
+              deployment/* | scripts/validate-config.mjs)
+                config_changed=true
+                break
+                ;;
+            esac
+          done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "config_changed=$config_changed" >> "$GITHUB_OUTPUT"
+
   validate-config:
     name: Validate deployment config
+    needs: detect-changes
+    if: needs.detect-changes.outputs.config_changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
