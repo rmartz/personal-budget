@@ -16,6 +16,21 @@ updates:
     # as individual PRs, since they more often need code changes and warrant
     # isolated review.
     groups:
+      # Prettier (and its plugins) gets its own group for major/minor bumps so a
+      # formatting-affecting upgrade lands in an isolated PR — a Prettier minor
+      # bump can reformat the whole tree and require code changes, which must not
+      # be buried in a batched dev-dependencies PR. Listed first to win
+      # group-assignment precedence (a dependency joins the first group whose
+      # patterns AND update-types match). Patch bumps are intentionally excluded
+      # here, so trivial Prettier patches fall through to the dev-dependencies
+      # group and ride along with the routine batch.
+      prettier:
+        patterns:
+          - "prettier"
+          - "prettier-plugin-*"
+        update-types:
+          - "major"
+          - "minor"
       dev-dependencies:
         dependency-type: development
         patterns:
