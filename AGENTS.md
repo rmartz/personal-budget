@@ -4,6 +4,21 @@
 
 - Always use `pnpm`. Never `npm` or `yarn`.
 
+## Dependencies
+
+- **Pin every `package.json` version specifier to a full `major.minor.patch`.** A range
+  annotation (`^`, `~`) is allowed as a prefix, but the version after it must always be the
+  complete three-part semver — `"^3.8.3"` or `"~3.8.3"`, never `"^3"` or `"^3.8"`. This holds
+  for `dependencies`, `devDependencies`, and any other dependency block.
+- The reason is dependency-update visibility. Dependabot preserves the existing constraint
+  style when it bumps a package, so a full pin like `"^3.8.3" → "^3.9.0"` is recorded as a
+  diff in `package.json` itself, not buried in `pnpm-lock.yaml` alone. A short pin like `"^3"`
+  satisfies any 3.x release, so a minor/patch bump changes only the lockfile — the update
+  becomes invisible in `package.json` and easy to miss in review (e.g. a Prettier minor bump
+  that silently changes formatting). Full pins keep every bump explicit.
+- `src/package-pins.spec.ts` enforces this rule across the manifest; it also enforces the
+  stricter exact pin (no range annotation) for Prettier and its plugins.
+
 ## Common Commands
 
 ```bash
