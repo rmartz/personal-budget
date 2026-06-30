@@ -16,8 +16,10 @@
   satisfies any 3.x release, so a minor/patch bump changes only the lockfile — the update
   becomes invisible in `package.json` and easy to miss in review (e.g. a Prettier minor bump
   that silently changes formatting). Full pins keep every bump explicit.
-- `src/package-pins.spec.ts` enforces this rule across the manifest; it also enforces the
-  stricter exact pin (no range annotation) for Prettier and its plugins.
+- `pnpm run check:package-pins` (`scripts/check-package-pins.mjs`) enforces this rule across
+  every `package.json`; it also enforces the stricter exact pin (no range annotation) for
+  Prettier and its plugins. The `Package Pins` CI workflow runs it, gated to PRs that touch
+  `package.json` or `pnpm-lock.yaml`.
 
 ## Common Commands
 
