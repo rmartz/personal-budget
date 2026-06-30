@@ -1,0 +1,55 @@
+name: Package Pins
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Whether this PR touches the manifest the pin check reads. An allowlist is
+  # safe because the check's verdict is a pure function of package.json — nothing
+  # else can change it. pnpm-lock.yaml is included so a "package update" PR that
+  # touches only the lockfile still triggers the check. On push it is always true.
+  detect-changes:
+    name: Detect package changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      packages_changed: ${{ steps.filter.outputs.packages_changed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: filter
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "packages_changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          packages_changed=false
+          while IFS= read -r file; do
+            case "$file" in
+              package.json | */package.json | pnpm-lock.yaml)
+                packages_changed=true
+                break
+                ;;
+            esac
+          done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "packages_changed=$packages_changed" >> "$GITHUB_OUTPUT"
+
+  check-package-pins:
+    name: Check package.json pins
+    needs: detect-changes
+    if: needs.detect-changes.outputs.packages_changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm run check:package-pins
