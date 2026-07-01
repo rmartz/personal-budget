@@ -162,9 +162,6 @@ jobs:
             --changed-files=changed-files.txt \
             --output=.github/screenshots.dynamic.yml \
             --github-output="$GITHUB_OUTPUT"
-      - name: Install Playwright Chromium
-        if: steps.screenshot-config.outputs.has_stories == 'true'
-        run: pnpm exec playwright install chromium
       - name: Start Storybook
         if: steps.screenshot-config.outputs.has_stories == 'true'
         run: pnpm storybook --ci --port 6006 &
