@@ -4,6 +4,23 @@
 
 - Always use `pnpm`. Never `npm` or `yarn`.
 
+## Dependencies
+
+- **Pin every `package.json` version specifier to a full `major.minor.patch`.** A range
+  annotation (`^`, `~`) is allowed as a prefix, but the version after it must always be the
+  complete three-part semver — `"^3.8.3"` or `"~3.8.3"`, never `"^3"` or `"^3.8"`. This holds
+  for `dependencies`, `devDependencies`, and any other dependency block.
+- The reason is dependency-update visibility. Dependabot preserves the existing constraint
+  style when it bumps a package, so a full pin like `"^3.8.3" → "^3.9.0"` is recorded as a
+  diff in `package.json` itself, not buried in `pnpm-lock.yaml` alone. A short pin like `"^3"`
+  satisfies any 3.x release, so a minor/patch bump changes only the lockfile — the update
+  becomes invisible in `package.json` and easy to miss in review (e.g. a Prettier minor bump
+  that silently changes formatting). Full pins keep every bump explicit.
+- `pnpm run check:package-pins` (`scripts/check-package-pins.mjs`) enforces this rule across
+  every `package.json`; it also enforces the stricter exact pin (no range annotation) for
+  Prettier and its plugins. The `Package Pins` CI workflow runs it, gated to PRs that touch
+  `package.json` or `pnpm-lock.yaml`.
+
 ## Common Commands
 
 ```bash
@@ -31,9 +48,9 @@ After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `p
 
 Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
 
-- To validate config files against schema locally: `pnpm run env:validate` (also runs in the pre-commit hook and the CI `validate-config` job).
+- To validate config files against schema locally: `pnpm run env:validate` (also runs in the pre-commit hook and the CI `Validate Config` workflow).
 - Syncing config values to Vercel and pulling a local `.env.local` were provided by `vercel-deploy-scripts` (now removed); a local `envctl` CLI will replace them (forthcoming, local-only — not wired into CI).
-- Secret scanning (gitleaks) runs in CI via `.github/workflows/secret-scan.yml`. With `vercel-deploy-scripts` removed, the pre-commit hook no longer runs gitleaks locally — only config validation; CI remains the enforcing secret-scan gate.
+- Secret scanning (gitleaks) was provided by `vercel-deploy-scripts` and has been removed with it — there is currently **no** gitleaks scan locally or in CI. Restoring secret scanning is expected to come with the new env tooling. Until then, take extra care not to commit secrets (`.gitleaks.toml` is retained for when scanning returns).
 
 ## TypeScript
 
@@ -67,7 +84,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
   - **Import statements** — enforced automatically by ESLint (`simple-import-sort`). Run `pnpm lint --fix` to auto-correct.
   - **Enum members and `as const` objects** — kept in alphabetical order by convention (no automated enforcement yet; reviewers should flag violations).
   - **Re-exports in barrel files** — enforced automatically by ESLint alongside import statements.
-- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum Status { Active = "active", Inactive = "inactive" }` rather than `"active" | "inactive"`). String enum values must match the current serialized schema. Export new enums from the module barrel (the directory-level `index.ts` when one exists or is required by the barrel rule above).
+- **Default fixed value-sets to a structural type, not an `enum`.** For a fixed set of named values use a string union (`type Tier = "investment" | "reserve"`), or an `as const` array when you also need the values at runtime for validation/iteration (`const TIERS = ["investment", "reserve"] as const; type Tier = (typeof TIERS)[number]`). Both stay **structural**, so serialized/wire strings — Firebase documents, query params, API payloads — assign without a cast and emit ~no runtime. A string `enum` is **nominal**: it rejects the underlying literal and forces a cast at every serialization boundary, and a plain `enum` ships a runtime object (`const enum` is unavailable under `isolatedModules`). The deciding question is the serialization boundary: a value that crosses a wire/persistence boundary with no converter seam → structural union / `as const`; an **internal-only** set you iterate as a unit and never serialize raw → an `enum` is fine. An enum already isolated behind a converter seam (`{domain}ToFirebase()` / `firebaseTo{Domain}()`) also stays — the seam centralizes the boundary; the `src/lib/firebase/schema/` enums sit here deliberately and should not be churned. Export any enum you keep from the module barrel.
 
 ## Naming Conventions
 

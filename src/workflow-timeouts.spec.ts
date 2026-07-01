@@ -10,24 +10,31 @@ import { parse } from "yaml";
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "ci-actions.yml": {
     build: 2,
+    "detect-changes": 1,
     format: 2,
     lint: 2,
     "storybook-build": 2,
     "storybook-screenshots": 3,
-    tests: 3,
+    "storybook-tests": 4,
+    tests: 2,
     "type-check": 2,
   },
   "file-length.yml": {
     check: 2,
   },
+  "package-pins.yml": {
+    "check-package-pins": 1,
+    "detect-changes": 1,
+  },
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
-  "secret-scan.yml": {
-    "validate-config": 2,
-  },
   "sentry-release.yml": {
     "create-release": 2,
+  },
+  "validate-config.yml": {
+    "detect-changes": 1,
+    "validate-config": 2,
   },
 };
 

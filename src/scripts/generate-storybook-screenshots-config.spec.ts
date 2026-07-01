@@ -66,9 +66,9 @@ function runGenerateScreenshotsConfig(options: {
 }
 
 describe("generate-storybook-screenshots-config script", () => {
-  it("includes all stories when a component file changes", () => {
+  it("includes all stories when the story file itself changes", () => {
     const result = runGenerateScreenshotsConfig({
-      changedFiles: ["src/components/ui/bar.tsx"],
+      changedFiles: ["src/components/ui/bar.stories.tsx"],
       files: {
         "src/components/ui/bar.stories.tsx": `
 import type { Meta, StoryObj } from "@storybook/react";
@@ -84,7 +84,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const WithLabel: Story = {};
 `,
-        "src/components/ui/bar.tsx": "export const Bar = () => null;\n",
       },
     });
 
@@ -95,6 +94,31 @@ export const WithLabel: Story = {};
     expect(result.output).toContain(
       "http://127.0.0.1:6006/?path=/story/components-ui-bar--with-label",
     );
+  });
+
+  it("generates no screenshots when only a component changes (regression is caught by Storybook Tests, not screenshots)", () => {
+    const result = runGenerateScreenshotsConfig({
+      changedFiles: ["src/components/ui/bar.tsx"],
+      files: {
+        "src/components/ui/bar.stories.tsx": `
+import type { Meta, StoryObj } from "@storybook/react";
+
+const meta = {
+  title: "Components/UI/Bar",
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {};
+`,
+        "src/components/ui/bar.tsx": "export const Bar = () => null;\n",
+      },
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.output.trim()).toBe("version: 1\nscreenshots: []");
   });
 
   it("uses meta id when provided and component story file is changed directly", () => {
