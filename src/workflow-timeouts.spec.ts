@@ -14,7 +14,7 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     format: 2,
     lint: 2,
     "storybook-build": 2,
-    "storybook-screenshots": 10,
+    "storybook-screenshots": 8,
     "storybook-tests": 4,
     tests: 2,
     "type-check": 2,

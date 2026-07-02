@@ -10,4 +10,5 @@ tsconfig.tsbuildinfo
 .env*.local
 .env.sentry-build-plugin
 storybook-static
+screenshots
 next-env.d.ts
