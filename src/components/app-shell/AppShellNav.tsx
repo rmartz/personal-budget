@@ -29,6 +29,7 @@ const PRIMARY_LINKS: NavLink[] = [
   { href: "/investments", label: APP_SHELL_COPY.linkInvestments },
   { href: "/annuities", label: APP_SHELL_COPY.linkAnnuities },
   { href: "/accounts", label: APP_SHELL_COPY.linkAccounts },
+  { href: "/reports", label: APP_SHELL_COPY.linkReports },
   { href: "/profile", label: APP_SHELL_COPY.linkProfile },
 ];
 
@@ -42,6 +43,7 @@ const MOBILE_TABS: NavLink[] = [
 const OVERFLOW_LINKS: NavLink[] = [
   { href: "/annuities", label: APP_SHELL_COPY.linkAnnuities },
   { href: "/accounts", label: APP_SHELL_COPY.linkAccounts },
+  { href: "/reports", label: APP_SHELL_COPY.linkReports },
   { href: "/profile", label: APP_SHELL_COPY.linkProfile },
 ];
 

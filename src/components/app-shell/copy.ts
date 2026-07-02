@@ -9,6 +9,7 @@ export const APP_SHELL_COPY = {
   linkLedgers: "Ledgers",
   linkProfile: "Profile",
   linkReconcile: "Reconcile",
+  linkReports: "Reports",
   menuButtonLabel: "Open navigation menu",
   mobileNavLabel: "Mobile navigation",
   moreLabel: "More",

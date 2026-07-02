@@ -66,6 +66,14 @@ describe("AppShellNavView — desktop top nav", () => {
     expect(link).toBeDefined();
   });
 
+  it("renders a Reports link pointing to /reports", () => {
+    render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
+    const link = screen
+      .getAllByRole("link", { name: APP_SHELL_COPY.linkReports })
+      .find((el) => el.getAttribute("href") === "/reports");
+    expect(link).toBeDefined();
+  });
+
   it("renders a Profile link pointing to /profile", () => {
     render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
     const link = screen
