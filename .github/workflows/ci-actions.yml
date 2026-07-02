@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 1
     outputs:
       code_changed: ${{ steps.filter.outputs.code_changed }}
+      stories_changed: ${{ steps.filter.outputs.stories_changed }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -31,8 +32,10 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "code_changed=true" >> "$GITHUB_OUTPUT"
+            echo "stories_changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
           code_changed=false
           while IFS= read -r file; do
             [ -z "$file" ] && continue
@@ -44,8 +47,15 @@ jobs:
                 break
                 ;;
             esac
-          done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          done <<< "$changed"
           echo "code_changed=$code_changed" >> "$GITHUB_OUTPUT"
+          # A changed Storybook story implies an intended visual change worth a
+          # fresh screenshot; the advisory screenshots job gates on this.
+          if printf '%s\n' "$changed" | grep -Eq '\.stories\.(ts|tsx)$'; then
+            echo "stories_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "stories_changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
   tests:
     name: Tests
@@ -68,29 +78,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - name: Resolve Playwright version
-        id: playwright-version
-        # Key the browser cache on the exact installed Playwright version, so a
-        # dependency bump fetches the matching Chromium rather than restoring a
-        # stale build. Resolvable because setup has already run pnpm install.
-        run: echo "version=$(node -e "console.log(require('playwright/package.json').version)")" >> "$GITHUB_OUTPUT"
-      - name: Cache Playwright browsers
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
-      - name: Install Playwright Chromium
-        # Retry to ride out transient apt/CDN failures during --with-deps. On a
-        # cache hit the Chromium build is already present, so this only installs
-        # the OS-level dependencies (which the browser cache cannot carry).
-        run: |
-          for attempt in 1 2 3; do
-            pnpm exec playwright install --with-deps chromium && exit 0
-            echo "playwright install attempt $attempt failed; retrying..." >&2
-            sleep 5
-          done
-          echo "playwright install failed after 3 attempts" >&2
-          exit 1
+      - uses: ./.github/actions/playwright-chromium
       - run: pnpm exec vitest run --project storybook
 
   lint:
@@ -144,68 +132,36 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm build-storybook
 
+  # Advisory visual-acceptance aid: builds Storybook, screenshots every story
+  # from the static build, and uploads them as an artifact. Runs only when a
+  # story changed (an intended visual change worth eyeballing); continue-on-error
+  # keeps it non-blocking, so the correctness gates (Tests, Storybook Tests,
+  # Lint, Format, Type Check, Build, Storybook Build) remain hard-gating. The
+  # captured render path is covered for compile by the gating Storybook Build
+  # job. No concurrency group is needed — the artifact surface is per-run, so
+  # concurrent PR runs never race on a shared resource.
   storybook-screenshots:
     name: Storybook Screenshots
-    if: github.event_name == 'pull_request'
-    # Advisory only: PR-preview decoration built on a flaky third-party beta
-    # action. A hang or failure must report neutral, never block merge. The
-    # correctness gates (Tests, Storybook Tests, Lint, Format, Type Check,
-    # Build) remain hard-gating.
-    continue-on-error: true
-    concurrency:
-      group: storybook-screenshots-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
+    needs: detect-changes
+    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.stories_changed == 'true'
     runs-on: ubuntu-latest
-    # The capture step drives a real browser: the third-party action installs
-    # its own ~174 MiB Chromium build, then a full Storybook dev server boots
-    # and every changed story is screenshotted. 3 minutes could not cover that
-    # setup, so the job was hitting the timeout mid-install (a cancellation, not
-    # a hang) on every run. Sister repos budget 8 minutes for the equivalent
-    # job; 10 leaves headroom for the double browser download this job still
-    # incurs. The timeout is a backstop against a genuine hang, not a cap on
-    # legitimate setup time.
-    timeout-minutes: 10
-    permissions:
-      contents: write
-      pull-requests: write
+    timeout-minutes: 8
+    continue-on-error: true
+    env:
+      STORYBOOK_DISABLE_TELEMETRY: "1"
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - uses: ./.github/actions/setup
-      - name: Generate changed files list
-        run: |
-          git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.sha }}" > changed-files.txt
-      - id: screenshot-config
-        name: Generate screenshot config for changed stories
-        run: |
-          node scripts/generate-storybook-screenshots-config.mjs \
-            --changed-files=changed-files.txt \
-            --output=.github/screenshots.dynamic.yml \
-            --github-output="$GITHUB_OUTPUT"
-      - name: Start Storybook
-        if: steps.screenshot-config.outputs.has_stories == 'true'
-        run: pnpm storybook --ci --port 6006 &
-      - name: Wait for Storybook
-        if: steps.screenshot-config.outputs.has_stories == 'true'
-        run: |
-          # Max wait: 2 minutes, checking every 2 seconds.
-          TIMEOUT_SECONDS=120
-          RETRY_INTERVAL=2
-          MAX_ATTEMPTS=$((TIMEOUT_SECONDS / RETRY_INTERVAL))
-
-          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
-            if curl --silent --show-error --fail http://127.0.0.1:6006 >/dev/null; then
-              echo "Storybook is ready."
-              exit 0
-            fi
-            sleep "$RETRY_INTERVAL"
-          done
-          echo "Storybook did not start in time." >&2
-          exit 1
-      - name: Capture Storybook screenshots
-        if: steps.screenshot-config.outputs.has_stories == 'true'
-        uses: yoavf/auto-pr-screenshots-action@v1.4.0-beta
+      - uses: ./.github/actions/playwright-chromium
+      - name: Build Storybook
+        run: pnpm build-storybook
+      - name: Capture screenshots
+        continue-on-error: true
+        run: node scripts/capture-screenshots.mjs
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
         with:
-          config-file: .github/screenshots.dynamic.yml
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: storybook-screenshots
+          path: screenshots/
+          if-no-files-found: warn
