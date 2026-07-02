@@ -68,8 +68,21 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
+      - name: Resolve Playwright version
+        id: playwright-version
+        # Key the browser cache on the exact installed Playwright version, so a
+        # dependency bump fetches the matching Chromium rather than restoring a
+        # stale build. Resolvable because setup has already run pnpm install.
+        run: echo "version=$(node -e "console.log(require('playwright/package.json').version)")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
       - name: Install Playwright Chromium
-        # Retry to ride out transient apt/CDN failures during --with-deps.
+        # Retry to ride out transient apt/CDN failures during --with-deps. On a
+        # cache hit the Chromium build is already present, so this only installs
+        # the OS-level dependencies (which the browser cache cannot carry).
         run: |
           for attempt in 1 2 3; do
             pnpm exec playwright install --with-deps chromium && exit 0
@@ -143,7 +156,15 @@ jobs:
       group: storybook-screenshots-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    # The capture step drives a real browser: the third-party action installs
+    # its own ~174 MiB Chromium build, then a full Storybook dev server boots
+    # and every changed story is screenshotted. 3 minutes could not cover that
+    # setup, so the job was hitting the timeout mid-install (a cancellation, not
+    # a hang) on every run. Sister repos budget 8 minutes for the equivalent
+    # job; 10 leaves headroom for the double browser download this job still
+    # incurs. The timeout is a backstop against a genuine hang, not a cap on
+    # legitimate setup time.
+    timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write

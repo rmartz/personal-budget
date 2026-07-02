@@ -11,3 +11,7 @@ This is a `type` convention, not a closed set — add a new value when none fits
 # Schema
 
 - [Firebase Realtime Database Schema](database-schema.md) - Path structure, field formats, and security rules for all user data in the Firebase Realtime Database.
+
+# Guide
+
+- [Staging Test Accounts](staging-test-accounts.md) - The seeded email/password test users in the staging Firebase project and how to (re-)seed them.
