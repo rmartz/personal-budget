@@ -38,7 +38,7 @@ export function GoalSiblingProjections({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        {siblingGoals.length > 0 && (
+        {unfundedSiblingGoals.length > 0 && (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left text-xs text-muted-foreground">
@@ -54,7 +54,7 @@ export function GoalSiblingProjections({
               </tr>
             </thead>
             <tbody>
-              {siblingGoals.map((goal) => {
+              {unfundedSiblingGoals.map((goal) => {
                 const priorEta = computeGoalEtaFromShare(
                   goal,
                   priorShares.get(goal.id) ?? 0,
