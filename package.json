@@ -1,7 +1,7 @@
 {
-  "name": "firebase-nextjs-template",
+  "name": "personal-budget",
   "version": "0.1.0",
-  "description": "Template repository for Next.js projects built on Firebase",
+  "description": "Personal budgeting app built on Next.js and Firebase",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.30.3",
