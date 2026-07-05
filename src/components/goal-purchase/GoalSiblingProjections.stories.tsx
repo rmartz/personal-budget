@@ -66,3 +66,22 @@ export const NoSiblings: Story = {
     siblingGoals: [],
   },
 };
+
+export const WithFundedSibling: Story = {
+  args: {
+    monthlyAllocation: 400,
+    purchasedGoal,
+    referenceDate,
+    siblingGoals: [
+      ...siblingGoals,
+      {
+        id: "goal-4",
+        ledgerId: "ledger-1",
+        name: "AirPods (Funded)",
+        targetAmount: 200,
+        fundedAmount: 200,
+        priority: 4,
+      },
+    ],
+  },
+};
