@@ -29,6 +29,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
+  "preview-deploy.yml": {
+    "deploy-preview": 10,
+  },
   "sentry-release.yml": {
     "create-release": 2,
   },
