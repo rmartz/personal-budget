@@ -1,7 +1,5 @@
 "use client";
 
-import { useId } from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,77 +10,63 @@ import {
 } from "@/components/ui/dialog";
 
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
-
-export type AnnuityMode = "flat" | "pv";
-
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
+import { CreateAnnuityFlatFields } from "./CreateAnnuityFlatFields";
+import { CreateAnnuityModeToggle } from "./CreateAnnuityModeToggle";
+import { CreateAnnuityNameField } from "./CreateAnnuityNameField";
+import { CreateAnnuityPVFields } from "./CreateAnnuityPVFields";
+import { AnnuityMode } from "./types";
 
 export interface CreateAnnuityDialogViewProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  mode: AnnuityMode;
-  onModeChange: (mode: AnnuityMode) => void;
-  name: string;
-  onNameChange: (value: string) => void;
-  monthlyAmount: string;
-  onMonthlyAmountChange: (value: string) => void;
-  presentValue: string;
-  onPresentValueChange: (value: string) => void;
   annualRate: string;
-  onAnnualRateChange: (value: string) => void;
-  durationMonths: string;
-  onDurationMonthsChange: (value: string) => void;
-  monthlyPreview: number | undefined;
-  nameError: string | undefined;
-  monthlyAmountError: string | undefined;
-  presentValueError: string | undefined;
   annualRateError: string | undefined;
+  durationMonths: string;
   durationMonthsError: string | undefined;
-  submitError: string | undefined;
-  onSubmit: () => void;
   isSubmitting: boolean;
+  mode: AnnuityMode;
+  monthlyAmount: string;
+  monthlyAmountError: string | undefined;
+  monthlyPreview: number | undefined;
+  name: string;
+  nameError: string | undefined;
+  onAnnualRateChange: (value: string) => void;
+  onDurationMonthsChange: (value: string) => void;
+  onModeChange: (mode: AnnuityMode) => void;
+  onMonthlyAmountChange: (value: string) => void;
+  onNameChange: (value: string) => void;
+  onOpenChange: (open: boolean) => void;
+  onPresentValueChange: (value: string) => void;
+  onSubmit: () => void;
+  open: boolean;
+  presentValue: string;
+  presentValueError: string | undefined;
+  submitError: string | undefined;
 }
 
 export function CreateAnnuityDialogView({
-  open,
-  onOpenChange,
-  mode,
-  onModeChange,
-  name,
-  onNameChange,
-  monthlyAmount,
-  onMonthlyAmountChange,
-  presentValue,
-  onPresentValueChange,
   annualRate,
-  onAnnualRateChange,
-  durationMonths,
-  onDurationMonthsChange,
-  monthlyPreview,
-  nameError,
-  monthlyAmountError,
-  presentValueError,
   annualRateError,
+  durationMonths,
   durationMonthsError,
-  submitError,
-  onSubmit,
   isSubmitting,
+  mode,
+  monthlyAmount,
+  monthlyAmountError,
+  monthlyPreview,
+  name,
+  nameError,
+  onAnnualRateChange,
+  onDurationMonthsChange,
+  onModeChange,
+  onMonthlyAmountChange,
+  onNameChange,
+  onOpenChange,
+  onPresentValueChange,
+  onSubmit,
+  open,
+  presentValue,
+  presentValueError,
+  submitError,
 }: CreateAnnuityDialogViewProps) {
-  const baseId = useId();
-  const nameInputId = `${baseId}-name`;
-  const nameErrorId = `${baseId}-name-error`;
-  const monthlyAmountInputId = `${baseId}-monthly-amount`;
-  const monthlyAmountErrorId = `${baseId}-monthly-amount-error`;
-  const presentValueInputId = `${baseId}-present-value`;
-  const presentValueErrorId = `${baseId}-present-value-error`;
-  const annualRateInputId = `${baseId}-annual-rate`;
-  const annualRateErrorId = `${baseId}-annual-rate-error`;
-  const durationInputId = `${baseId}-duration`;
-  const durationErrorId = `${baseId}-duration-error`;
-
   return (
     <Dialog
       open={open}
@@ -103,236 +87,39 @@ export function CreateAnnuityDialogView({
           }}
         >
           <div className="flex flex-col gap-4 py-2">
-            {/* Mode toggle */}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  onModeChange("flat");
-                }}
-                className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                  mode === "flat"
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background hover:bg-muted"
-                }`}
-              >
-                {CREATE_ANNUITY_DIALOG_COPY.modeFlatButton}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onModeChange("pv");
-                }}
-                className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                  mode === "pv"
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background hover:bg-muted"
-                }`}
-              >
-                {CREATE_ANNUITY_DIALOG_COPY.modeLoanButton}
-              </button>
-            </div>
-
-            {/* Name field */}
-            <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor={nameInputId}
-                className="text-sm font-medium leading-none"
-              >
-                {CREATE_ANNUITY_DIALOG_COPY.nameLabel}
-              </label>
-              <input
-                id={nameInputId}
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  onNameChange(e.target.value);
-                }}
-                placeholder={CREATE_ANNUITY_DIALOG_COPY.namePlaceholder}
-                aria-invalid={nameError !== undefined}
-                aria-describedby={nameError ? nameErrorId : undefined}
-                className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            <CreateAnnuityModeToggle mode={mode} onModeChange={onModeChange} />
+            <CreateAnnuityNameField
+              name={name}
+              nameError={nameError}
+              onNameChange={onNameChange}
+            />
+            {mode === AnnuityMode.Flat && (
+              <CreateAnnuityFlatFields
+                monthlyAmount={monthlyAmount}
+                monthlyAmountError={monthlyAmountError}
+                onMonthlyAmountChange={onMonthlyAmountChange}
               />
-              {nameError !== undefined && (
-                <p
-                  id={nameErrorId}
-                  role="alert"
-                  className="text-xs text-destructive"
-                >
-                  {nameError}
-                </p>
-              )}
-            </div>
-
-            {/* Flat mode: monthly amount */}
-            {mode === "flat" && (
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor={monthlyAmountInputId}
-                  className="text-sm font-medium leading-none"
-                >
-                  {CREATE_ANNUITY_DIALOG_COPY.monthlyAmountLabel}
-                </label>
-                <input
-                  id={monthlyAmountInputId}
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={monthlyAmount}
-                  onChange={(e) => {
-                    onMonthlyAmountChange(e.target.value);
-                  }}
-                  placeholder={
-                    CREATE_ANNUITY_DIALOG_COPY.monthlyAmountPlaceholder
-                  }
-                  aria-invalid={monthlyAmountError !== undefined}
-                  aria-describedby={
-                    monthlyAmountError ? monthlyAmountErrorId : undefined
-                  }
-                  className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
-                {monthlyAmountError !== undefined && (
-                  <p
-                    id={monthlyAmountErrorId}
-                    role="alert"
-                    className="text-xs text-destructive"
-                  >
-                    {monthlyAmountError}
-                  </p>
-                )}
-              </div>
             )}
-
-            {/* PV mode: present value, annual rate, duration */}
-            {mode === "pv" && (
-              <>
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor={presentValueInputId}
-                    className="text-sm font-medium leading-none"
-                  >
-                    {CREATE_ANNUITY_DIALOG_COPY.presentValueLabel}
-                  </label>
-                  <input
-                    id={presentValueInputId}
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={presentValue}
-                    onChange={(e) => {
-                      onPresentValueChange(e.target.value);
-                    }}
-                    placeholder={
-                      CREATE_ANNUITY_DIALOG_COPY.presentValuePlaceholder
-                    }
-                    aria-invalid={presentValueError !== undefined}
-                    aria-describedby={
-                      presentValueError ? presentValueErrorId : undefined
-                    }
-                    className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                  {presentValueError !== undefined && (
-                    <p
-                      id={presentValueErrorId}
-                      role="alert"
-                      className="text-xs text-destructive"
-                    >
-                      {presentValueError}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor={annualRateInputId}
-                    className="text-sm font-medium leading-none"
-                  >
-                    {CREATE_ANNUITY_DIALOG_COPY.annualRateLabel}
-                  </label>
-                  <input
-                    id={annualRateInputId}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={annualRate}
-                    onChange={(e) => {
-                      onAnnualRateChange(e.target.value);
-                    }}
-                    placeholder={
-                      CREATE_ANNUITY_DIALOG_COPY.annualRatePlaceholder
-                    }
-                    aria-invalid={annualRateError !== undefined}
-                    aria-describedby={
-                      annualRateError ? annualRateErrorId : undefined
-                    }
-                    className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                  {annualRateError !== undefined && (
-                    <p
-                      id={annualRateErrorId}
-                      role="alert"
-                      className="text-xs text-destructive"
-                    >
-                      {annualRateError}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor={durationInputId}
-                    className="text-sm font-medium leading-none"
-                  >
-                    {CREATE_ANNUITY_DIALOG_COPY.durationLabel}
-                  </label>
-                  <input
-                    id={durationInputId}
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={durationMonths}
-                    onChange={(e) => {
-                      onDurationMonthsChange(e.target.value);
-                    }}
-                    placeholder={CREATE_ANNUITY_DIALOG_COPY.durationPlaceholder}
-                    aria-invalid={durationMonthsError !== undefined}
-                    aria-describedby={
-                      durationMonthsError ? durationErrorId : undefined
-                    }
-                    className="flex h-8 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                  {durationMonthsError !== undefined && (
-                    <p
-                      id={durationErrorId}
-                      role="alert"
-                      className="text-xs text-destructive"
-                    >
-                      {durationMonthsError}
-                    </p>
-                  )}
-                </div>
-
-                {/* Live preview */}
-                {monthlyPreview !== undefined && (
-                  <div className="rounded-lg border border-border bg-muted/50 px-4 py-3">
-                    <p className="text-xs text-muted-foreground">
-                      {CREATE_ANNUITY_DIALOG_COPY.previewLabel}
-                    </p>
-                    <p className="mt-0.5 text-lg font-semibold">
-                      {currencyFormatter.format(monthlyPreview)}/mo
-                    </p>
-                  </div>
-                )}
-              </>
+            {mode === AnnuityMode.PV && (
+              <CreateAnnuityPVFields
+                annualRate={annualRate}
+                annualRateError={annualRateError}
+                durationMonths={durationMonths}
+                durationMonthsError={durationMonthsError}
+                monthlyPreview={monthlyPreview}
+                onAnnualRateChange={onAnnualRateChange}
+                onDurationMonthsChange={onDurationMonthsChange}
+                onPresentValueChange={onPresentValueChange}
+                presentValue={presentValue}
+                presentValueError={presentValueError}
+              />
             )}
-
             {submitError !== undefined && (
               <p role="alert" className="text-xs text-destructive">
                 {submitError}
               </p>
             )}
           </div>
-
           <DialogFooter className="mt-2">
             <Button
               type="button"
