@@ -37,6 +37,18 @@ const indexPath = join(staticDir, "index.json");
 const CONCURRENCY = 4;
 const NAV_TIMEOUT_MS = 15000;
 const RENDER_TIMEOUT_MS = 4000;
+
+// A story is "rendered" once something visible appears. Most stories mount into
+// #storybook-root, but overlay components (Dialog, AlertDialog) render their
+// content into a portal on document.body — outside #storybook-root — so an
+// open-dialog story leaves the root empty. Accept a visible portal overlay as
+// an equivalent ready signal so those stories are captured instead of timing
+// out. page.screenshot() shoots the whole viewport, so the portal is included.
+const RENDER_READY_SELECTOR = [
+  "#storybook-root > *",
+  "[role='dialog']",
+  "[role='alertdialog']",
+].join(", ");
 const DEADLINE_MS = Number(process.env["CAPTURE_DEADLINE_MS"] ?? 4 * 60 * 1000);
 if (Number.isNaN(DEADLINE_MS)) {
   console.error(
@@ -122,7 +134,7 @@ async function worker() {
         timeout: NAV_TIMEOUT_MS,
       });
       await page
-        .locator("#storybook-root > *")
+        .locator(RENDER_READY_SELECTOR)
         .first()
         .waitFor({ state: "visible", timeout: RENDER_TIMEOUT_MS });
       await page.screenshot({ path: join(outDir, `${story.id}.png`) });
