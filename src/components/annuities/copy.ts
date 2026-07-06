@@ -110,6 +110,7 @@ export const CREATE_ANNUITY_DIALOG_COPY = {
   presentValueLabel: "Starting value",
   presentValuePlaceholder: "e.g. 10000",
   presentValueInvalidError: "Starting value must be a positive number.",
+  perMonthSuffix: "/mo",
   previewLabel: "Monthly payment",
   submitButton: "Create Annuity",
   submitError: "Failed to create annuity. Please try again.",
