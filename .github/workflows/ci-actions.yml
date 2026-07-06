@@ -126,11 +126,19 @@ jobs:
     needs: detect-changes
     if: needs.detect-changes.outputs.code_changed == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
+      - uses: ./.github/actions/playwright-chromium
       - run: pnpm build-storybook
+      # Guards the *built* render path: renders canary Redux-connected stories
+      # from the static build and fails if they crash. Catches the Vite/Rolldown
+      # reselect regression (#359) — which neither the compile above nor the
+      # vitest Storybook Tests (dev/esbuild transform) detect — so a Dependabot
+      # PR bumping Vite back to 8 stays red here until the bundler is fixed.
+      - name: Canary render check
+        run: node scripts/check-storybook-render.mjs
 
   # Advisory visual-acceptance aid: builds Storybook, screenshots every story
   # from the static build, and uploads them as an artifact. Runs only when a
@@ -156,7 +164,13 @@ jobs:
       - name: Build Storybook
         run: pnpm build-storybook
       - name: Capture screenshots
-        continue-on-error: true
+        # No step-level continue-on-error: a capture failure (a broken or slow
+        # story) must surface as a job *failure* so the coordinator routes it to
+        # fix-review. The script fails fast — stories run concurrently with a
+        # short per-story render budget and an overall wall-clock deadline below
+        # this job's timeout-minutes — so the job never hits its timeout and gets
+        # *cancelled* (which escalates to a human instead). Job-level
+        # continue-on-error still keeps the failure non-blocking for the run.
         run: node scripts/capture-screenshots.mjs
       - name: Upload screenshots
         if: always()
