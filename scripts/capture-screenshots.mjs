@@ -38,6 +38,12 @@ const CONCURRENCY = 4;
 const NAV_TIMEOUT_MS = 15000;
 const RENDER_TIMEOUT_MS = 4000;
 const DEADLINE_MS = Number(process.env["CAPTURE_DEADLINE_MS"] ?? 4 * 60 * 1000);
+if (Number.isNaN(DEADLINE_MS)) {
+  console.error(
+    `error: CAPTURE_DEADLINE_MS="${process.env["CAPTURE_DEADLINE_MS"]}" is not a valid number.`,
+  );
+  process.exit(1);
+}
 
 if (!existsSync(indexPath)) {
   console.error(
