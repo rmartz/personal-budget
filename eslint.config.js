@@ -72,6 +72,33 @@ export default tseslint.config(
       },
     },
   },
+  // File-length caps (CLAUDE.md hard cap: 2× the recommended max). Enforced by
+  // ESLint's built-in max-lines rule via the Lint job, replacing the former
+  // bespoke file-length.yml workflow + scripts/check-file-length.mjs. Physical
+  // lines are counted (blank lines and comments included) to match the prior
+  // check. The test override follows so it wins for spec/test files.
+  {
+    files: ["**/*.{ts,tsx}"],
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 400, skipBlankLines: false, skipComments: false },
+      ],
+    },
+  },
+  {
+    files: [
+      "**/*.spec.{ts,tsx}",
+      "**/*.test.{ts,tsx}",
+      "**/*-tests/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 600, skipBlankLines: false, skipComments: false },
+      ],
+    },
+  },
   // Test files use Response.json() which inherently returns `any`; relax unsafe rules
   {
     files: ["src/**/*.spec.ts", "src/**/*.spec.tsx"],
