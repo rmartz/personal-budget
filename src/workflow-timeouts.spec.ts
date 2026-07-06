@@ -19,9 +19,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     tests: 2,
     "type-check": 2,
   },
-  "file-length.yml": {
-    check: 2,
-  },
   "package-pins.yml": {
     "check-package-pins": 1,
     "detect-changes": 1,

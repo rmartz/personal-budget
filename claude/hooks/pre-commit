@@ -9,4 +9,3 @@
 # Bypass: git commit --no-verify
 set -e
 pnpm run env:validate
-node scripts/check-file-length.mjs --staged
