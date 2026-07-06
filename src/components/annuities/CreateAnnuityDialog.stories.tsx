@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { CreateAnnuityDialogView } from "./CreateAnnuityDialogView";
+import { AnnuityMode } from "./types";
 
 const meta: Meta<typeof CreateAnnuityDialogView> = {
   component: CreateAnnuityDialogView,
@@ -9,7 +10,7 @@ const meta: Meta<typeof CreateAnnuityDialogView> = {
     open: true,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onOpenChange: () => {},
-    mode: "flat",
+    mode: AnnuityMode.Flat,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onModeChange: () => {},
     name: "",
@@ -47,7 +48,7 @@ export const FlatModeEmpty: Story = {};
 
 export const FlatModeValidationErrors: Story = {
   args: {
-    mode: "flat",
+    mode: AnnuityMode.Flat,
     nameError: "Name is required.",
     monthlyAmountError: "Monthly amount must be a positive number.",
   },
@@ -55,13 +56,13 @@ export const FlatModeValidationErrors: Story = {
 
 export const LoanModeEmpty: Story = {
   args: {
-    mode: "pv",
+    mode: AnnuityMode.PV,
   },
 };
 
 export const LoanModeWithPreview: Story = {
   args: {
-    mode: "pv",
+    mode: AnnuityMode.PV,
     name: "Car Loan",
     presentValue: "10000",
     annualRate: "5",
@@ -72,7 +73,7 @@ export const LoanModeWithPreview: Story = {
 
 export const LoanModeValidationErrors: Story = {
   args: {
-    mode: "pv",
+    mode: AnnuityMode.PV,
     presentValueError: "Starting value must be a positive number.",
     annualRateError: "Annual rate must be a positive number.",
     durationMonthsError: "Duration must be a positive whole number.",
@@ -81,7 +82,7 @@ export const LoanModeValidationErrors: Story = {
 
 export const Submitting: Story = {
   args: {
-    mode: "flat",
+    mode: AnnuityMode.Flat,
     name: "Netflix",
     monthlyAmount: "15.99",
     isSubmitting: true,
@@ -90,7 +91,7 @@ export const Submitting: Story = {
 
 export const SubmitError: Story = {
   args: {
-    mode: "flat",
+    mode: AnnuityMode.Flat,
     name: "Netflix",
     monthlyAmount: "15.99",
     submitError: "Failed to create annuity. Please try again.",

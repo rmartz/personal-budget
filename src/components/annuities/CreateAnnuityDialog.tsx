@@ -6,10 +6,8 @@ import { calculateMonthlyPayment } from "@/lib/annuity-math";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
-import {
-  type AnnuityMode,
-  CreateAnnuityDialogView,
-} from "./CreateAnnuityDialogView";
+import { CreateAnnuityDialogView } from "./CreateAnnuityDialogView";
+import { AnnuityMode } from "./types";
 
 export interface CreateAnnuityInput {
   annualRatePercent: number | undefined;
@@ -31,7 +29,7 @@ export function CreateAnnuityDialog({
   onOpenChange,
   onSubmit,
 }: CreateAnnuityDialogProps) {
-  const [mode, setMode] = useState<AnnuityMode>("flat");
+  const [mode, setMode] = useState(AnnuityMode.Flat);
   const [name, setName] = useState("");
   const [monthlyAmount, setMonthlyAmount] = useState("");
   const [presentValue, setPresentValue] = useState("");
@@ -59,7 +57,7 @@ export function CreateAnnuityDialog({
   const rateNum = parseFloat(annualRate);
   const durNum = parseInt(durationMonths, 10);
   const monthlyPreview =
-    mode === "pv" &&
+    mode === AnnuityMode.PV &&
     presentValue.trim() !== "" &&
     annualRate.trim() !== "" &&
     durationMonths.trim() !== "" &&
@@ -79,7 +77,7 @@ export function CreateAnnuityDialog({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen && isSubmitting) return;
     if (!nextOpen) {
-      setMode("flat");
+      setMode(AnnuityMode.Flat);
       setName("");
       setMonthlyAmount("");
       setPresentValue("");
@@ -112,7 +110,7 @@ export function CreateAnnuityDialog({
     let resolvedPresentValue: number | undefined;
     let resolvedAnnualRate: number | undefined;
 
-    if (mode === "flat") {
+    if (mode === AnnuityMode.Flat) {
       const parsed = parseFloat(monthlyAmount);
       if (isNaN(parsed) || parsed <= 0) {
         setMonthlyAmountError(
@@ -171,7 +169,7 @@ export function CreateAnnuityDialog({
         durationMonths: resolvedDuration,
         monthlyAmount: resolvedMonthlyAmount,
         monthlyMode:
-          mode === "pv"
+          mode === AnnuityMode.PV
             ? AnnuityMonthlyMode.PVDerived
             : AnnuityMonthlyMode.Flat,
         name: name.trim(),
