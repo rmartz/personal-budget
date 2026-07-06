@@ -10,7 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
-import { CreateAnnuityDialogView } from "./CreateAnnuityDialog";
+import { CreateAnnuityDialogView } from "./CreateAnnuityDialogView";
 
 afterEach(cleanup);
 
