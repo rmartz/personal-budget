@@ -149,26 +149,33 @@ async function captureScreenshots() {
       await page.setViewportSize({ width: 1280, height: 800 });
 
       const url = `http://localhost:${STORYBOOK_PORT}/iframe.html?id=${story.id}&viewMode=story`;
-      // `domcontentloaded` (not `networkidle`, which can hang on animations or
-      // polling) so no single story can stall the run; the visibility wait
-      // below is what confirms the story actually rendered.
-      await page.goto(url, {
-        waitUntil: "domcontentloaded",
-        timeout: NAV_TIMEOUT_MS,
-      });
-      await page
-        .locator(RENDER_READY_SELECTOR)
-        .first()
-        .waitFor({ state: "visible", timeout: RENDER_TIMEOUT_MS })
-        .catch(() => {
-          // Best effort: a story that renders nothing visible in time is still
-          // screenshotted (blank), and the gating storybook-tests job is the
-          // real render regression net. Don't abort the whole advisory run.
+      try {
+        // `domcontentloaded` (not `networkidle`, which can hang on animations or
+        // polling) so no single story can stall the run; the visibility wait
+        // below is what confirms the story actually rendered.
+        await page.goto(url, {
+          waitUntil: "domcontentloaded",
+          timeout: NAV_TIMEOUT_MS,
         });
+        await page
+          .locator(RENDER_READY_SELECTOR)
+          .first()
+          .waitFor({ state: "visible", timeout: RENDER_TIMEOUT_MS })
+          .catch(() => {
+            // Best effort: a story that renders nothing visible in time is still
+            // screenshotted (blank), and the gating storybook-tests job is the
+            // real render regression net. Don't abort the whole advisory run.
+          });
 
-      const buffer = await page.screenshot({ type: "png" });
-      results.push({ story, buffer });
-      await page.close();
+        const buffer = await page.screenshot({ type: "png" });
+        results.push({ story, buffer });
+      } catch (err) {
+        console.error(
+          `  Skipping ${story.title} / ${story.name}: ${err.message}`,
+        );
+      } finally {
+        await page.close();
+      }
     }
   } finally {
     await browser.close();
