@@ -20,7 +20,6 @@ jobs:
     timeout-minutes: 1
     outputs:
       code_changed: ${{ steps.filter.outputs.code_changed }}
-      stories_changed: ${{ steps.filter.outputs.stories_changed }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -32,7 +31,6 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "code_changed=true" >> "$GITHUB_OUTPUT"
-            echo "stories_changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           changed="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
@@ -49,13 +47,6 @@ jobs:
             esac
           done <<< "$changed"
           echo "code_changed=$code_changed" >> "$GITHUB_OUTPUT"
-          # A changed Storybook story implies an intended visual change worth a
-          # fresh screenshot; the advisory screenshots job gates on this.
-          if printf '%s\n' "$changed" | grep -Eq '\.stories\.(ts|tsx)$'; then
-            echo "stories_changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "stories_changed=false" >> "$GITHUB_OUTPUT"
-          fi
 
   tests:
     name: Tests
@@ -139,43 +130,3 @@ jobs:
       # PR bumping Vite back to 8 stays red here until the bundler is fixed.
       - name: Canary render check
         run: node scripts/check-storybook-render.mjs
-
-  # Advisory visual-acceptance aid: builds Storybook, screenshots every story
-  # from the static build, and uploads them as an artifact. Runs only when a
-  # story changed (an intended visual change worth eyeballing); continue-on-error
-  # keeps it non-blocking, so the correctness gates (Tests, Storybook Tests,
-  # Lint, Format, Type Check, Build, Storybook Build) remain hard-gating. The
-  # captured render path is covered for compile by the gating Storybook Build
-  # job. No concurrency group is needed — the artifact surface is per-run, so
-  # concurrent PR runs never race on a shared resource.
-  storybook-screenshots:
-    name: Storybook Screenshots
-    needs: detect-changes
-    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.stories_changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    continue-on-error: true
-    env:
-      STORYBOOK_DISABLE_TELEMETRY: "1"
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - uses: ./.github/actions/playwright-chromium
-      - name: Build Storybook
-        run: pnpm build-storybook
-      - name: Capture screenshots
-        # No step-level continue-on-error: a capture failure (a broken or slow
-        # story) must surface as a job *failure* so the coordinator routes it to
-        # fix-review. The script fails fast — stories run concurrently with a
-        # short per-story render budget and an overall wall-clock deadline below
-        # this job's timeout-minutes — so the job never hits its timeout and gets
-        # *cancelled* (which escalates to a human instead). Job-level
-        # continue-on-error still keeps the failure non-blocking for the run.
-        run: node scripts/capture-screenshots.mjs
-      - name: Upload screenshots
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: storybook-screenshots
-          path: screenshots/
-          if-no-files-found: warn
