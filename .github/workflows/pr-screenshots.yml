@@ -1,0 +1,85 @@
+name: PR Screenshots
+
+on:
+  pull_request:
+
+# contents:write pushes the per-PR gh-screenshots-pr-<N> branch (owned solely by
+# this PR and force-pushed each run, so it is concurrency-safe by construction);
+# pull-requests:write posts the sticky gallery comment. pr-screenshots-cleanup.yml
+# deletes the branch on PR close. Forks get a read-only token, so the job is
+# skipped for forked PRs (see the job `if:` below).
+permissions:
+  contents: write
+  pull-requests: write
+
+# Per-PR group only — never global. With a per-PR image surface there is no
+# cross-PR shared resource to race on; this group merely saves work on rapid
+# intra-PR re-pushes and cannot evict another PR's run.
+concurrency:
+  group: screenshots-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Storybook Screenshots
+    runs-on: ubuntu-latest
+    # Hard backstop only. The capture script self-deadlines well below this
+    # (CAPTURE_DEADLINE_MS, default 4 min) and exits non-zero, so a hung/slow
+    # render surfaces as a `failure` (agent-fixable → fix-review) rather than a
+    # `cancelled` at this cap (which requires human escalation).
+    timeout-minutes: 8
+    # Advisory: best-effort preview screenshots for human UAT, not a correctness
+    # gate. Job-level continue-on-error keeps a Playwright/CDN/build/comment-API
+    # failure non-blocking — but the capture step has no step-level
+    # continue-on-error, so a non-zero exit still reports this job red (visible,
+    # non-blocking), the desired fail-fast signal. The always-on Storybook Tests
+    # job remains the render regression gate.
+    continue-on-error: true
+    # Skip forked PRs — their GITHUB_TOKEN is read-only and cannot push the
+    # per-PR branch or post a comment regardless of the permissions block above.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      STORYBOOK_DISABLE_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      # Gated on changed *.stories.tsx only. A changed story file means the
+      # intended appearance changed — the screenshots exist for a human to
+      # confirm the new result is what was wanted. Non-story edits deliberately
+      # do NOT trigger screenshots here; an unintended regression from such an
+      # edit is caught by the always-run Storybook Tests job instead.
+      - name: Detect changed story files
+        id: stories
+        run: |
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- '*.stories.tsx')
+          if [ -z "$CHANGED" ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            printf 'files<<EOF\n%s\nEOF\n' "$CHANGED" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./.github/actions/setup
+        if: steps.stories.outputs.found == 'true'
+
+      - uses: ./.github/actions/playwright-chromium
+        if: steps.stories.outputs.found == 'true'
+
+      - name: Build Storybook
+        if: steps.stories.outputs.found == 'true'
+        run: pnpm build-storybook
+
+      - name: Capture screenshots and post PR comment
+        if: steps.stories.outputs.found == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ steps.stories.outputs.files }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node .github/scripts/storybook-screenshots.mjs

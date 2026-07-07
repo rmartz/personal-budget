@@ -10,7 +10,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AnnuityMonthlyMode } from "@/lib/firebase/schema/annuities";
 
 import { CREATE_ANNUITY_DIALOG_COPY } from "./copy";
-import { CreateAnnuityDialogView } from "./CreateAnnuityDialog";
+import { CreateAnnuityDialogView } from "./CreateAnnuityDialogView";
+import { AnnuityMode } from "./types";
 
 afterEach(cleanup);
 
@@ -18,7 +19,7 @@ describe("CreateAnnuityDialogView", () => {
   const baseProps = {
     open: true,
     onOpenChange: vi.fn(),
-    mode: "flat" as const,
+    mode: AnnuityMode.Flat,
     onModeChange: vi.fn(),
     name: "",
     onNameChange: vi.fn(),
@@ -64,7 +65,7 @@ describe("CreateAnnuityDialogView", () => {
       fireEvent.click(
         screen.getByText(CREATE_ANNUITY_DIALOG_COPY.modeLoanButton),
       );
-      expect(onModeChange).toHaveBeenCalledWith("pv");
+      expect(onModeChange).toHaveBeenCalledWith(AnnuityMode.PV);
     });
 
     it("calls onModeChange with 'flat' when flat button is clicked in pv mode", () => {
@@ -72,34 +73,40 @@ describe("CreateAnnuityDialogView", () => {
       render(
         <CreateAnnuityDialogView
           {...baseProps}
-          mode="pv"
+          mode={AnnuityMode.PV}
           onModeChange={onModeChange}
         />,
       );
       fireEvent.click(
         screen.getByText(CREATE_ANNUITY_DIALOG_COPY.modeFlatButton),
       );
-      expect(onModeChange).toHaveBeenCalledWith("flat");
+      expect(onModeChange).toHaveBeenCalledWith(AnnuityMode.Flat);
     });
   });
 
   describe("flat mode fields", () => {
     it("renders the name field", () => {
-      render(<CreateAnnuityDialogView {...baseProps} mode="flat" />);
+      render(
+        <CreateAnnuityDialogView {...baseProps} mode={AnnuityMode.Flat} />,
+      );
       expect(
         screen.getByLabelText(CREATE_ANNUITY_DIALOG_COPY.nameLabel),
       ).toBeDefined();
     });
 
     it("renders the monthly amount field in flat mode", () => {
-      render(<CreateAnnuityDialogView {...baseProps} mode="flat" />);
+      render(
+        <CreateAnnuityDialogView {...baseProps} mode={AnnuityMode.Flat} />,
+      );
       expect(
         screen.getByLabelText(CREATE_ANNUITY_DIALOG_COPY.monthlyAmountLabel),
       ).toBeDefined();
     });
 
     it("does not render the present value field in flat mode", () => {
-      render(<CreateAnnuityDialogView {...baseProps} mode="flat" />);
+      render(
+        <CreateAnnuityDialogView {...baseProps} mode={AnnuityMode.Flat} />,
+      );
       expect(
         screen.queryByLabelText(CREATE_ANNUITY_DIALOG_COPY.presentValueLabel),
       ).toBeNull();
@@ -108,28 +115,28 @@ describe("CreateAnnuityDialogView", () => {
 
   describe("pv mode fields", () => {
     it("renders the present value field in pv mode", () => {
-      render(<CreateAnnuityDialogView {...baseProps} mode="pv" />);
+      render(<CreateAnnuityDialogView {...baseProps} mode={AnnuityMode.PV} />);
       expect(
         screen.getByLabelText(CREATE_ANNUITY_DIALOG_COPY.presentValueLabel),
       ).toBeDefined();
     });
 
     it("renders the annual rate field in pv mode", () => {
-      render(<CreateAnnuityDialogView {...baseProps} mode="pv" />);
+      render(<CreateAnnuityDialogView {...baseProps} mode={AnnuityMode.PV} />);
       expect(
         screen.getByLabelText(CREATE_ANNUITY_DIALOG_COPY.annualRateLabel),
       ).toBeDefined();
     });
 
     it("renders the duration field in pv mode", () => {
-      render(<CreateAnnuityDialogView {...baseProps} mode="pv" />);
+      render(<CreateAnnuityDialogView {...baseProps} mode={AnnuityMode.PV} />);
       expect(
         screen.getByLabelText(CREATE_ANNUITY_DIALOG_COPY.durationLabel),
       ).toBeDefined();
     });
 
     it("does not render the monthly amount field in pv mode", () => {
-      render(<CreateAnnuityDialogView {...baseProps} mode="pv" />);
+      render(<CreateAnnuityDialogView {...baseProps} mode={AnnuityMode.PV} />);
       expect(
         screen.queryByLabelText(CREATE_ANNUITY_DIALOG_COPY.monthlyAmountLabel),
       ).toBeNull();
@@ -141,7 +148,7 @@ describe("CreateAnnuityDialogView", () => {
       render(
         <CreateAnnuityDialogView
           {...baseProps}
-          mode="pv"
+          mode={AnnuityMode.PV}
           monthlyPreview={undefined}
         />,
       );
@@ -154,7 +161,7 @@ describe("CreateAnnuityDialogView", () => {
       render(
         <CreateAnnuityDialogView
           {...baseProps}
-          mode="pv"
+          mode={AnnuityMode.PV}
           monthlyPreview={856.07}
         />,
       );
@@ -181,7 +188,7 @@ describe("CreateAnnuityDialogView", () => {
       render(
         <CreateAnnuityDialogView
           {...baseProps}
-          mode="flat"
+          mode={AnnuityMode.Flat}
           monthlyAmountError={
             CREATE_ANNUITY_DIALOG_COPY.monthlyAmountInvalidError
           }
@@ -196,7 +203,7 @@ describe("CreateAnnuityDialogView", () => {
       render(
         <CreateAnnuityDialogView
           {...baseProps}
-          mode="pv"
+          mode={AnnuityMode.PV}
           presentValueError={
             CREATE_ANNUITY_DIALOG_COPY.presentValueInvalidError
           }

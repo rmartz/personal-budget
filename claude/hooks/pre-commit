@@ -2,11 +2,12 @@
 # Pre-commit guards for agent worktrees (installed via core.hooksPath=claude/hooks
 # by new-worktree.py when claude/hooks/pre-commit is present).
 #
-# Intentionally lighter than .husky/pre-commit: lint-staged is omitted because
-# the PostToolUse Prettier hook already formats every file at edit time, so
-# staged files are already clean by commit time.
+# Runs lint-staged so ESLint (including max-lines enforcement) checks staged
+# ts/tsx files. The PostToolUse Prettier hook makes the Prettier pass a no-op
+# in practice, but the ESLint pass must run here to catch over-cap files before
+# commit.
 #
 # Bypass: git commit --no-verify
 set -e
+pnpm exec lint-staged
 pnpm run env:validate
-node scripts/check-file-length.mjs --staged
