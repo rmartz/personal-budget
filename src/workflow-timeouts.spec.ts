@@ -14,7 +14,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     format: 2,
     lint: 2,
     "storybook-build": 4,
-    "storybook-screenshots": 8,
     "storybook-tests": 4,
     tests: 2,
     "type-check": 2,
@@ -22,6 +21,12 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "package-pins.yml": {
     "check-package-pins": 1,
     "detect-changes": 1,
+  },
+  "pr-screenshots-cleanup.yml": {
+    cleanup: 5,
+  },
+  "pr-screenshots.yml": {
+    screenshots: 8,
   },
   "pr-title-lint.yml": {
     "pr-title": 1,
