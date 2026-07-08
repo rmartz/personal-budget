@@ -135,4 +135,23 @@ describe("verifySessionCookie — signature path", () => {
     vi.spyOn(crypto.subtle, "verify").mockResolvedValue(true);
     expect(await verifySessionCookie(makeCookie(), PROJECT_ID)).toBe(true);
   });
+
+  it("accepts a valid-claims cookie whose header base64url length requires padding", async () => {
+    stubCertFetch();
+    vi.spyOn(crypto.subtle, "verify").mockResolvedValue(true);
+    // { alg: "RS256", kid: KID, extra: 1 } → 40-byte JSON → 54-char base64url (54 % 4 === 2),
+    // so atob() needs "==" padding restored before decoding.
+    const now = Math.floor(Date.now() / 1000);
+    const header = b64url({ alg: "RS256", kid: KID, extra: 1 });
+    const payload = b64url({
+      aud: PROJECT_ID,
+      exp: now + 3600,
+      iat: now - 10,
+      iss: `https://session.firebase.google.com/${PROJECT_ID}`,
+      sub: "uid-1",
+    });
+    expect(
+      await verifySessionCookie(`${header}.${payload}.c2lnbmF0dXJl`, PROJECT_ID),
+    ).toBe(true);
+  });
 });

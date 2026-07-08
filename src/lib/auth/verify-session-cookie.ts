@@ -31,7 +31,8 @@ interface JwtPayload {
 }
 
 function base64UrlToBytes(input: string): Uint8Array<ArrayBuffer> {
-  return base64ToBytes(input.replace(/-/g, "+").replace(/_/g, "/"));
+  const base64 = input.replace(/-/g, "+").replace(/_/g, "/");
+  return base64ToBytes(base64 + "=".repeat((4 - (base64.length % 4)) % 4));
 }
 
 function decodeJson(base64Url: string): unknown {
