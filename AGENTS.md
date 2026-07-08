@@ -23,15 +23,16 @@
 
 ## GitHub Actions
 
-- **Pin every external GitHub Action to a full commit SHA**, with the release in a trailing
-  comment: `uses: actions/checkout@<40-hex-sha> # v7.0.0`. A mutable tag (`@v7`) can be
-  re-pointed at malicious code by a compromised maintainer or token; an immutable SHA cannot.
-  Local composite actions (`./.github/actions/*`) and `docker://` image refs are exempt — they
-  are not mutable Git tags.
-- `pnpm run check:action-pins` (`scripts/check-action-pins.mjs`) enforces this across every
-  workflow and composite action; the `Action Pins` CI workflow runs it, gated to PRs that touch
-  `.github/`. Dependabot's `github-actions` updater maintains the pins — it bumps the SHA and
-  the `# vX.Y.Z` comment together on new releases.
+- **Pin every external GitHub Action to a full commit SHA _and_ a trailing version comment**:
+  `uses: actions/checkout@<40-hex-sha> # v7.0.0`. A mutable tag (`@v7`) can be re-pointed at
+  malicious code by a compromised maintainer or token; an immutable SHA cannot. The `# vX.Y.Z`
+  comment is required, not cosmetic — Dependabot reads it to know the current version, so a SHA
+  with no version comment is pinned but un-updatable. Local composite actions
+  (`./.github/actions/*`) and `docker://` image refs are exempt — they are not mutable Git tags.
+- `pnpm run check:action-pins` (`scripts/check-action-pins.mjs`) enforces **both** the SHA pin
+  and the version comment across every workflow and composite action; the `Action Pins` CI
+  workflow runs it, gated to PRs that touch `.github/`. Dependabot's `github-actions` updater
+  then bumps the SHA and the `# vX.Y.Z` comment together on new releases.
 
 ## Common Commands
 
