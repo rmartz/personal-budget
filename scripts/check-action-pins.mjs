@@ -8,11 +8,12 @@
  * compromised maintainer or token; a 40-char commit SHA is immutable. Every
  * `uses:` that references an external action must therefore:
  *   1. pin a 40-char commit SHA, and
- *   2. carry a trailing version comment (`@<sha> # v7.0.0`).
+ *   2. carry a full `major.minor.patch` version comment (`@<sha> # v7.0.0`).
  * The comment is not cosmetic: Dependabot's github-actions updater reads it to
  * know the current version, and bumps the SHA and the comment together on a new
- * release. A SHA with no version comment is pinned but un-trackable, so it is a
- * violation too.
+ * release. It tracks partial comments (`# v7`, `# v7.0`) inconsistently, so full
+ * semver is required; a SHA with no (or partial) version comment is pinned but
+ * un-trackable, and is a violation too.
  *
  * Skipped: local composite actions (`./…`, `../…`) and `docker://` image refs —
  * neither is a mutable Git tag this rule governs.
@@ -25,9 +26,11 @@ import { join } from "node:path";
 
 const SHA = /^[0-9a-f]{40}$/;
 const USES = /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)/;
-// A version comment right after the ref (`# v7.0.0`, optional `v`, `# 7.0` ok):
-// the token Dependabot reads to track the pin. Must lead the comment.
-const VERSION_COMMENT = /#\s*v?\d+(?:\.\d+)*/;
+// A full major.minor.patch version comment leading the trailing comment
+// (`# v7.0.0`; optional `v`; a `-prerelease`/`+build` suffix is tolerated). Full
+// semver is required because Dependabot tracks partial comments (`# v7`, `# v7.0`)
+// inconsistently — the token it reads to bump the pin must be a complete version.
+const VERSION_COMMENT = /#\s*v?\d+\.\d+\.\d+/;
 const IN_CI = process.env.GITHUB_ACTIONS === "true";
 
 function findWorkflowFiles(directory) {
@@ -66,7 +69,7 @@ function violationsFor(file) {
       );
     } else if (!VERSION_COMMENT.test(line)) {
       found.push(
-        `${location} — "${ref}" is SHA-pinned but has no version comment; add \`# vX.Y.Z\` so Dependabot can track and bump the pin`,
+        `${location} — "${ref}" is SHA-pinned but lacks a full-semver version comment; add \`# vMAJOR.MINOR.PATCH\` (e.g. \`# v7.0.0\`) so Dependabot can track and bump the pin`,
       );
     } else {
       found.push(null); // compliant external ref (counted below)
@@ -96,5 +99,5 @@ if (violations.length > 0) {
 }
 
 console.log(
-  `All external GitHub Actions are SHA-pinned with version comments (${checkedCount} ref(s) checked).`,
+  `All external GitHub Actions are SHA-pinned with full-semver version comments (${checkedCount} ref(s) checked).`,
 );
