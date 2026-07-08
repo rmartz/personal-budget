@@ -101,6 +101,13 @@ describe("verifySessionCookie — claim rejections", () => {
     ).toBe(false);
   });
 
+  it("rejects a cookie whose exp equals the current second", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    expect(
+      await verifySessionCookie(makeCookie({ exp: now }), PROJECT_ID),
+    ).toBe(false);
+  });
+
   it("rejects a cookie issued in the future", async () => {
     const now = Math.floor(Date.now() / 1000);
     expect(
@@ -151,7 +158,10 @@ describe("verifySessionCookie — signature path", () => {
       sub: "uid-1",
     });
     expect(
-      await verifySessionCookie(`${header}.${payload}.c2lnbmF0dXJl`, PROJECT_ID),
+      await verifySessionCookie(
+        `${header}.${payload}.c2lnbmF0dXJl`,
+        PROJECT_ID,
+      ),
     ).toBe(true);
   });
 });

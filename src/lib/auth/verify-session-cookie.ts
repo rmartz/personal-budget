@@ -78,7 +78,7 @@ export async function verifySessionCookie(
   const now = Math.floor(Date.now() / 1000);
   if (
     !payload.exp ||
-    payload.exp < now ||
+    payload.exp <= now ||
     !payload.iat ||
     payload.iat > now ||
     payload.aud !== projectId ||
