@@ -1,0 +1,55 @@
+name: Action Pins
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Whether this PR touches workflow/action definitions the pin check reads. An
+  # allowlist is safe because the check's verdict is a pure function of the
+  # .github YAML. On push it is always true.
+  detect-changes:
+    name: Detect workflow changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      workflows_changed: ${{ steps.filter.outputs.workflows_changed }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+      - id: filter
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "workflows_changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          workflows_changed=false
+          while IFS= read -r file; do
+            case "$file" in
+              .github/workflows/*.yml | .github/workflows/*.yaml | .github/actions/*)
+                workflows_changed=true
+                break
+                ;;
+            esac
+          done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "workflows_changed=$workflows_changed" >> "$GITHUB_OUTPUT"
+
+  check-action-pins:
+    name: Check action SHA pins
+    needs: detect-changes
+    if: needs.detect-changes.outputs.workflows_changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      # Pure Node script (no dependencies), so it runs on the runner's built-in
+      # Node without the pnpm-install setup step.
+      - run: node scripts/check-action-pins.mjs
