@@ -1,4 +1,4 @@
-name: Package Pins
+name: Action Pins
 
 on:
   push:
@@ -9,16 +9,15 @@ permissions:
   contents: read
 
 jobs:
-  # Whether this PR touches the manifest the pin check reads. An allowlist is
-  # safe because the check's verdict is a pure function of package.json — nothing
-  # else can change it. pnpm-lock.yaml is included so a "package update" PR that
-  # touches only the lockfile still triggers the check. On push it is always true.
+  # Whether this PR touches workflow/action definitions the pin check reads. An
+  # allowlist is safe because the check's verdict is a pure function of the
+  # .github YAML. On push it is always true.
   detect-changes:
-    name: Detect package changes
+    name: Detect workflow changes
     runs-on: ubuntu-latest
     timeout-minutes: 1
     outputs:
-      packages_changed: ${{ steps.filter.outputs.packages_changed }}
+      workflows_changed: ${{ steps.filter.outputs.workflows_changed }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -29,27 +28,28 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "packages_changed=true" >> "$GITHUB_OUTPUT"
+            echo "workflows_changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          packages_changed=false
+          workflows_changed=false
           while IFS= read -r file; do
             case "$file" in
-              package.json | */package.json | pnpm-lock.yaml)
-                packages_changed=true
+              .github/workflows/*.yml | .github/workflows/*.yaml | .github/actions/*)
+                workflows_changed=true
                 break
                 ;;
             esac
           done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
-          echo "packages_changed=$packages_changed" >> "$GITHUB_OUTPUT"
+          echo "workflows_changed=$workflows_changed" >> "$GITHUB_OUTPUT"
 
-  check-package-pins:
-    name: Check package.json pins
+  check-action-pins:
+    name: Check action SHA pins
     needs: detect-changes
-    if: needs.detect-changes.outputs.packages_changed == 'true'
+    if: needs.detect-changes.outputs.workflows_changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: ./.github/actions/setup
-      - run: pnpm run check:package-pins
+      # Pure Node script (no dependencies), so it runs on the runner's built-in
+      # Node without the pnpm-install setup step.
+      - run: node scripts/check-action-pins.mjs

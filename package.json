@@ -17,6 +17,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky",
+    "check:action-pins": "node scripts/check-action-pins.mjs",
     "check:package-pins": "node scripts/check-package-pins.mjs",
     "env:validate": "node scripts/validate-config.mjs"
   },
