@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   sendPasswordReset,
@@ -50,11 +50,18 @@ describe("auth service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(getClientAuth).mockReturnValue(mockAuth as never);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   describe("signIn", () => {
     it("calls signInWithEmailAndPassword with auth, email, and password", async () => {
-      const mockResult = { user: { uid: "uid-1" } };
+      const mockResult = {
+        user: { uid: "uid-1", getIdToken: vi.fn().mockResolvedValue("tok-1") },
+      };
       vi.mocked(signInWithEmailAndPassword).mockResolvedValue(
         mockResult as never,
       );
@@ -68,11 +75,44 @@ describe("auth service", () => {
       );
       expect(result).toBe(mockResult);
     });
+
+    it("establishes the server session with the user's ID token", async () => {
+      const mockResult = {
+        user: { uid: "uid-1", getIdToken: vi.fn().mockResolvedValue("tok-1") },
+      };
+      vi.mocked(signInWithEmailAndPassword).mockResolvedValue(
+        mockResult as never,
+      );
+
+      await signIn(email, password);
+
+      expect(fetch).toHaveBeenCalledWith("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: "tok-1" }),
+      });
+    });
+
+    it("throws when the session endpoint rejects", async () => {
+      const mockResult = {
+        user: { uid: "uid-1", getIdToken: vi.fn().mockResolvedValue("tok-1") },
+      };
+      vi.mocked(signInWithEmailAndPassword).mockResolvedValue(
+        mockResult as never,
+      );
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+
+      await expect(signIn(email, password)).rejects.toThrow(
+        "Failed to establish session",
+      );
+    });
   });
 
   describe("signUp", () => {
     it("calls createUserWithEmailAndPassword with auth, email, and password", async () => {
-      const mockResult = { user: { uid: "uid-2" } };
+      const mockResult = {
+        user: { uid: "uid-2", getIdToken: vi.fn().mockResolvedValue("tok-2") },
+      };
       vi.mocked(createUserWithEmailAndPassword).mockResolvedValue(
         mockResult as never,
       );
@@ -85,6 +125,23 @@ describe("auth service", () => {
         password,
       );
       expect(result).toBe(mockResult);
+    });
+
+    it("establishes the server session with the user's ID token", async () => {
+      const mockResult = {
+        user: { uid: "uid-2", getIdToken: vi.fn().mockResolvedValue("tok-2") },
+      };
+      vi.mocked(createUserWithEmailAndPassword).mockResolvedValue(
+        mockResult as never,
+      );
+
+      await signUp(email, password);
+
+      expect(fetch).toHaveBeenCalledWith("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: "tok-2" }),
+      });
     });
   });
 
