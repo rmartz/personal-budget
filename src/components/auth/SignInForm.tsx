@@ -116,6 +116,7 @@ export function SignInFormView({
               </Label>
               <Link
                 href="/forgot-password"
+                prefetch={false}
                 className="text-xs text-muted-foreground underline-offset-4 hover:underline"
               >
                 {SIGN_IN_FORM_COPY.forgotPasswordLink}
@@ -167,6 +168,7 @@ export function SignInFormView({
         </span>
         <Link
           href="/sign-up"
+          prefetch={false}
           className="font-medium underline-offset-4 hover:underline"
         >
           {SIGN_IN_FORM_COPY.signUpLink}
