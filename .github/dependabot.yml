@@ -11,11 +11,61 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-    # Group only minor and patch bumps so routine version churn arrives in one
-    # batched PR per dependency type. Major bumps match no group and are raised
-    # as individual PRs, since they more often need code changes and warrant
-    # isolated review.
+    # Version-locked families (first below) group across every update type so
+    # interdependent packages bump atomically, including majors. Otherwise, group
+    # only minor and patch bumps into one batched PR per dependency type;
+    # non-family major bumps match no group and raise individual PRs, since they
+    # more often need code changes and warrant isolated review.
     groups:
+      # Version-locked families. Each is a set of packages that ship on a shared
+      # version line (or whose majors are dictated by one member), so bumping one
+      # without the rest breaks the build. Grouped across ALL update types (major,
+      # minor, AND patch) and listed first to win group-assignment precedence, so
+      # any bump within a family lands as one atomic PR. Update-types are
+      # deliberately unrestricted: a react patch without react-dom is as broken as
+      # a major, and the prod/dev split below would otherwise scatter react and
+      # react-dom from their @types.
+      react:
+        # react + react-dom ship the same version and must move together; the
+        # @types track react's major. Spans prod (react, react-dom) and dev (@types).
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      storybook:
+        # Every @storybook/* package, the storybook CLI, and the eslint plugin
+        # share one Storybook version line. Listed before eslint and vite so
+        # eslint-plugin-storybook and @storybook/nextjs-vite / addon-vitest join
+        # here rather than those groups.
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+          - "eslint-plugin-storybook"
+      vite:
+        # vite + its react plugin + vitest + @vitest/* are one interlocked
+        # toolchain: a vite major dictates the plugin and vitest majors (the
+        # @vitejs/plugin-react <-> vite coupling that forced the Vite 8 -> 7 pin,
+        # #360), so they must bump together as one atomic PR.
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "vitest"
+          - "@vitest/*"
+      eslint:
+        # eslint + @eslint/js share a version line; typescript-eslint and the
+        # react-hooks plugin track the eslint major.
+        patterns:
+          - "eslint"
+          - "@eslint/js"
+          - "typescript-eslint"
+          - "eslint-plugin-react-hooks"
+      tailwind:
+        # tailwindcss core + its postcss plugin ship in lockstep; a mismatch
+        # fails the build.
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
       # Prettier (and its plugins) gets its own group for major/minor bumps so a
       # formatting-affecting upgrade lands in an isolated PR — a Prettier minor
       # bump can reformat the whole tree and require code changes, which must not
