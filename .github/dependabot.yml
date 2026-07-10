@@ -95,6 +95,18 @@ updates:
         update-types:
           - "major"
           - "minor"
+      # TypeScript is the language itself, not just another dependency — a
+      # compiler major or minor can surface new type errors across the codebase
+      # and warrants isolated, visible review, so split those into their own PR
+      # (like prettier). The exact `typescript` pattern does not claim
+      # typescript-eslint, which stays in the eslint family. Patch bumps fall
+      # through to dev-dependencies and ride the routine batch.
+      typescript:
+        patterns:
+          - "typescript"
+        update-types:
+          - "major"
+          - "minor"
       dev-dependencies:
         dependency-type: development
         patterns:
