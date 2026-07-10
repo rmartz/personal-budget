@@ -11,11 +11,14 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-    # Version-locked families (first below) group across every update type so
-    # interdependent packages bump atomically, including majors. Otherwise, group
-    # only minor and patch bumps into one batched PR per dependency type;
-    # non-family major bumps match no group and raise individual PRs, since they
-    # more often need code changes and warrant isolated review.
+    # Version-locked families (first below) group interdependent packages so they
+    # bump atomically instead of scattering into separate PRs — chiefly for
+    # majors, which break the build if split (each family's note below states how
+    # far it scopes: same-tier families group majors only, while react spans both
+    # tiers and groups every update type). Otherwise, group only minor and patch
+    # bumps into one batched PR per dependency type; non-family major bumps match
+    # no group and raise individual PRs, since they more often need code changes
+    # and warrant isolated review.
     groups:
       # Version-locked families. Each is a set of packages that ship on a shared
       # version line (or whose majors are dictated by one member), so a major bump
