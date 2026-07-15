@@ -12,12 +12,13 @@ import tseslint from "typescript-eslint";
 // re-include these general selectors alongside its test-only additions.
 const noRestrictedSyntax = [
   {
-    // "No function-style imports": inline `import("…").Type` in type position.
-    // (Dynamic `await import("…")` for a value is untouched — it is not a
-    // TSImportType node.)
+    // "No function-style imports": any inline TypeScript import type in type
+    // position — both the qualified `import("…").Type` form and the bare
+    // `import("…")` form. (Dynamic `await import("…")` for a value is
+    // untouched — it is not a TSImportType node.)
     selector: "TSImportType",
     message:
-      'No inline import("…").Type. Use a module-level `import type { … } from "…"` statement.',
+      'No inline import types. Use a module-level `import type { … } from "…"` statement.',
   },
   {
     // "No IIFEs": a function/arrow expression invoked in place.
