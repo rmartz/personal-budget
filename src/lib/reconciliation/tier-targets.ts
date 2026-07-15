@@ -1,11 +1,7 @@
-import {
-  ReconciliationAccount,
-  ReconciliationAccountTier,
-} from "@/lib/firebase/schema/reconciliation-accounts";
-import {
-  ReconciliationExpense,
-  ReconciliationExpenseType,
-} from "@/lib/firebase/schema/reconciliation-expenses";
+import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
+import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
+import type { ReconciliationExpense } from "@/lib/firebase/schema/reconciliation-expenses";
+import { ReconciliationExpenseType } from "@/lib/firebase/schema/reconciliation-expenses";
 
 export interface TierTargetInputs {
   accounts: ReconciliationAccount[];
