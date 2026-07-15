@@ -6,6 +6,50 @@ import storybook from "eslint-plugin-storybook";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
+// `no-restricted-syntax` selectors that statically enforce prose conventions
+// from CLAUDE.md. ESLint does not merge this rule's array across config
+// objects — the last matching config wins — so the test-file block below must
+// re-include these general selectors alongside its test-only additions.
+const noRestrictedSyntax = [
+  {
+    // "No function-style imports": inline `import("…").Type` in type position.
+    // (Dynamic `await import("…")` for a value is untouched — it is not a
+    // TSImportType node.)
+    selector: "TSImportType",
+    message:
+      'No inline import("…").Type. Use a module-level `import type { … } from "…"` statement.',
+  },
+  {
+    // "No IIFEs": a function/arrow expression invoked in place.
+    selector:
+      "CallExpression[callee.type='FunctionExpression'], CallExpression[callee.type='ArrowFunctionExpression']",
+    message:
+      "No IIFEs. Extract a named helper, or compute the value with a plain expression.",
+  },
+  {
+    // "Use async/await, not `.then()` chains."
+    selector: "CallExpression[callee.property.name='then']",
+    message: "Use async/await, not `.then()` chains.",
+  },
+];
+
+// Test-file superset: the general selectors plus the Vitest test conventions.
+const testNoRestrictedSyntax = [
+  ...noRestrictedSyntax,
+  {
+    // "Use `describe`/`it` from Vitest (not `test`)."
+    selector:
+      "CallExpression[callee.name='test'], CallExpression[callee.object.name='test']",
+    message: "Use `describe`/`it` from Vitest, not `test()`.",
+  },
+  {
+    // "Do not use `.toBeInTheDocument()`."
+    selector: "MemberExpression[property.name='toBeInTheDocument']",
+    message:
+      "Do not use `.toBeInTheDocument()`; use `.toBeDefined()` or check `.textContent`.",
+  },
+];
+
 export default tseslint.config(
   {
     ignores: [
@@ -37,6 +81,37 @@ export default tseslint.config(
         project: ["./tsconfig.json"],
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+  },
+  // Static enforcement of the prose code-style conventions in CLAUDE.md that
+  // were previously only caught by eye in /review. No new dependency — every
+  // rule is core ESLint or typescript-eslint (already installed via the
+  // strictTypeChecked preset above). The CLAUDE.md prose for these rules is
+  // deliberately kept brief: the rule is the source of truth.
+  {
+    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
+    rules: {
+      // "Use module-level `import type`." Auto-fixes value imports of
+      // type-only bindings into a separate `import type` statement.
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "separate-type-imports" },
+      ],
+      "@typescript-eslint/no-import-type-side-effects": "error",
+      "no-restricted-syntax": ["error", ...noRestrictedSyntax],
+    },
+  },
+  // Test files get the general selectors plus the Vitest test-only conventions.
+  // This block follows the general one so it wins for spec/test files (the
+  // array rule does not merge across configs).
+  {
+    files: [
+      "src/**/*.spec.{ts,tsx}",
+      "src/**/*.test.{ts,tsx}",
+      "src/**/*-tests/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-syntax": ["error", ...testNoRestrictedSyntax],
     },
   },
   {

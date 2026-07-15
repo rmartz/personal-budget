@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Posture } from "@/lib/firebase/schema/investments";
+import type { Posture } from "@/lib/firebase/schema/investments";
 import { updateUserSettings } from "@/services/user-settings";
 
 export function useUpdateReconciliationPosture(uid: string) {

@@ -6,7 +6,7 @@ import type {
   AllocationTarget,
   InvestmentAccount,
 } from "@/lib/firebase/schema/investments";
-import { Posture } from "@/lib/firebase/schema/investments";
+import type { Posture } from "@/lib/firebase/schema/investments";
 
 import { AllocationDashboardView } from "./AllocationDashboardView";
 import {

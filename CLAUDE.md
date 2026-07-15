@@ -54,10 +54,10 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 
 ## TypeScript
 
-- Strict mode throughout. No `any` types. No `@ts-ignore`.
+- Strict mode throughout; `any` and `@ts-ignore` are blocked by ESLint (`strictTypeChecked`).
 - Do not use `null` unless required for API compatibility or when explicitly distinguishing `null` from `undefined`. Prefer `undefined` for absent/optional values throughout the codebase.
 - Prefer explicit `interface` names scoped to their component (e.g., `interface UserProfileCardProps` not `interface Props`).
-- Use `async/await`, not `.then()` chains.
+- Use `async/await`; `.then()` chains are blocked by ESLint (`no-restricted-syntax`).
 
 ## File Organization
 
@@ -79,8 +79,8 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 
 - **Favor type inference.** Explicit generic type arguments (for example, `someFn<Foo>(...)`) are a code smell when TypeScript can infer them.
 - **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
-- **No IIFEs.** Do not use immediately-invoked function expressions. Extract the logic into a named helper function or compute the value with a plain expression instead.
-- **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
+- **No IIFEs** (ESLint-enforced). Extract the logic into a named helper function, or compute the value with a plain expression.
+- **No function-style imports** (ESLint-enforced): use module-level `import type { … } from "…"` statements, never inline `import("…").Type` in a type annotation. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) remains acceptable — only the inline type form is blocked.
 - **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
 - **Alphabetical ordering** applies wherever sequence has no semantic value, to minimize merge conflicts:
   - **Import statements** — enforced automatically by ESLint (`simple-import-sort`). Run `pnpm lint --fix` to auto-correct.
@@ -143,13 +143,13 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - Test files are co-located with their component: `ComponentName.spec.tsx`.
 - When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
 - Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
-- Do not use `.toBeInTheDocument()` — use `.toBeDefined()` or check `.textContent` instead.
+- Do not use `.toBeInTheDocument()` (ESLint-enforced) — use `.toBeDefined()` or check `.textContent` instead.
 - Assert against copy constants (e.g., `HOME_PAGE_COPY`) rather than hardcoded strings.
 - Test presentational view components directly; avoid mocking hooks in tests where possible.
 
 ## Testing Conventions
 
-- Use `describe`/`it` from Vitest (not `test`).
+- Use `describe`/`it` from Vitest, not `test` (ESLint-enforced).
 - Test fixture generators use `make{DomainName}()` (e.g., `makeUser()`, `makeSession()`).
 - When splitting large test files, organize into `{module}-tests/` directories.
 
