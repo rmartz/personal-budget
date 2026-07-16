@@ -35,6 +35,12 @@ import { readFileSync } from "fs";
 
 const baseRef = process.argv[2] ?? "origin/main";
 const minDays = Number(process.env.RELEASE_AGE_MIN_DAYS ?? "7");
+if (!Number.isFinite(minDays) || minDays <= 0) {
+  console.error(
+    `Invalid RELEASE_AGE_MIN_DAYS: ${process.env.RELEASE_AGE_MIN_DAYS ?? "(unset)"} — must be a positive finite number.`,
+  );
+  process.exit(1);
+}
 const minMs = minDays * 24 * 60 * 60 * 1000;
 
 const SEMVER_VERSION = /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
@@ -72,12 +78,29 @@ function parseKey(key) {
   return { name, version };
 }
 
+/** Cache of package-name → registry `time` map (keyed by version). null = fetch failed. */
+const registryTimeCache = new Map();
+
 /** Publish timestamp (ms) for name@version, or undefined if unresolvable. */
 async function publishedAt(name, version) {
-  const url = `https://registry.npmjs.org/${name.replace("/", "%2F")}`;
-  const res = await fetch(url);
-  if (!res.ok) return undefined;
-  const time = (await res.json()).time?.[version];
+  let timeMap;
+  if (registryTimeCache.has(name)) {
+    timeMap = registryTimeCache.get(name);
+  } else {
+    const url = `https://registry.npmjs.org/${name.replace("/", "%2F")}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.warn(
+        `  warning: registry returned HTTP ${res.status} for ${name} — skipping`,
+      );
+      registryTimeCache.set(name, null);
+      return undefined;
+    }
+    timeMap = (await res.json()).time ?? null;
+    registryTimeCache.set(name, timeMap);
+  }
+  if (!timeMap) return undefined;
+  const time = timeMap[version];
   return time ? Date.parse(time) : undefined;
 }
 
