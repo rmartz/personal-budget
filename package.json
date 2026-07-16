@@ -19,6 +19,7 @@
     "prepare": "husky",
     "check:action-pins": "node scripts/check-action-pins.mjs",
     "check:package-pins": "node scripts/check-package-pins.mjs",
+    "check:release-age": "node scripts/check-release-age.mjs",
     "env:validate": "node scripts/validate-config.mjs"
   },
   "pnpm": {
