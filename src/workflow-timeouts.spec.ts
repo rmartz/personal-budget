@@ -38,6 +38,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "preview-deploy.yml": {
     "deploy-preview": 10,
   },
+  "release-age.yml": {
+    "check-release-age": 2,
+  },
   "sentry-release.yml": {
     "create-release": 2,
   },
