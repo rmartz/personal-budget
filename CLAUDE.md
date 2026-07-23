@@ -54,10 +54,10 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 
 ## TypeScript
 
-- Strict mode throughout. No `any` types. No `@ts-ignore`.
+- Strict mode throughout; `any` and `@ts-ignore` are blocked by ESLint (`strictTypeChecked`).
 - Do not use `null` unless required for API compatibility or when explicitly distinguishing `null` from `undefined`. Prefer `undefined` for absent/optional values throughout the codebase.
 - Prefer explicit `interface` names scoped to their component (e.g., `interface UserProfileCardProps` not `interface Props`).
-- Use `async/await`, not `.then()` chains.
+- Use `async/await`; `.then()` chains are blocked by ESLint (`no-restricted-syntax`).
 
 ## File Organization
 
@@ -66,6 +66,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - **Hard caps are enforced by ESLint** (`max-lines` in `eslint.config.js`, run by the `Lint` CI job and `lint-staged`): 400 lines for source `*.{ts,tsx}`, 600 for `*.spec`/`*.test`/`*-tests/` files. These are 2× the recommended maxima above — a backstop, not the target. A file over its cap fails lint, so split it before committing.
 - **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file — e.g., a context wrapper, structural template, or props alias. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests (e.g., list items, row components, panels, form sections). All component props must be defined as an explicitly named interface (e.g., `interface UserListProps`), never inline in the function signature.
 - **In-scope splitting of substantially-modified oversized files**: When a PR substantially modifies a file and that change pushes it past the recommended split threshold (more than 20% over the line limit — i.e. ~240 lines for source, ~360 for tests), splitting that file by logical concern is **in scope for the same PR**, not a separate change to defer. If the `/review` skill observes such a file that was _not_ split, it decides — based on how substantial the modification was — whether to require the split within that PR or to defer it to a follow-on `Tech Debt` ticket. Require the split in-PR when the file was substantially reworked; defer to a ticket when the change to the oversized file was incidental or small relative to its size. Either way the unsplit oversized file should not pass silently — it is flagged for a decision.
+- **Improve-on-write (Boy Scout Rule)**: Leave code cleaner than you found it. When you make a substantial change inside a domain/feature, take the opportunity to improve its structure — not just land the change. `src/` is currently **type-siloed**: `hooks/`, `services/`, and `lib/` are split away from the `components/<domain>/` they belong to. When you substantially touch a domain, opportunistically move its scattered hook/service/domain-logic files toward that domain's **vertical** and colocate them (spec/stories/copy alongside the component), per the target structure in issue #383. This is the same in-scope, along-a-clean-seam improvement as the split rule above — **not** license for a sprawling reorg of untouched code, and **not** terseness/code-golf; keep the migration scoped to what you touched. Issue #383 is the north star for the target vertical structure; `eslint-plugin-boundaries` will enforce the domain boundaries once configured (tracked in #383). See the cross-project [vertical-structuring guidance](https://github.com/rmartz/ai/blob/main/docs/guidance/code-style.md#vertical-structuring-colocation).
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain.
 - Add a barrel `index.ts` when a component or module directory exposes a public API or already
   follows a barrel pattern; do not require one for every directory (e.g. ShadCN-generated
@@ -78,8 +79,8 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 
 - **Favor type inference.** Explicit generic type arguments (for example, `someFn<Foo>(...)`) are a code smell when TypeScript can infer them.
 - **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
-- **No IIFEs.** Do not use immediately-invoked function expressions. Extract the logic into a named helper function or compute the value with a plain expression instead.
-- **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
+- **No IIFEs** (ESLint-enforced). Extract the logic into a named helper function, or compute the value with a plain expression.
+- **No function-style imports** (ESLint-enforced): use module-level `import type { … } from "…"` statements, never inline `import("…").Type` in a type annotation. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) remains acceptable — only the inline type form is blocked.
 - **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
 - **Alphabetical ordering** applies wherever sequence has no semantic value, to minimize merge conflicts:
   - **Import statements** — enforced automatically by ESLint (`simple-import-sort`). Run `pnpm lint --fix` to auto-correct.
@@ -142,13 +143,13 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - Test files are co-located with their component: `ComponentName.spec.tsx`.
 - When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
 - Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
-- Do not use `.toBeInTheDocument()` — use `.toBeDefined()` or check `.textContent` instead.
+- Do not use `.toBeInTheDocument()` (ESLint-enforced) — use `.toBeDefined()` or check `.textContent` instead.
 - Assert against copy constants (e.g., `HOME_PAGE_COPY`) rather than hardcoded strings.
 - Test presentational view components directly; avoid mocking hooks in tests where possible.
 
 ## Testing Conventions
 
-- Use `describe`/`it` from Vitest (not `test`).
+- Use `describe`/`it` from Vitest, not `test` (ESLint-enforced).
 - Test fixture generators use `make{DomainName}()` (e.g., `makeUser()`, `makeSession()`).
 - When splitting large test files, organize into `{module}-tests/` directories.
 
