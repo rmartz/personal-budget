@@ -210,6 +210,7 @@ export function SignUpFormView({
         </span>
         <Link
           href="/sign-in"
+          prefetch={false}
           className="font-medium underline-offset-4 hover:underline"
         >
           {SIGN_UP_FORM_COPY.signInLink}

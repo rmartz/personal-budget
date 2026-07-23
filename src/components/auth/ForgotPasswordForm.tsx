@@ -68,6 +68,7 @@ export function ForgotPasswordFormView({
       <CardFooter className="justify-center">
         <Link
           href="/sign-in"
+          prefetch={false}
           className="text-sm font-medium underline-offset-4 hover:underline"
         >
           {FORGOT_PASSWORD_FORM_COPY.confirmationBackLink}
@@ -135,6 +136,7 @@ export function ForgotPasswordFormView({
       <CardFooter className="justify-center">
         <Link
           href="/sign-in"
+          prefetch={false}
           className="text-sm text-muted-foreground underline-offset-4 hover:underline"
         >
           {FORGOT_PASSWORD_FORM_COPY.backToSignInLink}

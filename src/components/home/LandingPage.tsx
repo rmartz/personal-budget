@@ -21,7 +21,11 @@ export function LandingPage() {
             {LANDING_PAGE_COPY.bodyCopy}
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
+            <Link
+              href="/sign-up"
+              prefetch={false}
+              className={buttonVariants({ size: "lg" })}
+            >
               {LANDING_PAGE_COPY.primaryCta}
             </Link>
             <Button type="button" variant="ghost" size="sm">

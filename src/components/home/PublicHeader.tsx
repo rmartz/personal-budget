@@ -17,12 +17,14 @@ export function PublicHeader() {
         </Link>
         <Link
           href="/sign-in"
+          prefetch={false}
           className="text-muted-foreground transition-colors hover:text-foreground"
         >
           {PUBLIC_HEADER_COPY.navSignIn}
         </Link>
         <Link
           href="/sign-up"
+          prefetch={false}
           className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
         >
           {PUBLIC_HEADER_COPY.navGetStarted}
