@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { type ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
+import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
 import {
   type ReconciliationExpense,
   ReconciliationExpenseType,

@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type {
   AllocationTarget,
   InvestmentAccount,
+  Posture,
 } from "@/lib/firebase/schema/investments";
-import { Posture } from "@/lib/firebase/schema/investments";
 
 import { AllocationDashboardView } from "./AllocationDashboardView";
 import {

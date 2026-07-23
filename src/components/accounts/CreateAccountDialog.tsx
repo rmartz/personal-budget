@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
+import type { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-accounts";
 
 import { CREATE_ACCOUNT_DIALOG_COPY } from "./copy";
 import { CreateAccountDialogView, isCashTier } from "./CreateAccountDialogView";
