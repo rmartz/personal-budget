@@ -13,12 +13,40 @@ import {
 
 import { getClientAuth } from "@/lib/firebase/client";
 
+// Exchange the freshly-signed-in user's ID token for the httpOnly session
+// cookie the middleware reads. Client Firebase auth alone leaves the server
+// unaware the user is signed in, so this must run before any navigation into a
+// middleware-gated route.
+async function establishServerSession(user: User): Promise<void> {
+  const idToken = await user.getIdToken();
+  const response = await fetch("/api/auth/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to establish session");
+  }
+}
+
 export async function signIn(email: string, password: string) {
-  return signInWithEmailAndPassword(getClientAuth(), email, password);
+  const credential = await signInWithEmailAndPassword(
+    getClientAuth(),
+    email,
+    password,
+  );
+  await establishServerSession(credential.user);
+  return credential;
 }
 
 export async function signUp(email: string, password: string) {
-  return createUserWithEmailAndPassword(getClientAuth(), email, password);
+  const credential = await createUserWithEmailAndPassword(
+    getClientAuth(),
+    email,
+    password,
+  );
+  await establishServerSession(credential.user);
+  return credential;
 }
 
 export async function sendPasswordReset(email: string) {
