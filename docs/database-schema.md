@@ -46,6 +46,12 @@ Timestamps are stored as ISO 8601 strings (e.g. `"2024-01-15T00:00:00.000Z"`). T
       startDate         string        ISO 8601 timestamp; first payment date
       durationMonths    number|null   Optional. Total number of months; null = indefinite
 
+  investmentAccounts/
+    {accountId}/
+      name              string        Display name (e.g. "Vanguard Brokerage")
+      currentPercent    number        Current share of the portfolio, as a percentage
+      targetPercent     number        Target share of the portfolio, as a percentage
+
   reconciliationAccounts/
     {accountId}/
       name              string        Display name (e.g. "Chase Checking")
@@ -66,5 +72,5 @@ All paths under `/users/{uid}/` are readable and writable only by the authentica
 ## Design Notes
 
 - `budgetLedgerTransactions` and `budgetLedgerSavingsGoals` are nested under the ledger ID to keep related data co-located and to enable efficient Firebase queries scoped to a single ledger.
-- `annuities`, `reconciliationAccounts`, and `reconciliationExpenses` are flat (not nested under another entity) because they are independent domain objects.
+- `annuities`, `investmentAccounts`, `reconciliationAccounts`, and `reconciliationExpenses` are flat (not nested under another entity) because they are independent domain objects.
 - Optional fields that Firebase cannot store as `undefined` are written as `null` in the Firebase layer and converted back to `undefined` in the domain layer by the serialization helpers.
