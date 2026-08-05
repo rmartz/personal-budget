@@ -17,7 +17,7 @@ tags:
 
 # Savings Goal Liquidity Planning
 
-> Status: **design** (pre-implementation). Tracked by the **Savings Goal Liquidity Planning** epic and milestone. Some sections (notably the priority × date scarcity model) are deliberately left open for a follow-up pass.
+> Status: **design** (pre-implementation). Tracked by the **Savings Goal Liquidity Planning** epic and milestone.
 
 ## Summary
 
@@ -89,7 +89,7 @@ Only the **investment ↔ cash** boundary carries a tax cost (buy vs. sell). The
   └───────────────┘                                       └──────────────────┘
   owns: time, returns,                                     owns: current holdings,
   financing, glide,                                        tier subdivision,
-  feasibility menu                                         minimum-transaction moves
+  feasibility projection                                   minimum-transaction moves
 ```
 
 - **Planning layer** reasons about the _future_: it builds the liquidity schedule from all draws, applies the glide, and collapses the whole forward schedule into a **current-period target** — a `LiquidityTarget` (a target cash floor / investable ceiling).
@@ -108,33 +108,37 @@ Recommendations favor **stability and few long-term transactions**. The app shou
 
 The glide shape is a reasonable default (this is rough planning): stay maximally invested until a de-risking window, then glide to cash, assuming investments are safe over a reasonably long horizon. The window length can scale with volatility once the return model exists.
 
-## Infeasibility is advisory, not prescriptive
+## Feasibility: project, don't decide
 
-When a draw is not on track for its date, compute the feasibility frontier and present a few points, each holding the others fixed:
+The app tracks and plans; it does **not** make allocation decisions under scarcity. Planning is a **deterministic chronological cash-flow simulation**: walk time forward in date order, applying deposits (in) and each draw's cash-demand (out), tracking a running **projected cash balance** (the glide governs how much sits in investments vs. cash). Infeasibility is simply the **projected balance going negative** — a red region on a balance-over-time line, with an onset date and a magnitude.
 
-- fix rate + holdings → **a safe purchase date** (the flexible-date buyer, e.g. a laptop replacement),
-- fix date + holdings → **required extra savings per period** (the disciplined saver toward a fixed-date anniversary),
-- fix date + rate → **a bulk sale amount now** — or "expect a ~$X sale near [date]" (the investment-heavy buyer, e.g. a car, who stays invested and times the sale).
+The feasibility law is therefore **emergent, not enforced**: transfer-liquidation is a deterministic consequence, not a decision — where patient capacity exists the simulation reassigns investments to patient goals and no sale appears; where it runs out the demand cannot be covered and the balance dips negative (or a forced-sale marker appears). The simulation never _resolves_ scarcity; it reveals exactly when and how much it bites.
 
-Three personas, three levers, all advisory: the app presents the trade-offs and lets the user choose. The "stay invested and time my own sale" case is a first-class **mode** (opt out of the glide, track the projected shortfall), not a failure state.
+### Funding order (deterministic)
+
+Each period's deposits are allocated in a fixed order — no priority-based scarcity decisions:
+
+1. **Dated draws first, by required run-rate** — each dated draw claims enough to keep its prorated progress toward `amount` by `date` (on-track pacing). This is the "feasibility/scarcity" allocation.
+2. **Leftover to undated goals, by `priority`** — surplus after the dated draws' on-track needs flows to the undated "optimistic" goals, ordered by the existing Zipf `priority`. `priority` is retained **only** for this undated ordering; it plays no role in scarcity or liquidity.
+
+When even step 1 cannot be met (deposits insufficient), the shortfall surfaces as a dated draw falling behind its prorated line and/or the projected balance going negative.
+
+### Tools, not decisions
+
+When the projection shows a shortfall, the app surfaces it and hands the user levers — it never picks one:
+
+- the shortfall's **onset date and magnitude**;
+- the **dated draws falling before the shortfall** — the reschedule / rescope candidates;
+- **user-driven what-if**: recompute the whole projection under a change the user is weighing (push a date, cut an amount, add $X/period, plan a $Z sale) and redraw the balance line;
+- **impact ranking** of those candidates as pure information (e.g. "rescheduling the cruise 2 months clears the whole shortfall; trimming the wedding $2k clears half").
+
+The "stay invested and sell on my own clock" case needs no special handling: it is just a draw whose liquidation policy demands no cash for the invested remainder, so the projection shows that balance persisting until the user liquidates.
 
 ## Return model (prerequisite dependency)
 
 Projections need a **blended projected investment return**, derived from **per-holding expected return × target allocation** (e.g. 80% S&P at 10% + 20% bonds at 3%). Keep it simple and transparent for rough planning — blended mean, optionally a modest "safe" haircut, all user-tunable; no Monte Carlo. It drives two things: funding-pace projections, and the glide's de-risk window.
 
 **Status of the dependency:** target allocation is stubbed (`src/hooks/use-target-allocation.ts` → epic #11, Investment Target Allocation; `src/lib/firebase/schema/investments.ts` models `targetPercent` / `Posture`). **Per-holding expected return does not exist yet** and must be added. This is the first sub-issue and sequences before the planning layer.
-
-## Open: priority × date scarcity model
-
-When patient capacity cannot keep everything invested _and_ fund every draw on time, two scarcities appear — funding scarcity (not enough deposits) and liquidity scarcity (not enough patient capacity to stay invested). A candidate framing to develop:
-
-> **Date sets the default assignment and the funding urgency; priority resolves conflicts.**
->
-> - _Default:_ sort draws by date — nearest consume cash capacity, farthest back the investments.
-> - _Urgency:_ a draw behind its required run-rate competes for marginal deposits (earliest-deadline-first-ish).
-> - _Priority:_ under scarcity, decides **who yields** — whose date slips, who holds unwanted cash, or who bears forced-sale risk.
-
-This section is intentionally unfinished; it is the next design conversation.
 
 ## Task decomposition
 
@@ -145,10 +149,10 @@ The epic's sub-issues, along the seams above:
 3. **Liquidity planning layer** — cash-demand schedule, feasibility law, binary invest/cash glide; emits `LiquidityTarget`.
 4. **`LiquidityTarget` contract** — the thin, versioned data interface between planning and reconcile.
 5. **Reconcile integration** — consume the target as a cash-floor constraint; minimum-transaction reconciliation; deposit-steered de-risk; never auto-sell.
-6. **Deadline-aware funding allocation** — extend deposit allocation (Zipf / `priority`) with per-draw deadlines and required run-rate.
-7. **Advisory feasibility menu** — solve the frontier per lever (date / rate / sale) and surface as advisory projections.
-8. **Priority × date scarcity ordering** — the conflict-resolution model (design open, above).
-9. **UI** — draw / date / financing / liquidation input on goals; the projection menu; glide & feasibility visualization.
+6. **Funding allocation** — dated draws funded first by required run-rate (prorated progress toward `amount` by `date`); leftover distributed to undated goals by the existing Zipf `priority`.
+7. **Chronological cash-flow feasibility projection** — forward simulation producing the projected balance timeline, with negative-balance infeasibility surfacing (onset date + magnitude).
+8. **Feasibility tools** — user-driven what-if recomputation and impact-ranked reschedule / rescope candidates (information, never a chosen resolution).
+9. **UI** — draw / date / financing / liquidation input on goals; the cash-flow projection (balance-over-time with shortfall surfacing); glide visualization.
 
 ## Out of scope / non-goals
 
