@@ -112,7 +112,7 @@ The glide shape is a reasonable default (this is rough planning): stay maximally
 
 The app tracks and plans; it does **not** make allocation decisions under scarcity. Planning is a **deterministic chronological cash-flow simulation**: walk time forward in date order, applying deposits (in) and each draw's cash-demand (out), tracking a running **projected cash balance** (the glide governs how much sits in investments vs. cash). Infeasibility is simply the **projected balance going negative** — a red region on a balance-over-time line, with an onset date and a magnitude.
 
-The feasibility law is therefore **emergent, not enforced**: transfer-liquidation is a deterministic consequence, not a decision — where patient capacity exists the simulation reassigns investments to patient goals and no sale appears; where it runs out the demand cannot be covered and the balance dips negative (or a forced-sale marker appears). The simulation never _resolves_ scarcity; it reveals exactly when and how much it bites.
+The feasibility law is therefore **emergent, not enforced**: transfer-liquidation is a deterministic consequence, not a decision — where patient capacity exists the simulation reassigns investments to patient goals and no sale appears; where it runs out the demand cannot be covered and the balance dips negative. The simulation never _resolves_ scarcity; it reveals exactly when and how much it bites.
 
 ### Funding order (deterministic)
 
