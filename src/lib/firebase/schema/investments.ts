@@ -1,5 +1,5 @@
-// TODO: Implement real data model in epic #8 (Investment Ledger Management)
-// and epic #11 (Investment Target Allocation).
+// TODO: Implement real target-allocation data model in epic #11
+// (Investment Target Allocation).
 
 import { z } from "zod";
 
@@ -9,9 +9,9 @@ export enum Posture {
   Conservative = "conservative",
 }
 
-// TODO: Define real Firebase shape when wiring lands (#8, #11)
+// The Firebase shape omits `id`; it is carried by the Firebase key
+// (`users/{uid}/investmentAccounts/{accountId}`), mirroring reconciliationAccounts.
 const FirebaseInvestmentAccountSchema = z.object({
-  id: z.string(),
   name: z.string(),
   currentPercent: z.number(),
   targetPercent: z.number(),
@@ -47,18 +47,30 @@ export interface AllocationTarget {
   amount: number;
 }
 
-// TODO: Update mapper implementations when real Firebase wiring lands (#8, #11)
-export function firebaseToInvestmentAccount(data: unknown): InvestmentAccount {
+export function investmentAccountToFirebase(
+  account: Omit<InvestmentAccount, "id">,
+): FirebaseInvestmentAccount {
+  return {
+    name: account.name,
+    currentPercent: account.currentPercent,
+    targetPercent: account.targetPercent,
+  };
+}
+
+export function firebaseToInvestmentAccount(
+  id: string,
+  data: unknown,
+): InvestmentAccount {
   const parsed = FirebaseInvestmentAccountSchema.parse(data);
   return {
-    id: parsed.id,
+    id,
     name: parsed.name,
     currentPercent: parsed.currentPercent,
     targetPercent: parsed.targetPercent,
   };
 }
 
-// TODO: Update mapper implementations when real Firebase wiring lands (#8, #11)
+// TODO: Update mapper implementations when real Firebase wiring lands (#11)
 export function firebaseToAllocationTarget(data: unknown): AllocationTarget {
   const parsed = FirebaseAllocationTargetSchema.parse(data);
   return {
