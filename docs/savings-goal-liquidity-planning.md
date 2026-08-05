@@ -32,7 +32,7 @@ Let a savings goal carry an **expected purchase date** so the app can:
 
 The current model already supports this **without** tracking cash vs. investment per goal:
 
-- A savings goal is a scalar: `{ targetAmount, fundedAmount, priority, ledgerId }` (see `schema/savings-goals.ts`). There is **no per-goal cash/investment split**.
+- A savings goal is a scalar: `{ targetAmount, fundedAmount, priority, ledgerId }` (see `src/lib/firebase/schema/savings-goals.ts`). There is **no per-goal cash/investment split**.
 - Cash vs. investment lives at the **account tier** level (`ReconciliationAccountTier`: `Investment` vs. the cash tiers `ShortTerm` / `LongTerm` / `Reserve`). The reconcile engine reconciles _aggregate_ holdings against the _sum_ of goal funding.
 
 So "liquidate goal A's investments" is not a sale of segregated assets — it is **reassigning which goal backs the pooled investments while steering fresh cash to the goal that needs liquidity**. No shares are sold as long as some other goal is patient enough to keep backing those investments. This gives a precise:
@@ -122,7 +122,7 @@ Three personas, three levers, all advisory: the app presents the trade-offs and 
 
 Projections need a **blended projected investment return**, derived from **per-holding expected return × target allocation** (e.g. 80% S&P at 10% + 20% bonds at 3%). Keep it simple and transparent for rough planning — blended mean, optionally a modest "safe" haircut, all user-tunable; no Monte Carlo. It drives two things: funding-pace projections, and the glide's de-risk window.
 
-**Status of the dependency:** target allocation is stubbed (`use-target-allocation.ts` → epic #11, Investment Target Allocation; `schema/investments.ts` models `targetPercent` / `Posture`). **Per-holding expected return does not exist yet** and must be added. This is the first sub-issue and sequences before the planning layer.
+**Status of the dependency:** target allocation is stubbed (`src/hooks/use-target-allocation.ts` → epic #11, Investment Target Allocation; `src/lib/firebase/schema/investments.ts` models `targetPercent` / `Posture`). **Per-holding expected return does not exist yet** and must be added. This is the first sub-issue and sequences before the planning layer.
 
 ## Open: priority × date scarcity model
 
