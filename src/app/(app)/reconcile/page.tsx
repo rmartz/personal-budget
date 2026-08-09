@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 
-import type { CreateExpenseInput } from "@/components/reconcile/CreateExpenseDialog";
-import { CreateExpenseDialog } from "@/components/reconcile/CreateExpenseDialog";
-import { ReconcileView } from "@/components/reconcile/ReconcileView";
 import { useAuth } from "@/hooks/use-auth";
-import { createReconciliationExpense } from "@/services/reconciliation-expenses";
+import {
+  CreateExpenseDialog,
+  type CreateExpenseInput,
+  createReconciliationExpense,
+  ReconcileView,
+} from "@/reconcile";
 
 export default function ReconcilePage() {
   const { user, loading: authLoading } = useAuth();

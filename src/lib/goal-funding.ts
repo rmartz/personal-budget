@@ -3,9 +3,7 @@ import {
   BudgetLedgerTransactionType,
 } from "@/lib/firebase/schema/budget-ledger-transactions";
 import type { BudgetLedgerSavingsGoal } from "@/lib/firebase/schema/savings-goals";
-
-import { applyDepositSplit } from "./reconciliation/deposit-split";
-import { applyExpenseDeduction } from "./reconciliation/expense-deduction";
+import { applyDepositSplit, applyExpenseDeduction } from "@/reconcile";
 
 /**
  * Sums the exact cash-allocated portion of each in-window deposit by replaying

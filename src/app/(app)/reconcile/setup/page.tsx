@@ -2,28 +2,26 @@
 
 import { useState } from "react";
 
-import { DeleteAccountDialog } from "@/components/reconcile/DeleteAccountDialog";
-import { DELETE_ACCOUNT_DIALOG_COPY } from "@/components/reconcile/DeleteAccountDialog.copy";
-import { DeleteExpenseDialog } from "@/components/reconcile/DeleteExpenseDialog";
-import { DELETE_EXPENSE_DIALOG_COPY } from "@/components/reconcile/DeleteExpenseDialog.copy";
-import type { EditAccountInput } from "@/components/reconcile/EditAccountDialog";
-import { EditAccountDialog } from "@/components/reconcile/EditAccountDialog";
-import type { EditExpenseInput } from "@/components/reconcile/EditExpenseDialog";
-import { EditExpenseDialog } from "@/components/reconcile/EditExpenseDialog";
-import { ReconcileSetupView } from "@/components/reconcile/ReconcileSetupView";
 import { useAuth } from "@/hooks/use-auth";
-import { useReconciliationAccounts } from "@/hooks/use-reconciliation-accounts";
-import { useReconciliationExpenses } from "@/hooks/use-reconciliation-expenses";
 import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
 import type { ReconciliationExpense } from "@/lib/firebase/schema/reconciliation-expenses";
 import {
+  DELETE_ACCOUNT_DIALOG_COPY,
+  DELETE_EXPENSE_DIALOG_COPY,
+  DeleteAccountDialog,
+  DeleteExpenseDialog,
   deleteReconciliationAccount,
-  updateReconciliationAccount,
-} from "@/services/reconciliation-accounts";
-import {
   deleteReconciliationExpense,
+  EditAccountDialog,
+  type EditAccountInput,
+  EditExpenseDialog,
+  type EditExpenseInput,
+  ReconcileSetupView,
+  updateReconciliationAccount,
   updateReconciliationExpense,
-} from "@/services/reconciliation-expenses";
+  useReconciliationAccounts,
+  useReconciliationExpenses,
+} from "@/reconcile";
 
 export default function ReconcileSetupPage() {
   const { user, loading: authLoading } = useAuth();

@@ -12,7 +12,7 @@ import { useSavingsGoal } from "@/hooks/use-savings-goal";
 import { useSavingsGoals } from "@/hooks/use-savings-goals";
 import { useTransactions } from "@/hooks/use-transactions";
 import { computeMonthlyDepositRate } from "@/lib/goal-funding";
-import { calculateLedgerBalance } from "@/lib/reconciliation/ledger-balance";
+import { calculateLedgerBalance } from "@/reconcile";
 import { purchaseGoal } from "@/services/goal-purchase";
 
 interface GoalPurchasePageProps {

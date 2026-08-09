@@ -1,8 +1,7 @@
 "use client";
 
-import type { TierTransfer } from "@/lib/reconciliation/tier-transfers";
-
 import { RECONCILE_TIER_TRANSFERS_VIEW_COPY } from "./ReconcileTierTransfersView.copy";
+import type { TierTransfer } from "./tier-transfers";
 
 export interface ReconcileTierTransfersViewProps {
   transfers: TierTransfer[];

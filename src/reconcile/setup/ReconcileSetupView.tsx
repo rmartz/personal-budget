@@ -7,8 +7,8 @@ import {
   ReconciliationExpenseType,
 } from "@/lib/firebase/schema/reconciliation-expenses";
 import { currencyFormatter } from "@/lib/formatters";
-import { CASH_TIERS } from "@/lib/reconciliation/cash-tiers";
 
+import { CASH_TIERS } from "../tiers/cash-tiers";
 import { RECONCILE_SETUP_VIEW_COPY } from "./ReconcileSetupView.copy";
 
 function isCashAccount(account: ReconciliationAccount): boolean {

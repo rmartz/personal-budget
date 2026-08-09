@@ -11,7 +11,10 @@ export default defineConfig({
           name: "node",
           environment: "node",
           include: ["src/**/*.spec.ts"],
-          exclude: ["src/hooks/**/*.spec.ts"],
+          // Hook specs (use-*.spec.ts) use renderHook and need a DOM; match them
+          // by filename so they get happy-dom wherever they live — inside the
+          // type-siloed src/hooks/ or colocated within a domain vertical (#383).
+          exclude: ["src/**/use-*.spec.ts"],
         },
         resolve: {
           alias: { "@": path.resolve(import.meta.dirname, "./src") },
@@ -21,7 +24,7 @@ export default defineConfig({
         test: {
           name: "hooks",
           environment: "happy-dom",
-          include: ["src/hooks/**/*.spec.ts"],
+          include: ["src/**/use-*.spec.ts"],
         },
         resolve: {
           alias: { "@": path.resolve(import.meta.dirname, "./src") },

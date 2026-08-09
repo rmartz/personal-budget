@@ -178,6 +178,7 @@ export default tseslint.config(
         { type: "app", pattern: "src/app" },
         { type: "hooks", pattern: "src/hooks" },
         { type: "lib", pattern: "src/lib" },
+        { type: "reconcile", pattern: "src/reconcile" },
         { type: "server", pattern: "src/server" },
         { type: "services", pattern: "src/services" },
         { type: "store", pattern: "src/store" },

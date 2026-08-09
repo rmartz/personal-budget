@@ -16,8 +16,8 @@ import {
   type ReconciliationAccount,
   ReconciliationAccountTier,
 } from "@/lib/firebase/schema/reconciliation-accounts";
-import { CASH_TIERS } from "@/lib/reconciliation/cash-tiers";
 
+import { CASH_TIERS } from "../tiers/cash-tiers";
 import { EDIT_ACCOUNT_DIALOG_COPY } from "./EditAccountDialog.copy";
 
 function isCashTier(tier: ReconciliationAccountTier): boolean {

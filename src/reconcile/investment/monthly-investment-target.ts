@@ -1,6 +1,6 @@
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 
-import { calculateLedgerBalance } from "./ledger-balance";
+import { calculateLedgerBalance } from "../balance/ledger-balance";
 
 export interface MonthlyInvestmentTargetInput {
   cashCap: number | undefined;

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import type { ReconciliationAccount } from "@/lib/firebase/schema/reconciliation-accounts";
 import type { ReconciliationExpense } from "@/lib/firebase/schema/reconciliation-expenses";
 
-import { ReconcileBalanceInputsView } from "./ReconcileBalanceInputsView";
+import { ReconcileBalanceInputsView } from "./balance/ReconcileBalanceInputsView";
 import { RECONCILE_VIEW_COPY } from "./ReconcileView.copy";
 
 // TODO: Replace placeholder data with useReconciliation(uid, month) — see epic #18 (Monthly Reconciliation)

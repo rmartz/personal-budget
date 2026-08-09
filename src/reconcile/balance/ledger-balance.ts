@@ -1,8 +1,8 @@
 import type { BudgetLedgerTransaction } from "@/lib/firebase/schema/budget-ledger-transactions";
 import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 
+import { applyExpenseDeduction } from "../expenses/expense-deduction";
 import { applyDepositSplit } from "./deposit-split";
-import { applyExpenseDeduction } from "./expense-deduction";
 
 export interface LedgerBalanceInput {
   cashCap: number | undefined;
