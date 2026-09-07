@@ -1,0 +1,56 @@
+name: Agent Directive Files
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Whether this PR touches an AGENTS.md / CLAUDE.md file or the validator itself.
+  # An allowlist is safe because the check's verdict is a pure function of those
+  # files — the validator walks the whole tree, so any add/edit/rename/delete of a
+  # directive file re-triggers it. On push it is always true.
+  detect-changes:
+    name: Detect directive-file changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      agents_changed: ${{ steps.filter.outputs.agents_changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: filter
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "agents_changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          agents_changed=false
+          while IFS= read -r file; do
+            case "$file" in
+              AGENTS.md | CLAUDE.md | */AGENTS.md | */CLAUDE.md | scripts/check-agents-md.mjs)
+                agents_changed=true
+                break
+                ;;
+            esac
+          done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "agents_changed=$agents_changed" >> "$GITHUB_OUTPUT"
+
+  check-agents-md:
+    name: Check AGENTS.md / CLAUDE.md pairing
+    needs: detect-changes
+    if: needs.detect-changes.outputs.agents_changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Pure Node script (no dependencies), so it runs on the runner's built-in
+      # Node without the pnpm-install setup step.
+      - run: node scripts/check-agents-md.mjs
