@@ -12,6 +12,10 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     "check-action-pins": 1,
     "detect-changes": 1,
   },
+  "agents-md.yml": {
+    "check-agents-md": 1,
+    "detect-changes": 1,
+  },
   "ci-actions.yml": {
     build: 2,
     "detect-changes": 1,
