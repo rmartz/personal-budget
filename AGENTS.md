@@ -122,7 +122,9 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 ## Documentation
 
 - Keep documentation in sync with the code — outdated docs are worse than no docs.
-- Reference docs under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with a YAML frontmatter block whose only required key is `type` (drawn from the vocabulary in [`docs/index.md`](docs/index.md) — `Schema`, `Reference`, `Guide`), plus the recommended `title`, `description`, `resource` (path to the asset the page documents), and `tags`. When adding a new `docs/` page, include the frontmatter and add a listing entry to `docs/index.md`.
+- Reference docs under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with a YAML frontmatter block whose only required key is `type` (drawn from the vocabulary in [`docs/index.md`](docs/index.md) — `Schema`, `Reference`, `Guide`, `Design`), plus the recommended `title`, `description`, `resource` (path to the asset the page documents), and `tags`. The reserved files `index.md` and `log.md` carry **no** frontmatter (they are navigation / append-only logs) and are exempt.
+- **`docs/` must stay navigable from `index.md`.** Every directory that holds docs has an `index.md`; every non-reserved page is linked from the `index.md` in its own directory; and every subdirectory's `index.md` is linked from its parent's `index.md` — so a reader can walk `docs/index.md → sub/index.md → sub/page.md`. When adding a new `docs/` page, include its frontmatter and add a listing entry to the enclosing directory's `index.md`.
+- Both rules are enforced in CI by the `Docs` workflow, which runs `scripts/check-docs.mjs` (`pnpm run docs:validate` locally), gated to PRs that touch a `docs/**` file or the validator itself.
 
 ## Agent Directive Files
 

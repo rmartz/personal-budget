@@ -20,6 +20,7 @@
     "agents:validate": "node scripts/check-agents-md.mjs",
     "check:action-pins": "node scripts/check-action-pins.mjs",
     "check:package-pins": "node scripts/check-package-pins.mjs",
+    "docs:validate": "node scripts/check-docs.mjs",
     "env:validate": "node scripts/validate-config.mjs"
   },
   "pnpm": {
