@@ -4,18 +4,26 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # NOTE: Do NOT add a `cooldown` here. Dependabot enforces cooldown by passing
-    # pnpm a `minimumReleaseAge`; during lockfile regeneration pnpm hard-fails with
-    # ERR_PNPM_NO_MATURE_MATCHING_VERSION whenever any transitive dependency in the
-    # fast-moving Storybook/Vite toolchain has a version inside the window, instead
-    # of falling back to an older mature one. That breaks the lockfile step, so the
-    # whole grouped update fails with `unknown_error` and the PR is closed as
-    # `update_no_longer_possible`. A cooldown here left npm updates broken for weeks
-    # (no grouped npm PR merged 2026-07-12 -> 2026-08-30 while 20 vuln alerts piled
-    # up). Because Dependabot always resolves to latest — which almost always
-    # includes some package newer than the window — a freshness policy cannot
-    # coexist with it. The cooldown on the github-actions ecosystem below is kept:
-    # those runs succeed and it guards the tj-actions supply-chain attack class.
+    # NOTE: Do NOT add a `cooldown` to any ecosystem in this file. Cooldown was
+    # tried and deliberately removed — it added friction without meeting its goal:
+    #   * npm/pnpm: Dependabot enforces cooldown by passing pnpm a
+    #     `minimumReleaseAge`; during lockfile regeneration pnpm hard-fails with
+    #     ERR_PNPM_NO_MATURE_MATCHING_VERSION whenever any transitive dependency in
+    #     the fast-moving Storybook/Vite toolchain is inside the window, instead of
+    #     falling back to an older mature one. That breaks the lockfile step, the
+    #     grouped update fails with `unknown_error`, and the PR is closed as
+    #     `update_no_longer_possible`. A cooldown here left npm updates broken for
+    #     weeks (no grouped npm PR merged 2026-07-12 -> 2026-08-30 while 20 vuln
+    #     alerts piled up). Because Dependabot always resolves to latest, a freshness
+    #     policy cannot coexist with it.
+    #   * A cooldown also does not actually deliver freshness: Dependabot keeps its
+    #     PRs current, so even an older pinned release still pulls transitive
+    #     dependencies that can be inside the window — exactly the exposure a
+    #     cooldown is meant to avoid.
+    #   * github-actions: supply-chain risk is already mitigated by full commit-SHA
+    #     pinning (enforced by check-action-pins.mjs / the Action Pins workflow), so
+    #     a re-pointed mutable tag cannot reach CI. The cooldown only delayed every
+    #     action bump without adding protection the SHA pins don't already give.
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -137,10 +145,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # Same 7-day cooldown for action updates — a compromised action tag is a
-    # direct supply-chain risk to CI.
-    cooldown:
-      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"
