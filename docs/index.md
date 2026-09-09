@@ -13,6 +13,10 @@ This is a `type` convention, not a closed set — add a new value when none fits
 
 - [Firebase Realtime Database Schema](database-schema.md) - Path structure, field formats, and security rules for all user data in the Firebase Realtime Database.
 
+# Reference
+
+- [Open Knowledge Format (OKF)](open-knowledge-format.md) - How this repo structures `docs/` as OKF (frontmatter, the `type` vocabulary, reserved files, index reachability), with Google's spec as the authoritative reference.
+
 # Guide
 
 - [Staging Test Accounts](staging-test-accounts.md) - The seeded email/password test users in the staging Firebase project and how to (re-)seed them.
