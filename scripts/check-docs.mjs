@@ -35,10 +35,10 @@ const isConcept = (name) => isMarkdown(name) && !RESERVED.has(name);
  */
 function frontmatterError(filePath) {
   const lines = readFileSync(filePath, "utf8").split(/\r?\n/);
-  if (lines[0] !== "---") {
+  if (lines[0].trim() !== "---") {
     return "missing OKF frontmatter (file must start with a `---` YAML block)";
   }
-  const close = lines.indexOf("---", 1);
+  const close = lines.findIndex((l, i) => i > 0 && l.trim() === "---");
   if (close === -1) {
     return "OKF frontmatter block is not closed with `---`";
   }
