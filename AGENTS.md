@@ -139,6 +139,19 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
   `scripts/check-agents-md.mjs` (`pnpm run agents:validate` locally), gated to PRs that touch an
   `AGENTS.md` / `CLAUDE.md` file or the validator itself.
 
+## Agent Directive Files
+
+- **All directives live in `AGENTS.md`.** `AGENTS.md` is the single source of truth for a
+  directory's agent instructions; author and edit directives there, never in `CLAUDE.md`.
+- **Every `AGENTS.md` has a companion `CLAUDE.md`** in the same directory, and every `CLAUDE.md`
+  has a companion `AGENTS.md`. The two files are always paired.
+- **Every `CLAUDE.md` is a bare wrapper** whose only content is the Claude Code import line
+  `@AGENTS.md` — no directives, no other text, no symlinks. This feeds the `AGENTS.md` directives
+  to Claude Code while keeping them authored once, so the two files can never drift.
+- This pairing is enforced in CI by the `Agent Directive Files` workflow, which runs
+  `scripts/check-agents-md.mjs` (`pnpm run agents:validate` locally), gated to PRs that touch an
+  `AGENTS.md` / `CLAUDE.md` file or the validator itself.
+
 ## React / Next.js Standards
 
 ### Framework
