@@ -114,8 +114,13 @@ describe("LedgerListItem", () => {
         LEDGER_LIST_ITEM_COPY.deleteMenuLabel,
       );
       fireEvent.click(deleteMenuItem);
+      // Query by role: the overflow menu's "Delete" entry is a `menuitem` and
+      // may still be mounted while the confirmation dialog is open, so a
+      // text-only query is ambiguous.
       fireEvent.click(
-        screen.getByText(LEDGER_LIST_ITEM_COPY.deleteConfirmButton),
+        await screen.findByRole("button", {
+          name: LEDGER_LIST_ITEM_COPY.deleteConfirmButton,
+        }),
       );
 
       expect(onDelete).toHaveBeenCalledWith("ledger-xyz");

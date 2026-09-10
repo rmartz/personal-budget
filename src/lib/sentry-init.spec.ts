@@ -86,7 +86,6 @@ describe("Unhandled exceptions in server components / route handlers are capture
       "https://env123@o999.ingest.sentry.io/111",
     );
 
-    const { initSentry } = await import("./sentry-init");
     const { init } = await import("@sentry/nextjs");
 
     // The instrumentation module reads the DSN from env and passes it to initSentry
@@ -99,8 +98,6 @@ describe("Unhandled exceptions in server components / route handlers are capture
         dsn: "https://env123@o999.ingest.sentry.io/111",
       }),
     );
-
-    void initSentry; // suppress unused-import lint
   });
 
   it("calls initSentry with process.env.NEXT_PUBLIC_SENTRY_DSN when register() is called in edge runtime", async () => {
@@ -110,7 +107,6 @@ describe("Unhandled exceptions in server components / route handlers are capture
       "https://edge456@o888.ingest.sentry.io/222",
     );
 
-    const { initSentry } = await import("./sentry-init");
     const { init } = await import("@sentry/nextjs");
 
     const { register } = await import("../instrumentation");
@@ -122,8 +118,6 @@ describe("Unhandled exceptions in server components / route handlers are capture
         dsn: "https://edge456@o888.ingest.sentry.io/222",
       }),
     );
-
-    void initSentry;
   });
 });
 
