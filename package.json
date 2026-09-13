@@ -21,7 +21,9 @@
     "check:action-pins": "node scripts/check-action-pins.mjs",
     "check:package-pins": "node scripts/check-package-pins.mjs",
     "docs:validate": "node scripts/check-docs.mjs",
-    "env:validate": "node scripts/validate-config.mjs"
+    "env:validate": "node scripts/validate-config.mjs",
+    "mcp:smoke": "node scripts/mcp-smoke.mjs",
+    "mcp:token": "node scripts/mint-test-token.mjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
