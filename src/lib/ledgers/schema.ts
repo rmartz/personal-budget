@@ -12,6 +12,11 @@ import { z } from "zod";
 const ledgerName = z.string().trim().min(1);
 const ledgerCashCap = z.number().nonnegative();
 
+export const ledgerIdSchema = z
+  .string()
+  .min(1)
+  .regex(/^[^/]+$/, "id must be a single path segment");
+
 export const createLedgerSchema = z.object({
   name: ledgerName,
   cashCap: ledgerCashCap.optional(),

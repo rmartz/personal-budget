@@ -1,6 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import { createLedgerSchema, updateLedgerSchema } from "./schema";
+import {
+  createLedgerSchema,
+  ledgerIdSchema,
+  updateLedgerSchema,
+} from "./schema";
+
+describe("ledgerIdSchema", () => {
+  it("accepts a valid key", () => {
+    expect(ledgerIdSchema.safeParse("ledger-abc123").success).toBe(true);
+  });
+
+  it("rejects an empty string", () => {
+    expect(ledgerIdSchema.safeParse("").success).toBe(false);
+  });
+
+  it("rejects a value containing a forward slash", () => {
+    expect(ledgerIdSchema.safeParse("a/b").success).toBe(false);
+  });
+});
 
 describe("createLedgerSchema", () => {
   it("accepts a name with an optional cash cap", () => {

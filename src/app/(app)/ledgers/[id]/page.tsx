@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
@@ -32,6 +33,7 @@ export default function LedgerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user, loading: authLoading } = useAuth();
   const uid = user?.uid ?? "";
+  const queryClient = useQueryClient();
 
   const { ledgers, isLoading: ledgersLoading } = useLedgers(uid);
   const { transactions, isLoading: txLoading } = useTransactions(uid, id);
@@ -74,6 +76,7 @@ export default function LedgerDetailPage() {
     data: UpdateLedgerInput,
   ): Promise<void> => {
     await updateLedger(ledgerId, data);
+    void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
   };
 
   const handleAddGoal = async (

@@ -57,6 +57,19 @@ describe("listLedgers", () => {
       { id: "ledger-a", name: "Groceries", cashCap: 300 },
     ]);
   });
+
+  it("skips malformed records without failing the entire list", async () => {
+    get.mockResolvedValue({
+      exists: () => true,
+      val: () => ({
+        "ledger-good": { name: "Groceries", cashCap: 300 },
+        "ledger-bad": { invalid: true },
+      }),
+    });
+    expect(await listLedgers("uid-1")).toEqual([
+      { id: "ledger-good", name: "Groceries", cashCap: 300 },
+    ]);
+  });
 });
 
 describe("getLedger", () => {

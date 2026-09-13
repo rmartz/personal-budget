@@ -5,6 +5,7 @@ import {
   type FirebaseBudgetLedger,
   firebaseToBudgetLedger,
 } from "@/lib/firebase/schema/budget-ledgers";
+import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import type { CreateLedgerInput, UpdateLedgerInput } from "@/lib/types";
 
 /**
@@ -24,10 +25,8 @@ export async function listLedgers(uid: string): Promise<BudgetLedger[]> {
   if (!snapshot.exists()) {
     return [];
   }
-  const data = snapshot.val() as Record<string, FirebaseBudgetLedger>;
-  return Object.entries(data).map(([id, entry]) =>
-    firebaseToBudgetLedger(id, entry),
-  );
+  const data = snapshot.val() as Record<string, unknown>;
+  return parseCollection(data, firebaseToBudgetLedger);
 }
 
 export async function getLedger(

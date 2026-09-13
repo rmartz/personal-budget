@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { updateLedgerSchema } from "@/lib/ledgers/schema";
+import { ledgerIdSchema, updateLedgerSchema } from "@/lib/ledgers/schema";
 import { deleteLedger, getLedger, updateLedger } from "@/server/data/ledgers";
 import { withIdentity } from "@/server/http/with-identity";
 
@@ -11,6 +11,9 @@ interface LedgerRouteContext {
 export const GET = withIdentity<LedgerRouteContext>(
   async (uid, _request, { params }) => {
     const { id } = await params;
+    if (!ledgerIdSchema.safeParse(id).success) {
+      return NextResponse.json({ error: "Invalid ledger id" }, { status: 400 });
+    }
     const ledger = await getLedger(uid, id);
     if (!ledger) {
       return NextResponse.json({ error: "Ledger not found" }, { status: 404 });
@@ -22,6 +25,9 @@ export const GET = withIdentity<LedgerRouteContext>(
 export const PATCH = withIdentity<LedgerRouteContext>(
   async (uid, request, { params }) => {
     const { id } = await params;
+    if (!ledgerIdSchema.safeParse(id).success) {
+      return NextResponse.json({ error: "Invalid ledger id" }, { status: 400 });
+    }
 
     let body: unknown;
     try {
@@ -48,6 +54,9 @@ export const PATCH = withIdentity<LedgerRouteContext>(
 export const DELETE = withIdentity<LedgerRouteContext>(
   async (uid, _request, { params }) => {
     const { id } = await params;
+    if (!ledgerIdSchema.safeParse(id).success) {
+      return NextResponse.json({ error: "Invalid ledger id" }, { status: 400 });
+    }
     await deleteLedger(uid, id);
     return new NextResponse(null, { status: 204 });
   },
