@@ -1,40 +1,57 @@
 ---
 type: Guide
 title: Testing the MCP server
-description: Drive the MCP server's first-party (Bearer) path during UAT — mint a staging ID token and exercise the tools from a Claude Code session or the command line, locally or against a preview.
+description: The MCP staging test process — run the app against the staging Firebase project and exercise the MCP tools (locally, or against a preview) from a Claude Code session or the CLI.
 resource: scripts/mcp-smoke.mjs
 tags: [mcp, testing, uat, staging, firebase, preview]
 ---
 
 # Testing the MCP server
 
-The MCP server (`/api/mcp`) authenticates a request with a **Firebase ID token as
+The MCP server (`/api/mcp`) authenticates each request with a **Firebase ID token as
 `Bearer`** (Phase 1 — see epic #442). Because that token is just the app's own ID
-token, the fastest way to UAT the tools is a small client that mints one and calls
-the server — no OAuth, no GUI connector (connectors are Phase 2). The intended
-workflow is to **ask a Claude Code session to test behavior**, which it does by
-running the two scripts below.
+token, the fastest way to UAT the tools is a small client that mints one and calls the
+server — no OAuth, no GUI connector (connectors are Phase 2). The intended workflow is
+to **ask a Claude Code session to test behavior**, which it does by running the two
+`pnpm` scripts below.
 
 Every MCP tool corresponds to a UI action (MCP ⊆ UI): the ledger tools map to the
-ledgers pages' list/create/edit/delete. Testing a tool validates the same shared
+ledgers pages' list/create/edit/delete, and validating a tool exercises the same shared
 server data layer (`src/server/data/*`) the UI calls.
 
-## Prerequisites
+## Primary loop: local dev against staging
 
-- Seeded staging test users and the shared `STAGING_TEST_PASSWORD` — see
-  [Staging Test Accounts](staging-test-accounts.md). Default account:
-  `active@staging.test` (the richest data profile).
-- Staging is a **separate Firebase project**, so test writes never touch
-  production. Data shapes: [Firebase Realtime Database Schema](database-schema.md).
+This is the paved path — it runs the exact server code against **staging** data with no
+Vercel deployment protection and no preview-env gaps, so a Claude Code session can drive
+it end to end.
+
+### One-time setup: `.env.local`
+
+The server's Admin SDK (`src/lib/firebase/admin.ts`) reads `FIREBASE_PROJECT_ID`,
+`FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_DATABASE_URL`; point them at
+the **staging** service account so token verification and reads/writes hit the staging
+project. Put the staging values — plus the seeded test users' shared password (see
+[Staging Test Accounts](staging-test-accounts.md)) — in `.env.local` (gitignored):
 
 ```bash
-export STAGING_TEST_PASSWORD="<staging-only password>"
+# staging Firebase (admin SDK) — the staging service account, NOT production
+FIREBASE_PROJECT_ID=personal-budget-staging-a99af
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-…@personal-budget-staging-a99af.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----\n"
+FIREBASE_DATABASE_URL=https://personal-budget-staging-a99af-default-rtdb.firebaseio.com
+# staging Firebase (client) — the public config from deployment/staging.yml
+NEXT_PUBLIC_FIREBASE_API_KEY=…
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=personal-budget-staging-a99af
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://personal-budget-staging-a99af-default-rtdb.firebaseio.com
+# the seeded staging test users' shared password
+STAGING_TEST_PASSWORD=<staging-only password>
 ```
 
-## Local loop (fastest)
+Both the dev server and the `mcp:*` scripts load `.env.local` (the scripts via Node's
+`--env-file-if-exists`), so the secrets stay in that one gitignored file — a session
+never has to be handed them.
 
-Run the app locally and drive the server over `localhost` — no Vercel domain or
-deployment-protection friction, same code as the deploy:
+### Run it
 
 ```bash
 pnpm dev
@@ -52,57 +69,61 @@ pnpm mcp:smoke call list_ledgers                 # call a read tool
 pnpm mcp:smoke call create_ledger '{"name":"Test","cashCap":500}'
 ```
 
-`pnpm mcp:smoke` mints a fresh token itself (via `pnpm mcp:token`), performs the
-MCP `initialize` handshake, and runs `tools/list` (default) or `tools/call`. It
-prints the tool result as JSON.
+`pnpm mcp:smoke` mints a fresh token (via `mint-test-token.mjs`, defaulting to the
+`active@staging.test` user), performs the MCP `initialize` handshake, and runs
+`tools/list` (default) or `tools/call`, printing the tool result as JSON. Token
+overrides: `MCP_TEST_EMAIL`, `MCP_TEST_API_KEY`, `STAGING_TEST_PASSWORD` — all readable
+from `.env.local`. Mint a token alone with `pnpm mcp:token`.
 
-> **Project match.** The ID token's Firebase project must equal the project the
-> running server's Admin SDK verifies against. `mcp:token` mints against **staging**
-> by default (`deployment/staging.yml`'s public API key). So point local `pnpm dev`
-> at the staging project (its `.env.local`), or override `MCP_TEST_API_KEY` +
-> `FIREBASE_*` to match whatever project you run.
+> **Project match.** The token's Firebase project must equal the project the running
+> server's Admin SDK verifies against. Keeping both on staging in `.env.local` (above)
+> satisfies this; a mismatch is the most common testing 401.
 
-### Just the token
+## Preview loop (deployed-artifact validation)
+
+Labelling the PR **`ready for UAT`** deploys a preview (`Preview Deploy` workflow) and
+posts the URL as a sticky comment. Testing the deployed MCP endpoint has two extra
+requirements that the local loop avoids:
+
+- **Preview env parity (admin credentials).** The Preview environment must carry the
+  staging **admin** credentials (`FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY`) that
+  `admin.ts` reads. Vercel currently stores a `FIREBASE_SERVICE_ACCOUNT` for Production
+  only; syncing the staging service account into Preview as the vars `admin.ts` expects
+  is the env tooling's (`envctl`) job. Until that lands, the deployed MCP returns 401 on
+  every call regardless of the token.
+- **Deployment protection.** Previews sit behind Vercel Authentication (an SSO wall). Use
+  the caller's Vercel auth rather than disabling protection: `vercel curl` reaches a
+  protected deployment with automatic bypass (needs a current Vercel CLI — the `curl`
+  subcommand in older CLIs does not forward `-H`/`-X`). For the scripted client, set
+  `VERCEL_AUTOMATION_BYPASS_SECRET` (Protection Bypass for Automation) and
+  `mcp-smoke.mjs` sends it as `x-vercel-protection-bypass` automatically:
 
 ```bash
-pnpm mcp:token                                   # prints a fresh ID token (~1h TTL)
+VERCEL_AUTOMATION_BYPASS_SECRET=<secret> pnpm mcp:smoke --url https://<preview-host>/api/mcp call list_ledgers
 ```
 
-Env overrides: `MCP_TEST_EMAIL` (default `active@staging.test`),
-`MCP_TEST_API_KEY` (default: staging), `STAGING_TEST_PASSWORD` (required).
-
-## Preview / deployed loop
-
-A preview exists only when the PR carries the **`ready for UAT`** label — the
-`Preview Deploy` workflow then deploys and posts the URL as a sticky PR comment.
-Point the smoke client at that URL's `/api/mcp`:
+A quick reachability check that needs no bypass secret (current CLI):
 
 ```bash
-pnpm mcp:smoke --url https://<preview-host>/api/mcp call list_ledgers
+vercel curl https://<preview-host>/api/mcp -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream"
 ```
 
-Two things must be true for a deployed test to work:
-
-- **Preview env parity.** The Vercel **Preview** environment must carry the staging
-  Firebase **Admin** secrets (`FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) and
-  the staging public config, or every request 401s. Sync staging config with the
-  env tooling (`envctl`) before labelling.
-- **Deployment protection.** If previews sit behind Vercel Authentication, set
-  `VERCEL_AUTOMATION_BYPASS_SECRET` (Protection Bypass for Automation) and the
-  smoke client sends it as `x-vercel-protection-bypass` automatically.
+An app `401 invalid_token` (rather than the Vercel SSO page) means protection was
+bypassed and the MCP route was reached.
 
 ## Troubleshooting
 
-- **401 Unauthorized** — token expired (mint a fresh one), or the server's Admin
-  creds are for a different Firebase project than the token (project mismatch), or
-  (on a preview) deployment protection without the bypass secret.
-- **Empty / HTML response** — you hit the Vercel auth wall; set the bypass secret.
+- **401 Unauthorized** — token expired (mint a fresh one), the server's admin creds are
+  for a different Firebase project than the token (project mismatch), or (on a preview)
+  the Preview env has no staging admin credentials yet.
+- **Vercel SSO / protection page** — the request did not use an accepted auth path; use
+  `vercel curl` or the bypass secret.
 - **`tools/list` empty** — the server built without the tools registered; check the
   deploy logs.
 
 ## Scripts
 
-- [`scripts/mint-test-token.mjs`](../scripts/mint-test-token.mjs) — mint a staging
-  ID token (`pnpm mcp:token`); also `import { mintTestToken }` for reuse.
+- [`scripts/mint-test-token.mjs`](../scripts/mint-test-token.mjs) — mint a staging ID
+  token (`pnpm mcp:token`); also `import { mintTestToken }` for reuse.
 - [`scripts/mcp-smoke.mjs`](../scripts/mcp-smoke.mjs) — MCP Streamable-HTTP client
   (`pnpm mcp:smoke`).
