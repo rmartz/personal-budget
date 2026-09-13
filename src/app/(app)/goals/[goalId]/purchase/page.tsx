@@ -7,7 +7,7 @@ import { GoalPurchaseView } from "@/components/goal-purchase";
 import { GOAL_PURCHASE_PAGE_COPY } from "@/components/goal-purchase/copy";
 import type { PurchaseFormData } from "@/components/goal-purchase/GoalPurchaseForm";
 import { useAuth } from "@/hooks/use-auth";
-import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
+import { useLedgers } from "@/hooks/use-ledgers";
 import { useSavingsGoal } from "@/hooks/use-savings-goal";
 import { useSavingsGoals } from "@/hooks/use-savings-goals";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -29,7 +29,7 @@ export default function GoalPurchasePage({ params }: GoalPurchasePageProps) {
     isLoading: goalLoading,
     error: goalError,
   } = useSavingsGoal(uid, goalId);
-  const { ledgers, isLoading: ledgersLoading } = useLedgersSubscription(uid);
+  const { ledgers, isLoading: ledgersLoading } = useLedgers(uid);
   const ledgerId = goal?.ledgerId ?? "";
   const { savingsGoals: siblingGoals } = useSavingsGoals(uid, ledgerId);
   const { transactions, isLoading: transactionsLoading } = useTransactions(

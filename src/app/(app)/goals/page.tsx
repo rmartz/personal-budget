@@ -3,7 +3,7 @@
 import { GoalsListView } from "@/components/goals";
 import { useAllSavingsGoals } from "@/hooks/use-all-savings-goals";
 import { useAuth } from "@/hooks/use-auth";
-import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
+import { useLedgers } from "@/hooks/use-ledgers";
 
 export default function GoalsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -13,7 +13,7 @@ export default function GoalsPage() {
     isLoading: goalsLoading,
     error: goalsError,
   } = useAllSavingsGoals(uid);
-  const { ledgers } = useLedgersSubscription(uid);
+  const { ledgers } = useLedgers(uid);
 
   if (authLoading || !user) {
     return null;

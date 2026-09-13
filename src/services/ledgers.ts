@@ -1,79 +1,57 @@
-import { get, getDatabase, push, ref, set, update } from "firebase/database";
-
-import { getClientApp } from "@/lib/firebase/client";
-import {
-  budgetLedgerToFirebase,
-  type FirebaseBudgetLedger,
-  firebaseToBudgetLedger,
-} from "@/lib/firebase/schema/budget-ledgers";
-import { parseCollection } from "@/lib/firebase/schema/parse-collection";
+import type { BudgetLedger } from "@/lib/firebase/schema/budget-ledgers";
 import type { CreateLedgerInput, Ledger, UpdateLedgerInput } from "@/lib/types";
 
-function db() {
-  return getDatabase(getClientApp());
-}
+/**
+ * Client access to budget ledgers. The UI talks to the `/api/ledgers` BE
+ * endpoints (which own the Firebase Admin SDK and, in future, read-time schema
+ * migrations) rather than Firebase directly. The authenticated user is derived
+ * server-side from the session cookie, so these functions take no `uid`.
+ */
 
-function ledgersRef(uid: string) {
-  return ref(db(), `users/${uid}/budgetLedgers`);
-}
-
-function ledgerRef(uid: string, id: string) {
-  return ref(db(), `users/${uid}/budgetLedgers/${id}`);
-}
-
-export async function getLedgers(uid: string): Promise<Ledger[]> {
-  const snapshot = await get(ledgersRef(uid));
-  if (!snapshot.exists()) {
-    return [];
+async function requestJson<T>(input: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers);
+  headers.set("Content-Type", "application/json");
+  const response = await fetch(input, { ...init, headers });
+  if (!response.ok) {
+    throw new Error(`Ledger request failed: ${String(response.status)}`);
   }
-  const data = snapshot.val() as Record<string, unknown>;
-  return parseCollection(data, (id, entry) => ({
-    ...firebaseToBudgetLedger(id, entry),
-    cashBalance: 0,
-    investmentBalance: 0,
-  }));
+  return response.json() as Promise<T>;
 }
 
-export async function createLedger(
-  uid: string,
-  data: CreateLedgerInput,
-): Promise<Ledger> {
-  const newRef = push(ledgersRef(uid));
-  if (!newRef.key) {
-    throw new Error("Failed to generate ledger key");
-  }
-  await set(
-    newRef,
-    budgetLedgerToFirebase({ name: data.name, cashCap: data.cashCap }),
+function toLedger(stored: BudgetLedger): Ledger {
+  return { ...stored, cashBalance: 0, investmentBalance: 0 };
+}
+
+export async function getLedgers(): Promise<Ledger[]> {
+  const { ledgers } = await requestJson<{ ledgers: BudgetLedger[] }>(
+    "/api/ledgers",
   );
-  return {
-    id: newRef.key,
-    name: data.name,
-    cashCap: data.cashCap,
-    cashBalance: 0,
-    investmentBalance: 0,
-  };
+  return ledgers.map(toLedger);
+}
+
+export async function createLedger(data: CreateLedgerInput): Promise<Ledger> {
+  const { ledger } = await requestJson<{ ledger: BudgetLedger }>(
+    "/api/ledgers",
+    { method: "POST", body: JSON.stringify(data) },
+  );
+  return toLedger(ledger);
 }
 
 export async function updateLedger(
-  uid: string,
   id: string,
   data: UpdateLedgerInput,
 ): Promise<void> {
-  const updates: Partial<FirebaseBudgetLedger> = {};
-  if (data.name !== undefined) {
-    updates.name = data.name;
-  }
-  if (data.cashCap !== undefined) {
-    updates.cashCap = data.cashCap;
-  }
-  await update(ledgerRef(uid, id), updates);
+  await requestJson<{ ledger: BudgetLedger }>(
+    `/api/ledgers/${encodeURIComponent(id)}`,
+    { method: "PATCH", body: JSON.stringify(data) },
+  );
 }
 
-export async function deleteLedger(uid: string, id: string): Promise<void> {
-  await update(ref(db(), `users/${uid}`), {
-    [`budgetLedgers/${id}`]: null,
-    [`budgetLedgerTransactions/${id}`]: null,
-    [`budgetLedgerSavingsGoals/${id}`]: null,
+export async function deleteLedger(id: string): Promise<void> {
+  const response = await fetch(`/api/ledgers/${encodeURIComponent(id)}`, {
+    method: "DELETE",
   });
+  if (!response.ok) {
+    throw new Error(`Ledger request failed: ${String(response.status)}`);
+  }
 }

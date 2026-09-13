@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
@@ -15,7 +16,7 @@ import { useCreateDeposit } from "@/hooks/use-create-deposit";
 import { useCreateTransaction } from "@/hooks/use-create-transaction";
 import { useDeleteSavingsGoal } from "@/hooks/use-delete-savings-goal";
 import { useDeleteTransaction } from "@/hooks/use-delete-transaction";
-import { useLedgersSubscription } from "@/hooks/use-ledgers-subscription";
+import { useLedgers } from "@/hooks/use-ledgers";
 import { useSavingsGoals } from "@/hooks/use-savings-goals";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useUpdateSavingsGoal } from "@/hooks/use-update-savings-goal";
@@ -32,8 +33,9 @@ export default function LedgerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user, loading: authLoading } = useAuth();
   const uid = user?.uid ?? "";
+  const queryClient = useQueryClient();
 
-  const { ledgers, isLoading: ledgersLoading } = useLedgersSubscription(uid);
+  const { ledgers, isLoading: ledgersLoading } = useLedgers(uid);
   const { transactions, isLoading: txLoading } = useTransactions(uid, id);
   const { addExpense, isSubmitting: isExpenseSubmitting } =
     useCreateTransaction(uid, id);
@@ -73,7 +75,8 @@ export default function LedgerDetailPage() {
     ledgerId: string,
     data: UpdateLedgerInput,
   ): Promise<void> => {
-    await updateLedger(uid, ledgerId, data);
+    await updateLedger(ledgerId, data);
+    void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
   };
 
   const handleAddGoal = async (

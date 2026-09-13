@@ -34,7 +34,7 @@ function makeLedger(overrides: Partial<Ledger> = {}): Ledger {
 }
 
 describe("useCreateLedger", () => {
-  it("calls createLedger with the uid and input data", async () => {
+  it("calls createLedger with the input data", async () => {
     const ledger = makeLedger({ id: "abc", name: "Groceries" });
     const spy = vi
       .spyOn(ledgersService, "createLedger")
@@ -47,7 +47,7 @@ describe("useCreateLedger", () => {
     result.current.mutate({ name: "Groceries", cashCap: 300 });
 
     await waitFor(() => {
-      expect(spy).toHaveBeenCalledWith("uid-123", {
+      expect(spy).toHaveBeenCalledWith({
         name: "Groceries",
         cashCap: 300,
       });

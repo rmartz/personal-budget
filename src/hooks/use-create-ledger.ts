@@ -15,7 +15,7 @@ export function useCreateLedger(uid: string) {
           new Error("Cannot create ledger: user is not authenticated"),
         );
       }
-      return createLedger(uid, data);
+      return createLedger(data);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
