@@ -135,16 +135,22 @@ describe("/api/auth and sub-paths are excluded from the session check", () => {
   });
 });
 
-describe("config.matcher excludes /api/auth at a segment boundary", () => {
-  it("config.matcher pattern contains the segment-boundary api/auth lookahead", () => {
-    expect(config.matcher[0]).toMatch(/api\/auth\(\?:\/\|\$\)/);
+describe("config.matcher excludes the whole /api prefix at a segment boundary", () => {
+  it("config.matcher pattern contains the segment-boundary api lookahead", () => {
+    expect(config.matcher[0]).toMatch(/api\(\?:\/\|\$\)/);
   });
 });
 
-describe("/api/authentication is not excluded from the session check", () => {
-  it("redirects unauthenticated requests to /api/authentication to /sign-in", async () => {
-    const response = await middleware(makeRequest("/api/authentication"));
-    const location = response.headers.get("location");
-    expect(location).toContain("/sign-in");
+describe("all /api routes are excluded from the session redirect", () => {
+  it("allows unauthenticated requests to /api/ledgers through (routes self-authorize)", async () => {
+    const response = await middleware(makeRequest("/api/ledgers"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("allows unauthenticated requests to /api/mcp through (Bearer-authenticated)", async () => {
+    const response = await middleware(makeRequest("/api/mcp"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
   });
 });

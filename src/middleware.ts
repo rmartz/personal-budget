@@ -16,8 +16,8 @@ function isExcludedPath(pathname: string): boolean {
   return (
     pathname.startsWith("/_next/") ||
     pathname === "/favicon.ico" ||
-    pathname === "/api/auth" ||
-    pathname.startsWith("/api/auth/")
+    pathname === "/api" ||
+    pathname.startsWith("/api/")
   );
 }
 
@@ -61,5 +61,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth(?:/|$)).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api(?:/|$)).*)"],
 };

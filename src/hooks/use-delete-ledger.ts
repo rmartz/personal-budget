@@ -14,7 +14,7 @@ export function useDeleteLedger(uid: string) {
           new Error("Cannot delete ledger: user is not authenticated"),
         );
       }
-      return deleteLedger(uid, id);
+      return deleteLedger(id);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
