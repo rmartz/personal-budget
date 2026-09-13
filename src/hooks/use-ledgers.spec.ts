@@ -44,7 +44,7 @@ describe("useLedgers", () => {
       const spy = vi.spyOn(ledgersService, "getLedgers").mockResolvedValue([]);
       renderHook(() => useLedgers("uid-123"), { wrapper: makeWrapper() });
       await waitFor(() => {
-        expect(spy).toHaveBeenCalledWith("uid-123");
+        expect(spy).toHaveBeenCalledWith();
       });
     });
   });
