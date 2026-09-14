@@ -68,7 +68,7 @@ export default tseslint.config(
   },
   js.configs.recommended,
   {
-    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
+    files: ["scripts/**/*.{ts,tsx}", "src/**/*.{ts,tsx}", "*.{ts,tsx}"],
     extends: [
       ...tseslint.configs.strictTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
@@ -90,7 +90,7 @@ export default tseslint.config(
   // strictTypeChecked preset above). The CLAUDE.md prose for these rules is
   // deliberately kept brief: the rule is the source of truth.
   {
-    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
+    files: ["scripts/**/*.{ts,tsx}", "src/**/*.{ts,tsx}", "*.{ts,tsx}"],
     rules: {
       // "Use module-level `import type`." Auto-fixes value imports of
       // type-only bindings into a separate `import type` statement.
@@ -107,6 +107,7 @@ export default tseslint.config(
   // array rule does not merge across configs).
   {
     files: [
+      "scripts/**/*.spec.{ts,tsx}",
       "src/**/*.spec.{ts,tsx}",
       "src/**/*.test.{ts,tsx}",
       "src/**/*-tests/**/*.{ts,tsx}",
@@ -255,7 +256,7 @@ export default tseslint.config(
   },
   // Test files use Response.json() which inherently returns `any`; relax unsafe rules
   {
-    files: ["src/**/*.spec.ts", "src/**/*.spec.tsx"],
+    files: ["scripts/**/*.spec.ts", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
