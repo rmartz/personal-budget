@@ -15,6 +15,7 @@ This is a `type` convention, not a closed set — add a new value when none fits
 
 # Reference
 
+- [Dependabot grouping audit](dependabot-audit.md) - How `scripts/dependabot-audit.mjs` classifies every Dependabot PR's outcome and reports per-group intervention rates, keeping the `dependabot.yml` grouping evidence-based.
 - [Open Knowledge Format (OKF)](open-knowledge-format.md) - How this repo structures `docs/` as OKF (frontmatter, the `type` vocabulary, reserved files, index reachability), with Google's spec as the authoritative reference.
 
 # Guide
