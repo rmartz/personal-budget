@@ -103,6 +103,8 @@ function isRed(rollup) {
   return (rollup || []).some(
     (c) =>
       c.conclusion === "FAILURE" ||
+      c.conclusion === "STARTUP_FAILURE" ||
+      c.conclusion === "TIMED_OUT" ||
       c.state === "FAILURE" ||
       c.state === "ERROR",
   );
@@ -148,6 +150,7 @@ export function buildReport(dependabotPrs, otherPrs) {
       groups.set(row.group, {
         clean: 0,
         [NEEDED_FIX]: 0,
+        mechanics: 0,
         stuck: 0,
         pending: 0,
         churn: 0,
@@ -155,12 +158,13 @@ export function buildReport(dependabotPrs, otherPrs) {
     }
     const bucket = groups.get(row.group);
     bucket[row.outcome === CLEAN ? "clean" : row.outcome] += 1;
+    if (row.mechanics) bucket.mechanics += 1;
   }
   return { rows, groups };
 }
 
 function rate(bucket) {
-  const interventions = bucket[NEEDED_FIX] + bucket.stuck;
+  const interventions = bucket[NEEDED_FIX] - bucket.mechanics + bucket.stuck;
   const decided = bucket.clean + interventions;
   if (decided === 0) return { interventions, decided, label: "—" };
   return {
@@ -179,6 +183,7 @@ function renderMarkdown({ rows, groups }, repo) {
   );
   const clean = rows.filter((r) => r.outcome === CLEAN).length;
   const churn = rows.filter((r) => r.outcome === CHURN).length;
+  const pending = rows.filter((r) => r.outcome === PENDING).length;
 
   const lines = [];
   lines.push(`# Dependabot grouping audit — ${repo}`);
@@ -189,7 +194,7 @@ function renderMarkdown({ rows, groups }, repo) {
   lines.push("");
   lines.push(
     `**${clean} clean** · **${interventions.length} needed intervention** · ` +
-      `${churn} routine supersede-churn (excluded from rates).`,
+      `${churn} routine supersede-churn (excluded from rates) · ${pending} pending.`,
   );
   lines.push("");
   lines.push("## Per-group intervention rate");
@@ -199,13 +204,13 @@ function renderMarkdown({ rows, groups }, repo) {
   );
   lines.push("");
   lines.push(
-    "| Group | Clean | Needed fix | Stuck | Churn | Intervention rate |",
+    "| Group | Clean | Needed fix | Stuck | Churn | Pending | Intervention rate |",
   );
-  lines.push("| --- | --: | --: | --: | --: | --- |");
+  lines.push("| --- | --: | --: | --: | --: | --: | --- |");
   for (const [name, bucket] of [...groups.entries()].sort()) {
     const r = rate(bucket);
     lines.push(
-      `| \`${name}\` | ${bucket.clean} | ${bucket[NEEDED_FIX]} | ${bucket.stuck} | ${bucket.churn} | ${r.label} |`,
+      `| \`${name}\` | ${bucket.clean} | ${bucket[NEEDED_FIX]} | ${bucket.stuck} | ${bucket.churn} | ${bucket.pending} | ${r.label} |`,
     );
   }
   lines.push("");
@@ -288,11 +293,7 @@ function main() {
       "--json",
       "number,title,state,body,author",
     ]),
-  ).filter(
-    (pr) =>
-      pr.author?.login !== "app/dependabot" &&
-      pr.author?.login !== "dependabot",
-  );
+  ).filter((pr) => pr.author?.login !== "dependabot[bot]");
 
   const report = buildReport(dependabotPrs, otherPrs);
   const markdown = renderMarkdown(report, repo);

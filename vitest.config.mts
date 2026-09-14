@@ -10,7 +10,7 @@ export default defineConfig({
         test: {
           name: "node",
           environment: "node",
-          include: ["src/**/*.spec.ts"],
+          include: ["scripts/**/*.spec.ts", "src/**/*.spec.ts"],
           exclude: ["src/hooks/**/*.spec.ts"],
         },
         resolve: {
