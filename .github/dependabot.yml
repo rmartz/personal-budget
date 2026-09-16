@@ -58,17 +58,6 @@ updates:
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
-      storybook:
-        # Every @storybook/* package, the storybook CLI, and the eslint plugin
-        # share one Storybook version line. Listed before eslint and vite so
-        # eslint-plugin-storybook and @storybook/nextjs-vite / addon-vitest join
-        # here rather than those groups.
-        patterns:
-          - "storybook"
-          - "@storybook/*"
-          - "eslint-plugin-storybook"
-        update-types:
-          - "major"
       vite:
         # vite + its react plugin + vitest + @vitest/* are one interlocked
         # toolchain: a vite major dictates the plugin and vitest majors (the
@@ -81,24 +70,20 @@ updates:
           - "@vitest/*"
         update-types:
           - "major"
-      eslint:
-        # eslint + @eslint/js share a version line; typescript-eslint and the
-        # react-hooks plugin track the eslint major.
-        patterns:
-          - "eslint"
-          - "@eslint/js"
-          - "typescript-eslint"
-          - "eslint-plugin-react-hooks"
-        update-types:
-          - "major"
-      tailwind:
-        # tailwindcss core + its postcss plugin ship in lockstep; a mismatch
-        # fails the build.
-        patterns:
-          - "tailwindcss"
-          - "@tailwindcss/*"
-        update-types:
-          - "major"
+      # NOTE: storybook, eslint, and tailwind were previously grouped here as
+      # major-only lockstep families, on the assumption a major must move every
+      # member together. That assumption is UNTESTED for them: across the full
+      # Dependabot history (audited by scripts/dependabot-audit.mjs, issue #450)
+      # none of the three ever produced a real merged group PR — no major bump of
+      # those families has landed grouped, so there is no evidence the lockstep is
+      # needed, and none spans the prod/dev tier split. They were removed so that
+      # a future major surfaces as individual per-package PRs and the audit can
+      # measure whether an ungrouped major actually breaks the build. Re-add a
+      # family group only when that audit shows an ungrouped major of it needed a
+      # companion fix PR to unblock. react and vite are kept: both have merged
+      # real bumps cleanly, react must span the prod/dev split, and vite's grouped
+      # majors (#375, #434) landed green — plus the #360 vite<->plugin-react
+      # interlock — so their lockstep grouping is evidence-backed, not assumed.
       # Prettier (and its plugins) gets its own group for major/minor bumps so a
       # formatting-affecting upgrade lands in an isolated PR — a Prettier minor
       # bump can reformat the whole tree and require code changes, which must not
@@ -118,8 +103,9 @@ updates:
       # compiler major or minor can surface new type errors across the codebase
       # and warrants isolated, visible review, so split those into their own PR
       # (like prettier). The exact `typescript` pattern does not claim
-      # typescript-eslint, which stays in the eslint family. Patch bumps fall
-      # through to dev-dependencies and ride the routine batch.
+      # typescript-eslint (a distinct package), which batches with the other dev
+      # dependencies. Patch bumps fall through to dev-dependencies and ride the
+      # routine batch.
       typescript:
         patterns:
           - "typescript"
