@@ -1,0 +1,23 @@
+name: Repo Hygiene
+
+# The @rmartz/repo-hygiene reusable workflow runs the low-cost hygiene checks
+# that were previously hand-rolled here (action-pins, package-pins, okf, okf-index,
+# md-pairing) plus conflict-markers, which this repo lacked. Pinned by SHA and kept
+# current by Dependabot's github-actions ecosystem, so new checks and fixes arrive
+# on the normal bump cadence with no per-repo edit. The published package is public
+# on GitHub Packages, readable with the built-in GITHUB_TOKEN, so no PAT is needed.
+# Per-check config lives in .repo-hygiene.yml. See rmartz/repo-hygiene docs/consuming.md.
+on: [pull_request, push]
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  hygiene:
+    uses: rmartz/repo-hygiene/.github/workflows/hygiene.yml@a0607d987a9ab7b86d6ed489459ba4ee9832d6c6 # v3.0.0
+    with:
+      # Explicit set (not the default-on set) so the opt-in package-pins check is
+      # included alongside the default-on checks we rely on.
+      checks: conflict-markers action-pins package-pins okf okf-index md-pairing
+      config: .repo-hygiene.yml
