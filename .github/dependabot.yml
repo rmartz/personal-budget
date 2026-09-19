@@ -21,7 +21,7 @@ updates:
     #     dependencies that can be inside the window — exactly the exposure a
     #     cooldown is meant to avoid.
     #   * github-actions: supply-chain risk is already mitigated by full commit-SHA
-    #     pinning (enforced by check-action-pins.mjs / the Action Pins workflow), so
+    #     pinning (enforced by the action-pins check in the Repo Hygiene workflow), so
     #     a re-pointed mutable tag cannot reach CI. The cooldown only delayed every
     #     action bump without adding protection the SHA pins don't already give.
     commit-message:
