@@ -8,6 +8,13 @@ on:
 permissions:
   contents: read
 
+# Cancel superseded in-progress runs for the same PR so a rapid push series
+# doesn't queue redundant CI. Never cancel main: pushes there each deserve a
+# full run, so cancel-in-progress is disabled on refs/heads/main.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   # Detects whether a PR touches anything beyond inert documentation, so the
   # heavy code-validation jobs can skip doc-only PRs. Denylist, not allowlist:

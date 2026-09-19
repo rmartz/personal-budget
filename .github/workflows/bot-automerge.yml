@@ -1,0 +1,26 @@
+name: bot-automerge
+
+# Enables GitHub-native auto-merge for the low-impact bot PRs we trust —
+# Dependabot patch/minor bumps and release-please release PRs — so they land
+# without hand-holding once every required check goes green. Human PRs are
+# unaffected: bot-automerge only makes a bot PR *eligible*; the repo's required
+# status checks (CI gates + the required `merge-safety` check-run) are what it
+# waits on. It posts no check-run of its own. See rmartz/bot-automerge.
+#
+# pull_request_target (not pull_request): Dependabot PRs run with a read-only
+# token, and enabling auto-merge needs base-context write. It never checks out or
+# runs PR code — it only classifies the PR and calls `gh pr merge --auto`.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+
+permissions:
+  contents: write # enable auto-merge on the PR
+  pull-requests: write # read PR metadata / classify
+
+jobs:
+  bot-automerge:
+    uses: rmartz/bot-automerge/.github/workflows/bot-automerge.yml@139f4ce609c2dfe65f1e090c00f17204bfce1b3e # v0.1.1
+    with:
+      pr: ${{ github.event.pull_request.number }}
+    secrets: inherit
