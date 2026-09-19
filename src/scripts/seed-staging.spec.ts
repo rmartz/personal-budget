@@ -85,13 +85,14 @@ describe("seed-staging — refuses to run against non-staging projects", () => {
     expect(result.stderr).toContain("staging");
   });
 
-  it("aborts on a staging project when STAGING_TEST_PASSWORD is missing", () => {
+  it("does not require STAGING_TEST_PASSWORD (harness mints via the admin SDK)", () => {
     const result = run([], {
       ...cleanEnv(),
       FIREBASE_PROJECT_ID: "personal-budget-staging-a99af",
     });
-    expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("STAGING_TEST_PASSWORD");
+    // With no password set the script proceeds past the (now-optional) password
+    // step — it fails later on the absent admin credentials, not on the password.
+    expect(result.stderr).not.toContain("STAGING_TEST_PASSWORD");
   });
 });
 

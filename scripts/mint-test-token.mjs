@@ -1,23 +1,22 @@
 #!/usr/bin/env node
 /**
  * Mint a Firebase ID token for a seeded staging test user, for driving the MCP
- * server's first-party (Bearer) path during UAT. Firebase ID tokens expire in
- * ~1 hour, so mint a fresh one per test session.
+ * server's first-party (Bearer) path during UAT. Uses the Firebase Admin SDK
+ * (the staging service account already materialized into .env.local by
+ * `envctl config pull --env staging`) to create a custom token and exchange it
+ * for an ID token — so no test-user password is involved. ID tokens expire in
+ * ~1 hour, so mint fresh per session.
  *
- * Uses the Firebase Auth REST API (signInWithPassword) against the staging
- * project. The Web API key is public (it lives in deployment/staging.yml); the
- * password is the staging-only STAGING_TEST_PASSWORD shared by the seeded
- * accounts (see docs/staging-test-accounts.md). The token's `aud` is the staging
- * project, so it verifies against a server whose Admin SDK is the same project.
- *
- * Env:
- *   STAGING_TEST_PASSWORD  (required) shared password of the seeded test users
- *   MCP_TEST_EMAIL         (optional) default "active@staging.test"
- *   MCP_TEST_API_KEY       (optional) default: staging NEXT_PUBLIC_FIREBASE_API_KEY
+ * Env (all provided by `envctl config pull --env staging` into .env.local):
+ *   FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY  (admin SDK)
+ *   MCP_TEST_EMAIL    (optional) default "active@staging.test"
+ *   MCP_TEST_API_KEY  (optional) default: staging NEXT_PUBLIC_FIREBASE_API_KEY
  *
  * CLI: prints the raw ID token to stdout.
  */
 
+import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
@@ -37,31 +36,50 @@ export function stagingApiKey() {
   return key;
 }
 
+function adminAuth() {
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      "Admin credentials missing (FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / " +
+        "FIREBASE_PRIVATE_KEY). Run `envctl config pull --env staging` first.",
+    );
+  }
+  const app =
+    getApps().find((a) => a.name === "mint-test-token") ??
+    initializeApp(
+      { credential: cert({ projectId, clientEmail, privateKey }) },
+      "mint-test-token",
+    );
+  return getAuth(app);
+}
+
 export async function mintTestToken({
   apiKey = process.env.MCP_TEST_API_KEY ?? stagingApiKey(),
   email = process.env.MCP_TEST_EMAIL ?? "active@staging.test",
-  password = process.env.STAGING_TEST_PASSWORD,
 } = {}) {
-  if (!password) {
-    throw new Error(
-      "Set STAGING_TEST_PASSWORD (the seeded staging test users' shared password).",
-    );
-  }
-  const endpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
+  const auth = adminAuth();
+  const { uid } = await auth.getUserByEmail(email);
+  const customToken = await auth.createCustomToken(uid);
+
+  const endpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${apiKey}`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, returnSecureToken: true }),
+    body: JSON.stringify({ token: customToken, returnSecureToken: true }),
   });
   if (!response.ok) {
     const detail = await response.text();
     throw new Error(
-      `signInWithPassword failed (${String(response.status)}): ${detail}`,
+      `signInWithCustomToken failed (${String(response.status)}): ${detail}`,
     );
   }
   const data = await response.json();
   if (!data.idToken) {
-    throw new Error("signInWithPassword response did not include an idToken");
+    throw new Error(
+      "signInWithCustomToken response did not include an idToken",
+    );
   }
   return data.idToken;
 }
