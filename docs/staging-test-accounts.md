@@ -21,21 +21,30 @@ states. It never touches production — see [Safety](#safety).
 | `active@staging.test`   | **Active user** — two ledgers (one cash-capped), transactions, two savings goals, two annuities, and reconciliation accounts + expenses. |
 | `edge@staging.test`     | **Edge cases** — a fully-funded goal (`fundedAmount == targetAmount`) and a cash-capped ledger.                                          |
 
-All three share one password, supplied via `STAGING_TEST_PASSWORD` (below). The
-data shapes match the [Firebase Realtime Database Schema](database-schema.md).
+The data shapes match the [Firebase Realtime Database Schema](database-schema.md).
+Login is normally by **custom token** (the MCP test harness mints one via the Admin
+SDK — see [Testing the MCP server](mcp-server-testing.md)), so these accounts need
+**no shared password**. `STAGING_TEST_PASSWORD` is optional — set it only if you want
+to sign in as a test user by password (e.g. manual UI UAT); otherwise the seed assigns
+each account a random throwaway that nobody reads.
 
 ## Running the seed
 
-The script uses the Firebase Admin SDK against the staging project. Provide the
-staging service-account credentials and the shared test password as environment
-variables (the Firebase vars are the same ones `src/lib/firebase/admin.ts` reads):
+The script uses the Firebase Admin SDK against the staging project, reading the same
+Firebase vars as `src/lib/firebase/admin.ts`. The simplest source is `.env.local` from
+`envctl config pull --env staging` (see the MCP testing guide):
+
+```bash
+node --env-file-if-exists=.env.local scripts/seed-staging.mjs
+```
+
+Or provide them explicitly (`STAGING_TEST_PASSWORD` optional):
 
 ```bash
 export FIREBASE_PROJECT_ID="personal-budget-staging-…"   # must contain "staging"
 export FIREBASE_CLIENT_EMAIL="…@…iam.gserviceaccount.com"
 export FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n…"
 export FIREBASE_DATABASE_URL="https://personal-budget-staging-…-default-rtdb.firebaseio.com"
-export STAGING_TEST_PASSWORD="<staging-only password>"
 
 node scripts/seed-staging.mjs
 ```

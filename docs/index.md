@@ -21,6 +21,7 @@ This is a `type` convention, not a closed set — add a new value when none fits
 # Guide
 
 - [Staging Test Accounts](staging-test-accounts.md) - The seeded email/password test users in the staging Firebase project and how to (re-)seed them.
+- [Testing the MCP server](mcp-server-testing.md) - Mint a staging ID token and exercise the MCP tools (locally or against a preview) from a Claude Code session or the CLI.
 
 # Design
 
