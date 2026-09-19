@@ -62,10 +62,6 @@ So a reader can always walk `docs/index.md → sub/index.md → sub/page.md`.
 
 ## Enforcement
 
-Both rules — OKF frontmatter on every non-reserved page, and index reachability — are enforced in CI by the **`Docs`** workflow, which runs the zero-dependency validator `scripts/check-docs.mjs`. Run it locally with:
-
-```bash
-pnpm run docs:validate
-```
+Both rules are enforced in CI by the [`@rmartz/repo-hygiene`](https://github.com/rmartz/repo-hygiene) reusable workflow (`.github/workflows/repo-hygiene.yml`): the **`okf`** check validates frontmatter on every non-reserved page, and the **`okf-index`** check validates index reachability. Per-check settings (the OKF `type` vocabulary, docs roots) live in `.repo-hygiene.yml`.
 
 See the **Documentation** section of [`AGENTS.md`](../AGENTS.md) for the day-to-day authoring rules.

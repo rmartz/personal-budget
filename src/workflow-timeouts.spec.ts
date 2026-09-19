@@ -8,14 +8,6 @@ import { parse } from "yaml";
 // Adding a new job to any workflow requires adding an entry here — the test
 // asserts every non-reusable-workflow caller job has an explicit expected cap.
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
-  "action-pins.yml": {
-    "check-action-pins": 1,
-    "detect-changes": 1,
-  },
-  "agents-md.yml": {
-    "check-agents-md": 1,
-    "detect-changes": 1,
-  },
   // Caller-only workflow: its single job calls the reusable
   // rmartz/bot-automerge workflow (`uses:`), which owns its own timeout, so
   // there is no non-reusable job to cap here.
@@ -33,18 +25,10 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "dependabot-audit.yml": {
     audit: 10,
   },
-  "docs.yml": {
-    "check-docs": 1,
-    "detect-changes": 1,
-  },
   // Caller-only workflow: its single job calls the reusable
   // rmartz/merge-safety workflow (`uses:`), which owns its own timeout, so
   // there is no non-reusable job to cap here.
   "merge-safety.yml": {},
-  "package-pins.yml": {
-    "check-package-pins": 1,
-    "detect-changes": 1,
-  },
   "pr-screenshots-cleanup.yml": {
     cleanup: 5,
   },
@@ -57,6 +41,10 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "preview-deploy.yml": {
     "deploy-preview": 10,
   },
+  // Caller-only workflow: its single job calls the reusable
+  // rmartz/repo-hygiene workflow (`uses:`), which owns its own timeout, so
+  // there is no non-reusable job to cap here.
+  "repo-hygiene.yml": {},
   "sentry-release.yml": {
     "create-release": 2,
   },

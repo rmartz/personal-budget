@@ -1,0 +1,25 @@
+# Per-check config for the @rmartz/repo-hygiene reusable workflow
+# (.github/workflows/repo-hygiene.yml). Every enabled check runs at `error`
+# severity so it genuinely gates — this repo has no backlog to ramp down.
+checks:
+  action-pins:
+    severity: error
+  conflict-markers:
+    severity: error
+  md-pairing:
+    severity: error
+    # Every CLAUDE.md must be a bare `@AGENTS.md` import wrapper (AGENTS.md is the
+    # single source of truth for directives; see the Agent Directive Files section).
+    wrapper: true
+  okf:
+    severity: error
+    # This repo's closed OKF vocabulary (see docs/index.md). resource is not
+    # validated: Design/Reference pages point at design proposals or URLs, not
+    # on-disk assets, matching the prior check-docs.mjs behavior.
+    types: [Design, Guide, Reference, Schema]
+    resourceExemptTypes: "*"
+  okf-index:
+    severity: error
+    roots: [docs]
+  package-pins:
+    severity: error
