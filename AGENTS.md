@@ -16,10 +16,10 @@
   satisfies any 3.x release, so a minor/patch bump changes only the lockfile — the update
   becomes invisible in `package.json` and easy to miss in review (e.g. a Prettier minor bump
   that silently changes formatting). Full pins keep every bump explicit.
-- `pnpm run check:package-pins` (`scripts/check-package-pins.mjs`) enforces this rule across
-  every `package.json`; it also enforces the stricter exact pin (no range annotation) for
-  Prettier and its plugins. The `Package Pins` CI workflow runs it, gated to PRs that touch
-  `package.json` or `pnpm-lock.yaml`.
+- The `package-pins` check enforces this rule across every `package.json`; it also enforces the
+  stricter exact pin (no range annotation) for Prettier and its plugins. It runs in CI via the
+  `rmartz/repo-hygiene-action` action (`.github/workflows/repo-hygiene.yml`, configured in
+  `.repo-hygiene.yml`).
 
 ## GitHub Actions
 
@@ -30,10 +30,10 @@
   current version, and tracks partial comments (`# v7`, `# v7.0`) inconsistently, so a SHA with
   no or partial version comment is pinned but un-updatable. Local composite actions
   (`./.github/actions/*`) and `docker://` image refs are exempt — they are not mutable Git tags.
-- `pnpm run check:action-pins` (`scripts/check-action-pins.mjs`) enforces **both** the SHA pin
-  and a full-semver version comment across every workflow and composite action; the `Action
-Pins` CI workflow runs it, gated to PRs that touch `.github/`. Dependabot's `github-actions`
-  updater then bumps the SHA and the `# vX.Y.Z` comment together on new releases.
+- The `action-pins` check enforces **both** the SHA pin and a full-semver version comment across
+  every workflow and composite action. It runs in CI via the `rmartz/repo-hygiene-action` action
+  (`.github/workflows/repo-hygiene.yml`). Dependabot's `github-actions` updater then bumps the SHA
+  and the `# vX.Y.Z` comment together on new releases.
 
 ## Common Commands
 
@@ -124,7 +124,7 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - Keep documentation in sync with the code — outdated docs are worse than no docs.
 - Reference docs under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with a YAML frontmatter block whose only required key is `type` (drawn from the vocabulary in [`docs/index.md`](docs/index.md) — `Schema`, `Reference`, `Guide`, `Design`), plus the recommended `title`, `description`, `resource` (path to the asset the page documents), and `tags`. The reserved files `index.md` and `log.md` carry **no** frontmatter (they are navigation / append-only logs) and are exempt.
 - **`docs/` must stay navigable from `index.md`.** Every directory that holds docs has an `index.md`; every non-reserved page is linked from the `index.md` in its own directory; and every subdirectory's `index.md` is linked from its parent's `index.md` — so a reader can walk `docs/index.md → sub/index.md → sub/page.md`. When adding a new `docs/` page, include its frontmatter and add a listing entry to the enclosing directory's `index.md`.
-- Both rules are enforced in CI by the `Docs` workflow, which runs `scripts/check-docs.mjs` (`pnpm run docs:validate` locally), gated to PRs that touch a `docs/**` file or the validator itself.
+- Both rules are enforced in CI by the `rmartz/repo-hygiene-action` action (`.github/workflows/repo-hygiene.yml`): the `okf` check validates frontmatter and the `okf-index` check validates index reachability, configured in `.repo-hygiene.yml`.
 
 ## Agent Directive Files
 
@@ -135,9 +135,8 @@ Public (non-secret) environment config lives in `deployment/{env}.yml` and is va
 - **Every `CLAUDE.md` is a bare wrapper** whose only content is the Claude Code import line
   `@AGENTS.md` — no directives, no other text, no symlinks. This feeds the `AGENTS.md` directives
   to Claude Code while keeping them authored once, so the two files can never drift.
-- This pairing is enforced in CI by the `Agent Directive Files` workflow, which runs
-  `scripts/check-agents-md.mjs` (`pnpm run agents:validate` locally), gated to PRs that touch an
-  `AGENTS.md` / `CLAUDE.md` file or the validator itself.
+- This pairing is enforced in CI by the `md-pairing` check in the `rmartz/repo-hygiene-action`
+  action (`.github/workflows/repo-hygiene.yml`, configured in `.repo-hygiene.yml`).
 
 ## React / Next.js Standards
 
