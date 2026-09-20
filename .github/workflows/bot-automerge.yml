@@ -17,6 +17,7 @@ on:
 permissions:
   contents: write # enable auto-merge on the PR
   pull-requests: write # read PR metadata / classify
+  packages: read # required: the reusable workflow installs @rmartz/bot-automerge from GitHub Packages (caller caps the callee's token scopes)
 
 jobs:
   bot-automerge:
