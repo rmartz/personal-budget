@@ -16,10 +16,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     "check-agents-md": 1,
     "detect-changes": 1,
   },
-  // Caller-only workflow: its single job calls the reusable
-  // rmartz/bot-automerge workflow (`uses:`), which owns its own timeout, so
-  // there is no non-reusable job to cap here.
-  "bot-automerge.yml": {},
+  "bot-automerge.yml": {
+    "bot-automerge": 5,
+  },
   "ci-actions.yml": {
     build: 2,
     "detect-changes": 1,
