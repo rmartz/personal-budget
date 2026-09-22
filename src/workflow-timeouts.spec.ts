@@ -17,7 +17,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     format: 2,
     lint: 2,
     "storybook-build": 4,
-    "storybook-tests": 4,
     tests: 2,
     "type-check": 2,
   },
@@ -28,12 +27,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   // rmartz/merge-safety workflow (`uses:`), which owns its own timeout, so
   // there is no non-reusable job to cap here.
   "merge-safety.yml": {},
-  "pr-screenshots-cleanup.yml": {
-    cleanup: 5,
-  },
-  "pr-screenshots.yml": {
-    screenshots: 8,
-  },
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
@@ -46,6 +39,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "sentry-release.yml": {
     "create-release": 2,
   },
+  // Caller-only workflows: their single job calls a reusable
+  // rmartz/storybook-ci workflow (`uses:`), which owns its own timeouts, so
+  // there is no non-reusable job to cap here.
+  "storybook-screenshots.yml": {},
+  "storybook-tests.yml": {},
   "validate-config.yml": {
     "detect-changes": 1,
     "validate-config": 2,

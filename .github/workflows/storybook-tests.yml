@@ -1,0 +1,43 @@
+name: Storybook Tests
+
+# Gating Storybook story suite, delegated to the shared rmartz/storybook-ci
+# reusable workflow (issue #471). It runs the Vitest browser-mode story suite in
+# real Chromium and reports as `storybook-tests / Storybook Tests`.
+#
+# Everything this repo used to hand-roll for that job — Chromium provisioning and
+# binary caching with a retry, the docs-only change denylist, telemetry opt-out —
+# now lives in the shared workflow. The only input is `run-build: false`; every
+# other shared default already resolves here (`pnpm exec vitest run --project
+# storybook` matches the `storybook` project in vitest.config.mts, and Node 24.x
+# matches ./.github/actions/setup).
+#
+# Why `run-build: false`: the shared `Storybook Build` job is deliberately
+# browser-free, but this repo's build job is not — after `pnpm build-storybook` it
+# runs scripts/check-storybook-render.mjs, which renders Redux-connected canary
+# stories from the *built* bundle in real Chromium to guard the Vite/Rolldown
+# reselect regression (#359). That render guard cannot be expressed through the
+# shared `build-command` input, so `storybook-build` stays in ci-actions.yml with
+# its own cached Chromium. See docs/storybook-ci.md.
+#
+# The `@<sha>` pin is kept current by Dependabot's github-actions ecosystem, which
+# reads the trailing `# vX.Y.Z` comment to map the SHA to a release — so that
+# comment is required, not decorative.
+#
+# Required-check note: gating is the reusable workflow's `detect-changes` job plus
+# a per-job `if:`, NOT an `on.paths` filter. A job skipped by an `if:` counts as
+# passing, but a required check that never runs because its paths did not match
+# hangs the PR forever. Do not add `paths` here.
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  storybook-tests:
+    uses: rmartz/storybook-ci/.github/workflows/storybook-tests.yml@731dada2cdeb712b5443c4e2b29a3065f90ffd81 # v1.2.1
+    with:
+      run-build: false
