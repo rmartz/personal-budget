@@ -67,18 +67,6 @@ jobs:
       # Headless Vitest projects only — no browser, so no Playwright install.
       - run: pnpm exec vitest run --project node --project hooks --project components
 
-  storybook-tests:
-    name: Storybook Tests
-    needs: detect-changes
-    if: needs.detect-changes.outputs.code_changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 4
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup
-      - uses: ./.github/actions/playwright-chromium
-      - run: pnpm exec vitest run --project storybook
-
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -119,6 +107,11 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm build
 
+  # The vitest story suite moved to the shared rmartz/storybook-ci reusable
+  # workflow (.github/workflows/storybook-tests.yml). This job did NOT: the shared
+  # Storybook Build job is deliberately browser-free, while the canary render
+  # check below needs real Chromium against the built bundle. See
+  # docs/storybook-ci.md.
   storybook-build:
     name: Storybook Build
     needs: detect-changes
