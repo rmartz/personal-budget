@@ -2,7 +2,10 @@ import { z } from "zod";
 
 const FirebaseBudgetLedgerSchema = z.object({
   name: z.string(),
-  cashCap: z.number().nullable(),
+  // Optional: an absent (or null) cashCap is a valid "no cash cap" ledger — every
+  // deposit stays cash, nothing is invested (e.g. an emergency fund). The domain
+  // layer already treats `undefined` this way; the read schema must not drop it.
+  cashCap: z.number().nullable().optional(),
 });
 
 export type FirebaseBudgetLedger = z.infer<typeof FirebaseBudgetLedgerSchema>;

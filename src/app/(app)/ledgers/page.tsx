@@ -20,7 +20,7 @@ export default function LedgersPage() {
 
   const editMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLedgerInput }) =>
-      updateLedger(uid, id, data),
+      updateLedger(id, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["ledgers", uid] });
     },

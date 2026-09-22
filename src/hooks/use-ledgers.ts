@@ -8,7 +8,7 @@ import { getLedgers } from "@/services/ledgers";
 export function useLedgers(uid: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["ledgers", uid],
-    queryFn: () => getLedgers(uid),
+    queryFn: () => getLedgers(),
     enabled: uid.length > 0,
   });
 

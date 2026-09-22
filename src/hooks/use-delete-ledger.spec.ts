@@ -22,7 +22,7 @@ function makeWrapper() {
 }
 
 describe("useDeleteLedger", () => {
-  it("calls deleteLedger with the uid and ledger id", async () => {
+  it("calls deleteLedger with the ledger id", async () => {
     const spy = vi
       .spyOn(ledgersService, "deleteLedger")
       .mockResolvedValue(undefined);
@@ -34,7 +34,7 @@ describe("useDeleteLedger", () => {
     result.current.mutate("ledger-abc");
 
     await waitFor(() => {
-      expect(spy).toHaveBeenCalledWith("uid-123", "ledger-abc");
+      expect(spy).toHaveBeenCalledWith("ledger-abc");
     });
   });
 

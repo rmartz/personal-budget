@@ -48,6 +48,13 @@ describe("firebaseToBudgetLedger", () => {
     expect(result.cashCap).toBeUndefined();
   });
 
+  it("reads a record with no cashCap field as un-capped (undefined)", () => {
+    const result = firebaseToBudgetLedger("ledger-1", {
+      name: "Emergency Fund",
+    });
+    expect(result.cashCap).toBeUndefined();
+  });
+
   it("preserves numeric cashCap", () => {
     const result = firebaseToBudgetLedger("ledger-1", {
       name: "Travel",

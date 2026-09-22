@@ -13,14 +13,17 @@
  * same nodes rather than duplicating — and resets the account to a known state.
  *
  * Required env (staging service account + RTDB; same vars as src/lib/firebase/admin.ts):
- *   FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY,
- *   FIREBASE_DATABASE_URL, and STAGING_TEST_PASSWORD (shared test password).
+ *   FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, FIREBASE_DATABASE_URL.
+ * Optional: STAGING_TEST_PASSWORD — only for logging in as a test user by password
+ *   (e.g. manual UI UAT). The MCP test harness mints ID tokens via the Admin SDK
+ *   (custom token) and never uses it, so when unset a random throwaway is used.
  *
  * Run: node scripts/seed-staging.mjs   (see docs/staging-test-accounts.md)
  *
  * Data shapes match docs/database-schema.md exactly (Firebase layer).
  */
 
+import { randomBytes } from "crypto";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getDatabase } from "firebase-admin/database";
@@ -28,7 +31,7 @@ import { getDatabase } from "firebase-admin/database";
 const STAGING_MARKER = "staging";
 
 // Staging-only accounts. Emails use the non-routable `.test` TLD so they can
-// never collide with a real user; the password comes from env, never hardcoded.
+// never collide with a real user; the password is optional (see the header).
 const TEST_ACCOUNTS = [
   {
     key: "new",
@@ -195,10 +198,12 @@ async function ensureUser(auth, email, password) {
 
 async function main() {
   const projectId = assertStagingProject(process.env["FIREBASE_PROJECT_ID"]);
-  const password = process.env["STAGING_TEST_PASSWORD"];
-  if (!password) {
-    throw new Error("STAGING_TEST_PASSWORD is required to seed test accounts.");
-  }
+  // Optional: only used for password login (manual UI UAT). The MCP harness mints
+  // tokens via the Admin SDK, so when unset a random throwaway keeps each Firebase
+  // account with a valid (but unused) password.
+  const password =
+    process.env["STAGING_TEST_PASSWORD"] ??
+    randomBytes(18).toString("base64url");
 
   const app =
     getApps().find((a) => a.name === "[DEFAULT]") ??
