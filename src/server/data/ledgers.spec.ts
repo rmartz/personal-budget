@@ -5,11 +5,13 @@ vi.mock("@/lib/firebase/admin", () => ({
 }));
 
 import { getAdminDatabase } from "@/lib/firebase/admin";
+import { BudgetLedgerTransactionType } from "@/lib/firebase/schema/budget-ledger-transactions";
 
 import {
   createLedger,
   deleteLedger,
   getLedger,
+  getLedgerBalance,
   listLedgers,
   updateLedger,
 } from "./ledgers";
@@ -87,6 +89,39 @@ describe("getLedger", () => {
       id: "ledger-a",
       name: "Rent",
       cashCap: undefined,
+    });
+  });
+});
+
+describe("getLedgerBalance", () => {
+  it("returns undefined when the ledger does not exist", async () => {
+    get.mockResolvedValue({ exists: () => false });
+    expect(await getLedgerBalance("uid-1", "missing")).toBeUndefined();
+  });
+
+  it("splits deposits across cash and investment using the cash cap", async () => {
+    get
+      .mockResolvedValueOnce({
+        exists: () => true,
+        val: () => ({ name: "Savings", cashCap: 300 }),
+      })
+      .mockResolvedValueOnce({
+        exists: () => true,
+        val: () => ({
+          "tx-a": {
+            type: BudgetLedgerTransactionType.Deposit,
+            date: "2026-01-15T00:00:00.000Z",
+            amount: 500,
+            description: "Paycheck",
+          },
+        }),
+      });
+    expect(await getLedgerBalance("uid-1", "ledger-a")).toEqual({
+      id: "ledger-a",
+      name: "Savings",
+      cashCap: 300,
+      cashBalance: 300,
+      investmentBalance: 200,
     });
   });
 });
