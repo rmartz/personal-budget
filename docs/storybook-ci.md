@@ -18,10 +18,10 @@ there reaches us through a Dependabot pin bump rather than an edit here.
 
 ## The two callers
 
-| File                                          | Role     | What it configures                                                                                                    |
-| --------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
-| `.github/workflows/storybook-tests.yml`       | Gating   | `build-needs-browser: true` and `build-command: pnpm build-storybook && node scripts/check-storybook-render.mjs`.       |
-| `.github/workflows/storybook-screenshots.yml` | Advisory | `on.paths` (`src/**`, `.storybook/**`) and `secrets: inherit`.                                                        |
+| File                                          | Role     | What it configures                                                                                                |
+| --------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| `.github/workflows/storybook-tests.yml`       | Gating   | `build-needs-browser: true` and `build-command: pnpm build-storybook && node scripts/check-storybook-render.mjs`. |
+| `.github/workflows/storybook-screenshots.yml` | Advisory | `on.paths` (`src/**`, `.storybook/**`) and `secrets: inherit`.                                                    |
 
 Both callers grant `packages: read` alongside `contents: read`: the shared
 workflows declare it, and a called workflow can only narrow the caller's grant.
