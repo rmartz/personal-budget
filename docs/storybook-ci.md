@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: Storybook CI (shared rmartz/storybook-ci)
-description: How this repo's Storybook story suite and screenshot gallery are delegated to the shared rmartz/storybook-ci reusable workflows — what the two callers configure, why Storybook Build stayed local, the resulting check contexts, and the STORYBOOK_SCREENSHOT_PAT setup.
+description: How this repo's Storybook story suite, build, and screenshot gallery are delegated to the shared rmartz/storybook-ci reusable workflows — what the two callers configure, how Storybook Build runs its canary render check, the resulting check contexts, and the STORYBOOK_SCREENSHOT_PAT setup.
 resource: ../.github/workflows/storybook-tests.yml
 tags: [storybook, ci, screenshots, github-actions]
 ---
@@ -18,10 +18,13 @@ there reaches us through a Dependabot pin bump rather than an edit here.
 
 ## The two callers
 
-| File                                          | Role     | What it configures                                             |
-| --------------------------------------------- | -------- | -------------------------------------------------------------- |
-| `.github/workflows/storybook-tests.yml`       | Gating   | `run-build: false` — nothing else.                             |
-| `.github/workflows/storybook-screenshots.yml` | Advisory | `on.paths` (`src/**`, `.storybook/**`) and `secrets: inherit`. |
+| File                                          | Role     | What it configures                                                                                                |
+| --------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| `.github/workflows/storybook-tests.yml`       | Gating   | `build-needs-browser: true` and `build-command: pnpm build-storybook && node scripts/check-storybook-render.mjs`. |
+| `.github/workflows/storybook-screenshots.yml` | Advisory | `on.paths` (`src/**`, `.storybook/**`) and `secrets: inherit`.                                                    |
+
+Both callers grant `packages: read` alongside `contents: read`: the shared
+workflows declare it, and a called workflow can only narrow the caller's grant.
 
 Every other shared default already resolves here: `pnpm exec vitest run --project
 storybook` matches the `storybook` project in
@@ -30,16 +33,16 @@ storybook` matches the `storybook` project in
 glob matches this repo's co-located stories, and Node 24.x matches
 [`.github/actions/setup`](../.github/actions/setup/action.yml).
 
-## Why `Storybook Build` stayed in ci-actions.yml
+## The Storybook Build canary render check
 
-The shared workflow offers a `Storybook Build` job, and this repo does **not** use
-it (`run-build: false`). The shared job is deliberately browser-free — it compiles
-the bundle and stops — but this repo's build job does one more thing:
+The shared `Storybook Build` job is browser-free by default — it compiles the
+bundle and stops — but this repo's build gate does one more thing, so the caller
+overrides `build-command` to follow the build with a render check:
 
 ```yaml
-- run: pnpm build-storybook
-- name: Canary render check
-  run: node scripts/check-storybook-render.mjs
+with:
+  build-needs-browser: true
+  build-command: pnpm build-storybook && node scripts/check-storybook-render.mjs
 ```
 
 [`scripts/check-storybook-render.mjs`](../scripts/check-storybook-render.mjs)
@@ -50,29 +53,27 @@ which dropped reselect from the _built_ bundle — a failure neither the compile
 the Vitest story suite (which renders through the dev/esbuild transform) detects,
 so it would otherwise return silently on a future bundler bump.
 
-That guard needs a browser in the build job, which the shared `build-command`
-input cannot request. Folding the Playwright install into `build-command` would
-work but would pay an uncached ~130 MB Chromium download on every run, so the
-`storybook-build` job stays local with the cached
-[`playwright-chromium`](../.github/actions/playwright-chromium/action.yml)
-composite action. Upstream support for a browser-enabled build job is requested in
-[rmartz/storybook-ci#21](https://github.com/rmartz/storybook-ci/issues/21); if it
-lands, this job can move too and `run-build` can flip back to its default.
+That guard needs a browser in the build job. `build-needs-browser: true` has the
+shared job install Playwright Chromium into `~/.cache/ms-playwright` through the
+same cached, retried provisioning the test job uses (one shared cache entry), and
+the script's `chromium.launch()` resolves it from there. This replaced the former
+local `storybook-build` job in `ci-actions.yml` and its
+`.github/actions/playwright-chromium` composite action.
 
 ## Check contexts
 
 A reusable workflow's check context is `<caller job> / <called job>`, so adoption
-renames the story-suite check:
+renames the checks:
 
 | Before                  | After                                         |
 | ----------------------- | --------------------------------------------- |
 | `Storybook Tests`       | `storybook-tests / Storybook Tests`           |
-| `Storybook Build`       | `Storybook Build` (unchanged, local)          |
+| `Storybook Build`       | `storybook-tests / Storybook Build`           |
 | `Storybook Screenshots` | `screenshots / Capture Storybook Screenshots` |
 
-`Storybook Build` is the only one of the three in the default-branch ruleset's
-required checks, and it is unchanged — so adoption needs no ruleset edit to avoid
-hanging PRs. Adding `storybook-tests / Storybook Tests` to the required set is a
+`storybook-tests / Storybook Tests` is in the default-branch ruleset's required
+checks. `Storybook Build` was not, so moving it needs no ruleset edit to avoid
+hanging PRs; adding `storybook-tests / Storybook Build` to the required set is a
 separate, optional tightening.
 
 ## Why the screenshots caller has `on.paths` and the tests caller does not
@@ -144,4 +145,5 @@ decorative. The repo's `action-pins` hygiene check enforces both halves.
 - `.github/workflows/pr-screenshots-cleanup.yml` and the per-PR orphan image branch
   `gh-screenshots-pr-<N>`. `gh --attach` hosts the images natively, so there is no
   branch to tear down and no `contents: write` grant.
-- The `storybook-tests` job in `ci-actions.yml`.
+- The `storybook-tests` and `storybook-build` jobs in `ci-actions.yml`, and the
+  `.github/actions/playwright-chromium` composite action.
