@@ -6,7 +6,10 @@ import {
   firebaseToBudgetLedger,
 } from "@/lib/firebase/schema/budget-ledgers";
 import { parseCollection } from "@/lib/firebase/schema/parse-collection";
+import { calculateLedgerBalance } from "@/lib/reconciliation/ledger-balance";
 import type { CreateLedgerInput, UpdateLedgerInput } from "@/lib/types";
+
+import { listTransactions } from "./transactions";
 
 /**
  * Server-side ledger data access over the Firebase Admin SDK — the single layer
@@ -38,6 +41,36 @@ export async function getLedger(
     return undefined;
   }
   return firebaseToBudgetLedger(id, snapshot.val() as FirebaseBudgetLedger);
+}
+
+export interface LedgerBalance {
+  id: string;
+  name: string;
+  cashCap: number | undefined;
+  cashBalance: number;
+  investmentBalance: number;
+}
+
+export async function getLedgerBalance(
+  uid: string,
+  id: string,
+): Promise<LedgerBalance | undefined> {
+  const ledger = await getLedger(uid, id);
+  if (!ledger) {
+    return undefined;
+  }
+  const transactions = await listTransactions(uid, id);
+  const { cashBalance, investmentBalance } = calculateLedgerBalance({
+    cashCap: ledger.cashCap,
+    transactions,
+  });
+  return {
+    id: ledger.id,
+    name: ledger.name,
+    cashCap: ledger.cashCap,
+    cashBalance,
+    investmentBalance,
+  };
 }
 
 export async function createLedger(

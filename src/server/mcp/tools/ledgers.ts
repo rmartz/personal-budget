@@ -33,6 +33,16 @@ const getLedgerTool = defineTool({
   handler: (ctx, { id }) => ledgers.getLedger(ctx.uid, id),
 });
 
+const getLedgerBalanceTool = defineTool({
+  name: "get_ledger_balance",
+  title: "Get ledger balance",
+  description:
+    "Get a budget ledger's computed cash and investment balance by replaying its transactions.",
+  inputSchema: idSchema,
+  scopes: [LEDGERS_READ],
+  handler: (ctx, { id }) => ledgers.getLedgerBalance(ctx.uid, id),
+});
+
 const createLedgerTool = defineTool({
   name: "create_ledger",
   title: "Create ledger",
@@ -81,6 +91,7 @@ const deleteLedgerTool = defineTool({
 const ledgerTools = [
   createLedgerTool,
   deleteLedgerTool,
+  getLedgerBalanceTool,
   getLedgerTool,
   listLedgersTool,
   updateLedgerTool,
