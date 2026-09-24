@@ -16,7 +16,7 @@ This is a `type` convention, not a closed set — add a new value when none fits
 # Reference
 
 - [Dependabot grouping audit](dependabot-audit.md) - How `scripts/dependabot-audit.mjs` classifies every Dependabot PR's outcome and reports per-group intervention rates, keeping the `dependabot.yml` grouping evidence-based.
-- [Storybook CI (shared rmartz/storybook-ci)](storybook-ci.md) - How the Storybook story suite and screenshot gallery delegate to the shared rmartz/storybook-ci reusable workflows, why `Storybook Build` stayed local, and the `STORYBOOK_SCREENSHOT_PAT` setup.
+- [Storybook CI (shared rmartz/storybook-ci)](storybook-ci.md) - How the Storybook story suite, build (with its canary render check), and screenshot gallery delegate to the shared rmartz/storybook-ci reusable workflows, and the `STORYBOOK_SCREENSHOT_PAT` setup.
 - [Open Knowledge Format (OKF)](open-knowledge-format.md) - How this repo structures `docs/` as OKF (frontmatter, the `type` vocabulary, reserved files, index reachability), with Google's spec as the authoritative reference.
 
 # Guide

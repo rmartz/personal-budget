@@ -107,26 +107,7 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm build
 
-  # The vitest story suite moved to the shared rmartz/storybook-ci reusable
-  # workflow (.github/workflows/storybook-tests.yml). This job did NOT: the shared
-  # Storybook Build job is deliberately browser-free, while the canary render
-  # check below needs real Chromium against the built bundle. See
-  # docs/storybook-ci.md.
-  storybook-build:
-    name: Storybook Build
-    needs: detect-changes
-    if: needs.detect-changes.outputs.code_changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 4
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup
-      - uses: ./.github/actions/playwright-chromium
-      - run: pnpm build-storybook
-      # Guards the *built* render path: renders canary Redux-connected stories
-      # from the static build and fails if they crash. Catches the Vite/Rolldown
-      # reselect regression (#359) — which neither the compile above nor the
-      # vitest Storybook Tests (dev/esbuild transform) detect — so a Dependabot
-      # PR bumping Vite back to 8 stays red here until the bundler is fixed.
-      - name: Canary render check
-        run: node scripts/check-storybook-render.mjs
+  # The Storybook story suite and the Storybook build (with its canary render
+  # check, scripts/check-storybook-render.mjs) run in the shared
+  # rmartz/storybook-ci reusable workflow — see
+  # .github/workflows/storybook-tests.yml and docs/storybook-ci.md.

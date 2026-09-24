@@ -35,11 +35,14 @@ on:
       - "src/**"
       - ".storybook/**"
 
+# `packages: read` is required by the shared workflow (a called workflow can only
+# narrow the caller's grant, never widen it).
 permissions:
   contents: read
+  packages: read
   pull-requests: write
 
 jobs:
   screenshots:
-    uses: rmartz/storybook-ci/.github/workflows/storybook-screenshots.yml@731dada2cdeb712b5443c4e2b29a3065f90ffd81 # v1.2.1
+    uses: rmartz/storybook-ci/.github/workflows/storybook-screenshots.yml@ff758949491f6d22298273b424dd79144c5dd543 # v1.5.2
     secrets: inherit
