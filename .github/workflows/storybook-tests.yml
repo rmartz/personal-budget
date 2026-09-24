@@ -1,23 +1,22 @@
 name: Storybook Tests
 
-# Gating Storybook story suite, delegated to the shared rmartz/storybook-ci
-# reusable workflow (issue #471). It runs the Vitest browser-mode story suite in
-# real Chromium and reports as `storybook-tests / Storybook Tests`.
+# Gating Storybook CI, delegated to the shared rmartz/storybook-ci reusable
+# workflow (issue #471). It runs the Vitest browser-mode story suite in real
+# Chromium (`storybook-tests / Storybook Tests`) and the production Storybook
+# build plus its canary render check (`storybook-tests / Storybook Build`).
 #
-# Everything this repo used to hand-roll for that job — Chromium provisioning and
-# binary caching with a retry, the docs-only change denylist, telemetry opt-out —
-# now lives in the shared workflow. The only input is `run-build: false`; every
-# other shared default already resolves here (`pnpm exec vitest run --project
-# storybook` matches the `storybook` project in vitest.config.mts, and Node 24.x
-# matches ./.github/actions/setup).
+# Everything this repo used to hand-roll for those jobs — Chromium provisioning
+# and binary caching with a retry, the docs-only change denylist, telemetry
+# opt-out — now lives in the shared workflow. The test job uses the shared
+# defaults (`pnpm exec vitest run --project storybook` matches the `storybook`
+# project in vitest.config.mts, and Node 24.x matches ./.github/actions/setup).
 #
-# Why `run-build: false`: the shared `Storybook Build` job is deliberately
-# browser-free, but this repo's build job is not — after `pnpm build-storybook` it
+# The build job is configured, not defaulted: after `pnpm build-storybook` it
 # runs scripts/check-storybook-render.mjs, which renders Redux-connected canary
 # stories from the *built* bundle in real Chromium to guard the Vite/Rolldown
-# reselect regression (#359). That render guard cannot be expressed through the
-# shared `build-command` input, so `storybook-build` stays in ci-actions.yml with
-# its own cached Chromium. See docs/storybook-ci.md.
+# reselect regression (#359). `build-needs-browser: true` has the shared build
+# job provision the same cached Playwright Chromium the test job uses, so the
+# render check can launch it. See docs/storybook-ci.md.
 #
 # The `@<sha>` pin is kept current by Dependabot's github-actions ecosystem, which
 # reads the trailing `# vX.Y.Z` comment to map the SHA to a release — so that
@@ -33,11 +32,15 @@ on:
   push:
     branches: ["main"]
 
+# `packages: read` is required by the shared workflow (a called workflow can only
+# narrow the caller's grant, never widen it).
 permissions:
   contents: read
+  packages: read
 
 jobs:
   storybook-tests:
-    uses: rmartz/storybook-ci/.github/workflows/storybook-tests.yml@731dada2cdeb712b5443c4e2b29a3065f90ffd81 # v1.2.1
+    uses: rmartz/storybook-ci/.github/workflows/storybook-tests.yml@ff758949491f6d22298273b424dd79144c5dd543 # v1.5.2
     with:
-      run-build: false
+      build-needs-browser: true
+      build-command: pnpm build-storybook && node scripts/check-storybook-render.mjs
