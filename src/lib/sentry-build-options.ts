@@ -1,4 +1,4 @@
-import type { SentryBuildOptions } from "@sentry/nextjs";
+import type { SentryBuildOptions } from "@sentry/nextjs/config";
 
 /**
  * Returns the Sentry build-time options for withSentryConfig.
