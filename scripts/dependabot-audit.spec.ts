@@ -71,6 +71,16 @@ describe("buildReport", () => {
     expect(bucket?.mechanics).toBe(1);
   });
 
+  it("attributes a grouped github-actions PR to the github-actions group", () => {
+    const dep = makeDependabotPr({
+      number: 35,
+      title: "chore(deps): Bump the github-actions group with 2 updates",
+    });
+    const { groups } = buildReport([dep], []);
+    expect(groups.get("github-actions")?.clean).toBe(1);
+    expect(groups.get("individual")).toBeUndefined();
+  });
+
   it("classifies a Dependabot-closed PR as churn", () => {
     const dep = makeDependabotPr({
       number: 40,
