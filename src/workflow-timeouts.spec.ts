@@ -22,10 +22,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "dependabot-audit.yml": {
     audit: 10,
   },
-  // Caller-only workflow: its single job calls the reusable
-  // rmartz/merge-safety workflow (`uses:`), which owns its own timeout, so
-  // there is no non-reusable job to cap here.
-  "merge-safety.yml": {},
+  // rmartz/merge-safety-action caller: the action is a step, so the
+  // `merge-safety` job is ours and carries a real timeout.
+  "merge-safety.yml": {
+    "merge-safety": 5,
+  },
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
