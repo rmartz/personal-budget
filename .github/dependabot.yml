@@ -4,8 +4,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # NOTE: Do NOT add a `cooldown` to any ecosystem in this file. Cooldown was
-    # tried and deliberately removed — it added friction without meeting its goal:
+    # NOTE: Do NOT add an npm `cooldown`. (Since 2026-07-14 Dependabot applies a
+    # 3-day default wait even with none configured; the github-actions entry
+    # below declares one only to exempt first-party `rmartz/*` releases from that
+    # default.) An explicit cooldown was tried and deliberately removed — it
+    # added friction without meeting its goal:
     #   * npm/pnpm: Dependabot enforces cooldown by passing pnpm a
     #     `minimumReleaseAge`; during lockfile regeneration pnpm hard-fails with
     #     ERR_PNPM_NO_MATURE_MATCHING_VERSION whenever any transitive dependency in
@@ -22,8 +25,8 @@ updates:
     #     cooldown is meant to avoid.
     #   * github-actions: supply-chain risk is already mitigated by full commit-SHA
     #     pinning (enforced by the action-pins check in the Repo Hygiene workflow), so
-    #     a re-pointed mutable tag cannot reach CI. The cooldown only delayed every
-    #     action bump without adding protection the SHA pins don't already give.
+    #     a re-pointed mutable tag cannot reach CI. Third-party actions keep the
+    #     default wait; first-party `rmartz/*` ones are exempt (see below).
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -131,6 +134,14 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # First-party `rmartz/*` actions and reusable workflows are exempt from the
+    # default wait: they're published from our own repos with provenance, so it
+    # adds no supply-chain protection and only holds fixes back from the fleet.
+    cooldown:
+      # Explicit, so declaring the block can't change the third-party default.
+      default-days: 3
+      exclude:
+        - "rmartz/*"
     commit-message:
       prefix: "chore"
       include: "scope"
