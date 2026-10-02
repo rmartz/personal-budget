@@ -27,6 +27,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "merge-safety.yml": {
     "merge-safety": 5,
   },
+  // rmartz/pr-policy-action caller: the action is a step, so the
+  // `pr-policy` job is ours and carries a real timeout.
+  "pr-policy.yml": {
+    "pr-policy": 5,
+  },
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
