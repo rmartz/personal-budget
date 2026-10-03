@@ -58,7 +58,9 @@ describe("POST /api/auth/session", () => {
   });
 
   it("rethrows errors that are not token rejections", async () => {
-    const configError = new Error("Service account object must contain a project_id");
+    const configError = new Error(
+      "Service account object must contain a project_id",
+    );
     createSessionCookie.mockRejectedValue(configError);
     await expect(POST(makeSessionRequest("valid-token"))).rejects.toBe(
       configError,
