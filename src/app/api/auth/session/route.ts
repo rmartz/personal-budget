@@ -1,3 +1,4 @@
+import { FirebaseAuthError } from "firebase-admin/auth";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -19,9 +20,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
   }
 
-  const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
-    expiresIn: SESSION_EXPIRY_MS,
-  });
+  let sessionCookie: string;
+  try {
+    sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
+      expiresIn: SESSION_EXPIRY_MS,
+    });
+  } catch (error) {
+    // A rejected token (malformed, expired, revoked) is the caller's fault.
+    // Anything else — e.g. a missing or invalid admin credential — is a
+    // server misconfiguration and must keep surfacing as a 500.
+    if (error instanceof FirebaseAuthError) {
+      return NextResponse.json({ error: "Invalid idToken" }, { status: 401 });
+    }
+    throw error;
+  }
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, sessionCookie, {
