@@ -1,4 +1,10 @@
 {
-  "ignoreCommand": "bash scripts/vercel-ignore-build.sh",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "**": false
+    }
+  },
   "installCommand": "git config --global url.\"https://github.com/\".insteadOf \"git@github.com:\" && pnpm install --frozen-lockfile"
 }

@@ -80,7 +80,7 @@ with `pnpm mcp:token`. ID tokens last ~1h, so mint fresh per session.
 
 ## Preview loop (deployed-artifact validation)
 
-Labelling the PR **`ready for UAT`** deploys a preview and posts the URL as a sticky
+Labelling the PR **`UAT ready`** deploys a preview and posts the URL as a sticky
 comment. The deployed MCP works once the preview env has the staging admin credential
 (step 1 above provisions it). One extra hurdle vs. local:
 
