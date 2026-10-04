@@ -46,15 +46,26 @@ describe("POST /api/auth/session", () => {
     );
   });
 
-  it("returns 401 when Firebase rejects the id token", async () => {
-    createSessionCookie.mockRejectedValue(
-      new FirebaseAuthError({
-        code: "invalid-id-token",
-        message: "bad token",
-      }),
+  it.each(["id-token-expired", "id-token-revoked", "invalid-id-token"])(
+    "returns 401 when Firebase rejects the id token with %s",
+    async (code) => {
+      createSessionCookie.mockRejectedValue(
+        new FirebaseAuthError({ code, message: "bad token" }),
+      );
+      const response = await POST(makeSessionRequest("bad-token"));
+      expect(response.status).toBe(401);
+    },
+  );
+
+  it("rethrows a FirebaseAuthError that is not a token rejection", async () => {
+    const permissionError = new FirebaseAuthError({
+      code: "insufficient-permission",
+      message: "admin credential lacks permission",
+    });
+    createSessionCookie.mockRejectedValue(permissionError);
+    await expect(POST(makeSessionRequest("valid-token"))).rejects.toBe(
+      permissionError,
     );
-    const response = await POST(makeSessionRequest("bad-token"));
-    expect(response.status).toBe(401);
   });
 
   it("rethrows errors that are not token rejections", async () => {

@@ -8,6 +8,12 @@ import { getAdminAuth } from "@/lib/firebase/admin";
 
 const SESSION_EXPIRY_MS = 60 * 60 * 24 * 5 * 1000; // 5 days
 
+const TOKEN_REJECTION_CODES = new Set([
+  "auth/id-token-expired",
+  "auth/id-token-revoked",
+  "auth/invalid-id-token",
+]);
+
 interface SessionRequestBody {
   idToken?: unknown;
 }
@@ -27,9 +33,13 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     // A rejected token (malformed, expired, revoked) is the caller's fault.
-    // Anything else — e.g. a missing or invalid admin credential — is a
-    // server misconfiguration and must keep surfacing as a 500.
-    if (error instanceof FirebaseAuthError) {
+    // FirebaseAuthError also covers server-side failures such as
+    // insufficient-permission or project-not-found, and those — like a missing
+    // or invalid admin credential — must keep surfacing as a 500.
+    if (
+      error instanceof FirebaseAuthError &&
+      TOKEN_REJECTION_CODES.has(error.code)
+    ) {
       return NextResponse.json({ error: "Invalid idToken" }, { status: 401 });
     }
     throw error;
