@@ -15,6 +15,13 @@ import { ReconciliationAccountTier } from "@/lib/firebase/schema/reconciliation-
 
 import { CREATE_ACCOUNT_DIALOG_COPY } from "./copy";
 
+// ReconciliationAccountTier is a string enum, so its values double as the
+// <select> option values; this lookup narrows a raw option string back to the
+// enum without an unsound `as` assertion.
+const TIERS_BY_VALUE: ReadonlyMap<string, ReconciliationAccountTier> = new Map(
+  Object.values(ReconciliationAccountTier).map((tier) => [tier, tier]),
+);
+
 const CASH_TIERS = new Set<ReconciliationAccountTier>([
   ReconciliationAccountTier.LongTerm,
   ReconciliationAccountTier.Reserve,
@@ -111,9 +118,10 @@ export function CreateAccountDialogView({
                   id="create-account-type"
                   value={accountType ?? ""}
                   onChange={(e) => {
-                    onAccountTypeChange(
-                      e.target.value as ReconciliationAccountTier,
-                    );
+                    const tier = TIERS_BY_VALUE.get(e.target.value);
+                    if (tier !== undefined) {
+                      onAccountTypeChange(tier);
+                    }
                   }}
                   aria-invalid={accountTypeError !== undefined}
                   aria-describedby={
