@@ -32,9 +32,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-policy.yml": {
     "pr-policy": 5,
   },
-  "pr-title-lint.yml": {
-    "pr-title": 1,
-  },
   "repo-hygiene.yml": {
     hygiene: 5,
   },
