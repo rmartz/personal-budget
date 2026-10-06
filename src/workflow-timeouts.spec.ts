@@ -32,18 +32,16 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-policy.yml": {
     "pr-policy": 5,
   },
-  "preview-deploy.yml": {
-    "deploy-preview": 10,
-  },
   "repo-hygiene.yml": {
     hygiene: 5,
   },
   "sentry-release.yml": {
     "create-release": 2,
   },
-  // Caller-only workflows: their single job calls a reusable
-  // rmartz/storybook-ci workflow (`uses:`), which owns its own timeouts, so
-  // there is no non-reusable job to cap here.
+  // Caller-only workflows: their single job calls a reusable workflow
+  // (rmartz/storybook-ci, rmartz/vercel-preview-ci via `uses:`), which owns its
+  // own timeouts, so there is no non-reusable job to cap here.
+  "preview-deploy.yml": {},
   "storybook-screenshots.yml": {},
   "storybook-tests.yml": {},
   "validate-config.yml": {
