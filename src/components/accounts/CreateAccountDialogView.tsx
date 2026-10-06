@@ -1,5 +1,7 @@
 "use client";
 
+import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
   DialogBackdrop,
@@ -111,9 +113,12 @@ export function CreateAccountDialogView({
                   id="create-account-type"
                   value={accountType ?? ""}
                   onChange={(e) => {
-                    onAccountTypeChange(
-                      e.target.value as ReconciliationAccountTier,
-                    );
+                    const tier = z
+                      .enum(ReconciliationAccountTier)
+                      .safeParse(e.target.value);
+                    if (tier.success) {
+                      onAccountTypeChange(tier.data);
+                    }
                   }}
                   aria-invalid={accountTypeError !== undefined}
                   aria-describedby={
