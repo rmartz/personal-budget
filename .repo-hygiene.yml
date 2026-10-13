@@ -13,9 +13,10 @@ checks:
     wrapper: true
   okf:
     severity: error
-    # This repo's closed OKF vocabulary (see docs/index.md). resource is not
-    # validated: Design/Reference pages point at design proposals or URLs, not
-    # on-disk assets, matching the prior check-docs.mjs behavior.
+    # This repo's closed OKF vocabulary (see docs/index.md). resource is optional
+    # for every type (Design proposals and URL-backed Reference pages have no
+    # on-disk asset), but any resource a page does set must be a repo-root-relative
+    # path that exists on disk.
     types: [Design, Guide, Reference, Schema]
     resourceExemptTypes: "*"
   okf-index:
