@@ -2,7 +2,6 @@
 type: Reference
 title: Open Knowledge Format (OKF)
 description: How this repo structures docs/ as OKF — YAML frontmatter, the type vocabulary, reserved files, and index reachability — with Google's spec as the authoritative reference.
-resource: https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md
 tags: [documentation, okf, conventions]
 ---
 
@@ -25,7 +24,7 @@ Every non-reserved page begins with a YAML frontmatter block. Per the spec the *
 | `type`        | **yes**     | Classifies the page (see the vocabulary below). |
 | `title`       | recommended | Human-readable page title.                      |
 | `description` | recommended | One-line summary used for retrieval.            |
-| `resource`    | recommended | Path (or URL) to the asset the page documents.  |
+| `resource`    | recommended | Repo-root path to the asset the page documents. |
 | `tags`        | recommended | Free-form keywords.                             |
 
 A consumer must not reject a page for missing an optional key.

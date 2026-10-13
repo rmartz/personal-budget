@@ -2,7 +2,7 @@
 type: Reference
 title: Storybook CI (shared rmartz/storybook-ci)
 description: How this repo's Storybook story suite, build, and screenshot gallery are delegated to the shared rmartz/storybook-ci reusable workflows — what the two callers configure, how Storybook Build runs its canary render check, the resulting check contexts, and the STORYBOOK_SCREENSHOT_PAT setup.
-resource: ../.github/workflows/storybook-tests.yml
+resource: .github/workflows/storybook-tests.yml
 tags: [storybook, ci, screenshots, github-actions]
 ---
 

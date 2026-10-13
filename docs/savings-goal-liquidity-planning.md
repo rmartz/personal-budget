@@ -2,7 +2,6 @@
 type: Design
 title: Savings Goal Liquidity Planning
 description: Purchase-date-aware savings goals that glide funds between investments and cash to hit expected purchase dates without forced sales, via a planning layer that emits a thin liquidity target the reconcile engine executes.
-resource: (design proposal — tracked by the "Savings Goal Liquidity Planning" epic)
 tags:
   [
     savings-goals,
