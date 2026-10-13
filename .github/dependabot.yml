@@ -87,23 +87,30 @@ updates:
       # real bumps cleanly, react must span the prod/dev split, and vite's grouped
       # majors (#375, #434) landed green — plus the #360 vite<->plugin-react
       # interlock — so their lockstep grouping is evidence-backed, not assumed.
-      # Prettier (and its plugins) gets its own group so a formatting-affecting
-      # upgrade lands in an isolated PR — a Prettier minor bump can reformat the
-      # whole tree and require code changes, which must not be buried in a
-      # batched dev-dependencies PR. Listed first to win group-assignment
-      # precedence (a dependency joins the first group whose patterns AND
-      # update-types match). It carries no update-types filter, so every
-      # Prettier bump — major, minor, and patch — lands in this one group.
-      prettier:
+      # (eslint is grouped again below, in the `ci` group — for pr-policy's title
+      # rule, not as a lockstep family.)
+      # CI-sensitive tools in one group: pr-policy requires a `ci` title for any
+      # eslint/prettier version change (the formatter/linter can fail files a PR
+      # never touched — a Prettier minor can reformat the whole tree), so they
+      # must not ride in a catch-all where they would block every routine bump.
+      # Plugins and configs move in lockstep with their tool. Listed before the
+      # catch-alls to win group-assignment precedence (a dependency joins the
+      # first group whose patterns AND update-types match). No update-types
+      # filter, so a major brings its family with it.
+      ci:
         patterns:
           - "prettier"
           - "prettier-plugin-*"
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "typescript-eslint"
       # TypeScript is the language itself, not just another dependency — a
       # compiler bump can surface new type errors across the codebase and
       # warrants isolated, visible review, so every typescript bump (no
-      # update-types filter) lands in its own group (like prettier). The exact
-      # `typescript` pattern does not claim typescript-eslint (a distinct
-      # package), which batches with the other dev dependencies.
+      # update-types filter) lands in its own group (like the ci group). The
+      # exact `typescript` pattern does not claim typescript-eslint (a distinct
+      # package), which the ci group above claims first.
       typescript:
         patterns:
           - "typescript"
