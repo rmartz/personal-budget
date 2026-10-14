@@ -24,8 +24,10 @@ import { writeFileSync } from "node:fs";
 
 // Groups Dependabot can name in a PR title. Kept as the union of every group
 // this repo has ever defined — including storybook/eslint/tailwind, pruned in
-// issue #450 — so historical PRs still classify to the right group.
+// issue #450, and prettier, folded into ci — so historical PRs still classify
+// to the right group.
 const KNOWN_GROUPS = [
+  "ci",
   "dev-dependencies",
   "eslint",
   "github-actions",
