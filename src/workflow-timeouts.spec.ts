@@ -8,9 +8,6 @@ import { parse } from "yaml";
 // Adding a new job to any workflow requires adding an entry here — the test
 // asserts every non-reusable-workflow caller job has an explicit expected cap.
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
-  "bot-automerge.yml": {
-    "bot-automerge": 5,
-  },
   "ci-actions.yml": {
     build: 2,
     "detect-changes": 1,
