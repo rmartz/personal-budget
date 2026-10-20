@@ -20,6 +20,8 @@ export const USER_PROFILE_COPY = {
   displayNameLabel: "Display Name",
   emailSectionTitle: "Email Address",
   genericError: "An unexpected error occurred. Please try again.",
+  passwordlessNote:
+    "This account signs in with Google, so there is no password to change.",
   passwordSectionTitle: "Change Password",
   profileSectionTitle: "Profile",
   signOutButton: "Sign Out",

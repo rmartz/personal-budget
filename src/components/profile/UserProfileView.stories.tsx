@@ -30,6 +30,14 @@ export const EmptyDisplayName: Story = {
   },
 };
 
+export const GoogleOnlyAccount: Story = {
+  args: {
+    displayName: "Jane Smith",
+    email: "jane@example.com",
+    isPasswordless: true,
+  },
+};
+
 export const WithFieldErrors: Story = {
   args: {
     displayName: "Jane Smith",

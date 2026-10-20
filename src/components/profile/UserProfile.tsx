@@ -10,6 +10,7 @@ import {
   updatePassword,
 } from "@/services/auth";
 
+import { hasPasswordProvider } from "./has-password-provider";
 import { UserProfileView } from "./UserProfileView";
 
 interface UserProfileProps {
@@ -47,6 +48,7 @@ export function UserProfile({ user }: UserProfileProps) {
     <UserProfileView
       displayName={user.displayName ?? ""}
       email={user.email ?? ""}
+      isPasswordless={!hasPasswordProvider(user.providerData)}
       onUpdateDisplayName={handleUpdateDisplayName}
       onUpdateEmail={handleUpdateEmail}
       onUpdatePassword={handleUpdatePassword}

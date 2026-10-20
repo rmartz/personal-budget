@@ -12,6 +12,8 @@ import { PasswordForm } from "./PasswordForm";
 export interface UserProfileViewProps {
   displayName: string;
   email: string;
+  /** The account has no password provider (e.g. Google-only sign-in). */
+  isPasswordless?: boolean;
   displayNameError?: string;
   emailError?: string;
   passwordError?: string;
@@ -27,6 +29,7 @@ export interface UserProfileViewProps {
 export function UserProfileView({
   displayName,
   email,
+  isPasswordless = false,
   displayNameError: initialDisplayNameError,
   emailError: initialEmailError,
   passwordError: initialPasswordError,
@@ -132,17 +135,23 @@ export function UserProfileView({
         <h2 className="text-lg font-medium">
           {USER_PROFILE_COPY.passwordSectionTitle}
         </h2>
-        <PasswordForm
-          currentPassword={currentPassword}
-          newPassword={newPassword}
-          error={passwordError}
-          onCurrentPasswordChange={setCurrentPassword}
-          onNewPasswordChange={setNewPassword}
-          onSubmit={(e) => {
-            e.preventDefault();
-            void submitPassword();
-          }}
-        />
+        {isPasswordless ? (
+          <p className="text-sm text-muted-foreground">
+            {USER_PROFILE_COPY.passwordlessNote}
+          </p>
+        ) : (
+          <PasswordForm
+            currentPassword={currentPassword}
+            newPassword={newPassword}
+            error={passwordError}
+            onCurrentPasswordChange={setCurrentPassword}
+            onNewPasswordChange={setNewPassword}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void submitPassword();
+            }}
+          />
+        )}
       </section>
 
       <Button variant="outline" onClick={() => void onSignOut()}>
