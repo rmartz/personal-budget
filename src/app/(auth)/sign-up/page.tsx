@@ -3,9 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { getGoogleSignInErrorMessage } from "@/components/auth/google-sign-in-error";
 import { SignUpFormView } from "@/components/auth/SignUpForm";
 import { SIGN_UP_FORM_COPY } from "@/components/auth/SignUpForm.copy";
-import { signUp } from "@/services/auth";
+import { signInWithGoogle, signUp } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
   switch (code) {
@@ -47,11 +48,25 @@ export default function SignUpPage() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    setIsLoading(true);
+    setError(undefined);
+    try {
+      await signInWithGoogle();
+      router.push("/");
+    } catch (err) {
+      setError(getGoogleSignInErrorMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <SignUpFormView
       isLoading={isLoading}
       error={error}
       onSubmit={handleSubmit}
+      onGoogleSignIn={handleGoogleSignIn}
     />
   );
 }

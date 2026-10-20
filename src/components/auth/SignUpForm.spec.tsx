@@ -1,12 +1,31 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { GOOGLE_SIGN_IN_COPY } from "./GoogleSignIn.copy";
 import { SignUpFormView } from "./SignUpForm";
 import { SIGN_UP_FORM_COPY } from "./SignUpForm.copy";
 
 afterEach(cleanup);
 
 describe("SignUpFormView", () => {
+  describe("Google sign-in", () => {
+    it("calls onGoogleSignIn when the Google button is clicked", () => {
+      const onGoogleSignIn = vi.fn();
+      render(
+        <SignUpFormView
+          isLoading={false}
+          error={undefined}
+          onSubmit={vi.fn()}
+          onGoogleSignIn={onGoogleSignIn}
+        />,
+      );
+      fireEvent.click(
+        screen.getByRole("button", { name: GOOGLE_SIGN_IN_COPY.button }),
+      );
+      expect(onGoogleSignIn).toHaveBeenCalledOnce();
+    });
+  });
+
   describe("default state", () => {
     it("renders the form title", () => {
       render(
@@ -14,6 +33,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(SIGN_UP_FORM_COPY.title)).toBeDefined();
@@ -25,6 +45,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(SIGN_UP_FORM_COPY.submitButton)).toBeDefined();
@@ -36,6 +57,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(SIGN_UP_FORM_COPY.signInLink)).toBeDefined();
@@ -49,6 +71,7 @@ describe("SignUpFormView", () => {
           isLoading={true}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(SIGN_UP_FORM_COPY.loadingButton)).toBeDefined();
@@ -63,6 +86,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={errorMessage}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(errorMessage)).toBeDefined();
@@ -76,6 +100,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.submit(
@@ -92,6 +117,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.change(
@@ -117,6 +143,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.change(
@@ -149,6 +176,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={onSubmit}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.submit(
@@ -164,6 +192,7 @@ describe("SignUpFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={onSubmit}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.change(

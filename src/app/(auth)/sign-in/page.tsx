@@ -3,9 +3,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import { getGoogleSignInErrorMessage } from "@/components/auth/google-sign-in-error";
 import { SignInFormView } from "@/components/auth/SignInForm";
 import { SIGN_IN_FORM_COPY } from "@/components/auth/SignInForm.copy";
-import { signIn } from "@/services/auth";
+import { signIn, signInWithGoogle } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
   switch (code) {
@@ -55,11 +56,25 @@ function SignInContent() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    setIsLoading(true);
+    setError(undefined);
+    try {
+      await signInWithGoogle();
+      router.push(sanitizeNext(searchParams.get("next")));
+    } catch (err) {
+      setError(getGoogleSignInErrorMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <SignInFormView
       isLoading={isLoading}
       error={error}
       onSubmit={handleSubmit}
+      onGoogleSignIn={handleGoogleSignIn}
     />
   );
 }
