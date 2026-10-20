@@ -95,6 +95,27 @@ describe("UserProfileView", () => {
     ).toBeDefined();
   });
 
+  describe("passwordless account", () => {
+    it("shows the passwordless note instead of the password form", () => {
+      render(<UserProfileView {...makeProps({ isPasswordless: true })} />);
+      expect(
+        screen.getByText(USER_PROFILE_COPY.passwordlessNote),
+      ).toBeDefined();
+    });
+
+    it("does not render the password inputs", () => {
+      render(<UserProfileView {...makeProps({ isPasswordless: true })} />);
+      expect(
+        screen.queryByLabelText(USER_PROFILE_COPY.changePasswordCurrentLabel),
+      ).toBeNull();
+    });
+
+    it("does not show the passwordless note for a password account", () => {
+      render(<UserProfileView {...makeProps({ isPasswordless: false })} />);
+      expect(screen.queryByText(USER_PROFILE_COPY.passwordlessNote)).toBeNull();
+    });
+  });
+
   describe("error handling", () => {
     it("shows display name error when onUpdateDisplayName rejects", async () => {
       const onUpdateDisplayName = vi
