@@ -45,6 +45,7 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   // (rmartz/storybook-ci, rmartz/vercel-preview-ci via `uses:`), which owns its
   // own timeouts, so there is no non-reusable job to cap here.
   "preview-deploy.yml": {},
+  "staging-deploy.yml": {},
   "storybook-screenshots.yml": {},
   "storybook-tests.yml": {},
   "validate-config.yml": {
