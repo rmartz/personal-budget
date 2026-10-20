@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   staging:
-    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-staging.yml@a60cbe10be4e3a09f29234b4ed9e0f0669802832 # v1.2.0
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-staging.yml@fab17d9b909c5883f992c8f2a26ac0ea00ec5280 # v1.3.0
     with:
       alias-domain: staging.budget.reedmartz.com
     secrets: inherit
