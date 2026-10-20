@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import { getFirebaseErrorCode } from "@/components/auth/firebase-error-code";
 import { getGoogleSignInErrorMessage } from "@/components/auth/google-sign-in-error";
 import { SignInFormView } from "@/components/auth/SignInForm";
 import { SIGN_IN_FORM_COPY } from "@/components/auth/SignInForm.copy";
@@ -43,14 +44,7 @@ function SignInContent() {
       await signIn(email, password);
       router.push(sanitizeNext(searchParams.get("next")));
     } catch (err) {
-      const code =
-        err !== null &&
-        typeof err === "object" &&
-        "code" in err &&
-        typeof err.code === "string"
-          ? err.code
-          : "";
-      setError(getAuthErrorMessage(code));
+      setError(getAuthErrorMessage(getFirebaseErrorCode(err)));
     } finally {
       setIsLoading(false);
     }
