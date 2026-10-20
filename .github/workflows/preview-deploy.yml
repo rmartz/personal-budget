@@ -10,6 +10,12 @@ name: Preview Deploy
 # This is the sole preview path: vercel.json's `git.deploymentEnabled` disables
 # Vercel's Git-integration deploys for every branch except `main`.
 #
+# Each UAT deploy is also aliased to the stable staging host, so the most
+# recently deployed `UAT ready` PR is the one served there. The staging domain is
+# connected to the placeholder `staging` branch in Vercel (never deployed) rather
+# than left unassigned, so production deploys never claim it and it stays behind
+# preview deployment protection.
+#
 # Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
 
 on:
@@ -26,5 +32,7 @@ jobs:
     # `[WIP]`-titled PRs are held as unfinished work and get no preview. The
     # shared workflow gates on draft status but not the title, so it is kept here.
     if: ${{ !contains(github.event.pull_request.title, '[WIP]') }}
-    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@129b1339e8b7d80f20e5af6fe6f78ea99da5ad0d # v1.0.0
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@e4b2c3d6e1edfd0412c68c7b8e930d190edb0909 # v1.1.0
+    with:
+      alias-domain: staging.budget.reedmartz.com
     secrets: inherit
