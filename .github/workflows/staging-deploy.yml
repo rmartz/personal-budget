@@ -13,6 +13,11 @@ name: Staging Deploy
 # `staging` branch in Vercel (never deployed), so production deploys never claim
 # it and it stays behind preview deployment protection.
 #
+# `env-branch: staging` pulls the Preview variables as the `staging` placeholder
+# branch, so Preview variables scoped to that branch in Vercel (e.g.
+# NEXT_PUBLIC_APP_ENV=staging) reach staging only. Vercel refuses to scope a
+# Preview variable to `main`, the production branch.
+#
 # Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
 
 on:
@@ -26,7 +31,8 @@ permissions:
 
 jobs:
   staging:
-    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-staging.yml@fab17d9b909c5883f992c8f2a26ac0ea00ec5280 # v1.3.0
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-staging.yml@bbbd9cd58364b0416ddd11203635b556cc36c3fb # v1.4.0
     with:
       alias-domain: staging.budget.reedmartz.com
+      env-branch: staging
     secrets: inherit
