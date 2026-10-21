@@ -10,11 +10,14 @@ name: Preview Deploy
 # This is the sole preview path: vercel.json's `git.deploymentEnabled` disables
 # Vercel's Git-integration deploys for every branch except `main`.
 #
-# Each UAT deploy is also aliased to the stable staging host, so the most
-# recently deployed `UAT ready` PR is the one served there. The staging domain is
-# connected to the placeholder `staging` branch in Vercel (never deployed) rather
-# than left unassigned, so production deploys never claim it and it stays behind
-# preview deployment protection.
+# Each UAT deploy is also aliased to its own host, pr-<N>.preview.budget.reedmartz.com,
+# so every PR has a stable address under a domain we own (Firebase's authorized
+# domains and Google sign-in accept it) and the hostname itself says which PR it
+# serves. The `*.preview.budget.reedmartz.com` domain is connected to the
+# placeholder `staging` branch in Vercel (never deployed) rather than left
+# unassigned, so production deploys never claim it and it stays behind preview
+# deployment protection. The bare staging host belongs to the `main` deploy in
+# staging-deploy.yml.
 #
 # Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
 
@@ -32,7 +35,7 @@ jobs:
     # `[WIP]`-titled PRs are held as unfinished work and get no preview. The
     # shared workflow gates on draft status but not the title, so it is kept here.
     if: ${{ !contains(github.event.pull_request.title, '[WIP]') }}
-    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@e4b2c3d6e1edfd0412c68c7b8e930d190edb0909 # v1.1.0
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@fab17d9b909c5883f992c8f2a26ac0ea00ec5280 # v1.3.0
     with:
-      alias-domain: staging.budget.reedmartz.com
+      alias-domain: pr-${{ github.event.pull_request.number }}.preview.budget.reedmartz.com
     secrets: inherit
