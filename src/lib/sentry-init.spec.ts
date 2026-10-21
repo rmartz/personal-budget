@@ -158,9 +158,9 @@ describe("The approach is documented in the deployment config", () => {
     expect(raw).toMatch(/NEXT_PUBLIC_APP_ENV:\s*["']?production["']?/);
   });
 
-  it("deployment/staging.yml sets NEXT_PUBLIC_APP_ENV to 'staging'", () => {
+  it("deployment/staging.yml sets NEXT_PUBLIC_APP_ENV to 'preview'", () => {
     const path = join(import.meta.dirname, "../../deployment/staging.yml");
     const raw = readFileSync(path, "utf-8");
-    expect(raw).toMatch(/NEXT_PUBLIC_APP_ENV:\s*["']?staging["']?/);
+    expect(raw).toMatch(/NEXT_PUBLIC_APP_ENV:\s*["']?preview["']?/);
   });
 });
