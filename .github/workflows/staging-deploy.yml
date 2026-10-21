@@ -1,0 +1,32 @@
+name: Staging Deploy
+
+# The staging tier of the three-tier setup from rmartz/vercel-preview-ci's golden
+# pattern (docs/golden-pattern.md):
+#
+#   Production — main's code with Production config (Vercel Git integration)
+#   Staging    — main's code with Preview (staging) config (this workflow)
+#   Preview    — a PR's code with Preview config (preview-deploy.yml)
+#
+# Every push to main builds that commit with the Preview environment (the staging
+# Firebase project), deploys it as a preview — never --prod — and points
+# staging.budget.reedmartz.com at it. The domain is connected to the placeholder
+# `staging` branch in Vercel (never deployed), so production deploys never claim
+# it and it stays behind preview deployment protection.
+#
+# Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  staging:
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-staging.yml@fab17d9b909c5883f992c8f2a26ac0ea00ec5280 # v1.3.0
+    with:
+      alias-domain: staging.budget.reedmartz.com
+    secrets: inherit
