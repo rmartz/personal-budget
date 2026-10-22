@@ -26,7 +26,9 @@ A template repository for building Next.js applications with Firebase, deployed 
 
 - [Node.js](https://nodejs.org/) v24+
 - [pnpm](https://pnpm.io/) v10+
-- A [Firebase project](https://console.firebase.google.com/) with Realtime Database enabled
+- A [Firebase project](https://console.firebase.google.com/) with Realtime Database enabled, and in Authentication:
+  - the **Email/Password** and **Google** sign-in providers enabled (Sign-in method)
+  - every host the app is served from listed under Settings → Authorized domains (`localhost` is listed by default). Google sign-in shows an "isn't available on this address" error on any other host.
 - A [Vercel account](https://vercel.com/) (for deployment)
 
 ### Create a New Project
