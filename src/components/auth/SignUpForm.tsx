@@ -15,18 +15,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { GoogleSignIn } from "./GoogleSignIn";
 import { SIGN_UP_FORM_COPY } from "./SignUpForm.copy";
 
 export interface SignUpFormViewProps {
   isLoading: boolean;
   error: string | undefined;
   onSubmit: (email: string, password: string) => void | Promise<void>;
+  onGoogleSignIn: () => void | Promise<void>;
 }
 
 export function SignUpFormView({
   isLoading,
   error,
   onSubmit,
+  onGoogleSignIn,
 }: SignUpFormViewProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -98,7 +101,8 @@ export function SignUpFormView({
         <CardTitle>{SIGN_UP_FORM_COPY.title}</CardTitle>
         <CardDescription>{SIGN_UP_FORM_COPY.description}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-4">
+        <GoogleSignIn disabled={isLoading} onGoogleSignIn={onGoogleSignIn} />
         <form
           onSubmit={handleSubmit}
           noValidate

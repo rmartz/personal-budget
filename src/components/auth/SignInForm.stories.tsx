@@ -7,6 +7,7 @@ const meta: Meta<typeof SignInFormView> = {
   title: "Auth/SignInForm",
   args: {
     onSubmit: () => undefined,
+    onGoogleSignIn: () => undefined,
   },
 };
 

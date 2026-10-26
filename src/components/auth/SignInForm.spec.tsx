@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { GOOGLE_SIGN_IN_COPY } from "./GoogleSignIn.copy";
 import { SignInFormView } from "./SignInForm";
 import { SIGN_IN_FORM_COPY } from "./SignInForm.copy";
 
@@ -14,6 +15,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(
@@ -27,6 +29,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(
@@ -40,6 +43,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(
@@ -53,9 +57,28 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(SIGN_IN_FORM_COPY.signUpLink)).toBeDefined();
+    });
+  });
+
+  describe("Google sign-in", () => {
+    it("calls onGoogleSignIn when the Google button is clicked", () => {
+      const onGoogleSignIn = vi.fn();
+      render(
+        <SignInFormView
+          isLoading={false}
+          error={undefined}
+          onSubmit={vi.fn()}
+          onGoogleSignIn={onGoogleSignIn}
+        />,
+      );
+      fireEvent.click(
+        screen.getByRole("button", { name: GOOGLE_SIGN_IN_COPY.button }),
+      );
+      expect(onGoogleSignIn).toHaveBeenCalledOnce();
     });
   });
 
@@ -66,6 +89,7 @@ describe("SignInFormView", () => {
           isLoading={true}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(SIGN_IN_FORM_COPY.loadingButton)).toBeDefined();
@@ -80,6 +104,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={errorMessage}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       expect(screen.getByText(errorMessage)).toBeDefined();
@@ -93,6 +118,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.submit(
@@ -111,6 +137,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       const emailInput = screen.getByPlaceholderText(
@@ -130,6 +157,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={onSubmit}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.submit(
@@ -147,6 +175,7 @@ describe("SignInFormView", () => {
           isLoading={false}
           error={undefined}
           onSubmit={onSubmit}
+          onGoogleSignIn={vi.fn()}
         />,
       );
       fireEvent.change(
