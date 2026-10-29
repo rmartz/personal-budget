@@ -30,6 +30,16 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    ignore:
+      # babel-plugin-react-compiler 1.0 silently skips any component with a
+      # destructured prop default under Babel 8 (react/react#37406). This
+      # @babel/core only drives the compiler in Vitest and Storybook (Next uses
+      # its own bundled Babel 7), so a Babel 8 bump would still pass CI while
+      # tests and stories quietly stop exercising compiled code. Remove this,
+      # and the exact @babel/core pin, once a compiler release fixes
+      # react/react#37406.
+      - dependency-name: "@babel/core"
+        versions: [">= 8.0.0"]
     # Version-locked families (first below) group interdependent packages so they
     # bump atomically instead of scattering into separate PRs — chiefly for
     # majors, which break the build if split (each family's note below states how

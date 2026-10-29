@@ -1,13 +1,13 @@
 "use client";
 
-import { getDatabase, onValue, ref } from "firebase/database";
-import { useEffect, useState } from "react";
-
-import { getClientApp } from "@/lib/firebase/client";
 import {
   type BudgetLedgerSavingsGoal,
   firebaseToBudgetLedgerSavingsGoal,
 } from "@/lib/firebase/schema/savings-goals";
+
+import { useRealtimeSubscription } from "./use-realtime-subscription";
+
+type GoalsByLedger = Record<string, Record<string, unknown>>;
 
 interface UseSavingsGoalResult {
   goal: BudgetLedgerSavingsGoal | undefined;
@@ -15,64 +15,34 @@ interface UseSavingsGoalResult {
   error: Error | undefined;
 }
 
+function findGoal(
+  goalsByLedger: GoalsByLedger,
+  goalId: string,
+): BudgetLedgerSavingsGoal | undefined {
+  for (const [ledgerId, ledgerGoals] of Object.entries(goalsByLedger)) {
+    const entry = ledgerGoals[goalId];
+    if (entry !== undefined) {
+      return firebaseToBudgetLedgerSavingsGoal(goalId, ledgerId, entry);
+    }
+  }
+  return undefined;
+}
+
 export function useSavingsGoal(
   uid: string,
   goalId: string,
 ): UseSavingsGoalResult {
-  const [goal, setGoal] = useState<BudgetLedgerSavingsGoal | undefined>(
-    undefined,
+  // The goal's ledger isn't known up front, so subscribe to every ledger's
+  // goals and pick this one out during render.
+  const { data, isLoading, error } = useRealtimeSubscription(
+    uid && goalId ? `users/${uid}/budgetLedgerSavingsGoals` : undefined,
+    (snapshot): GoalsByLedger =>
+      snapshot.exists() ? (snapshot.val() as GoalsByLedger) : {},
   );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | undefined>(undefined);
 
-  useEffect(() => {
-    if (!uid || !goalId) {
-      setGoal(undefined);
-      setIsLoading(false);
-      setError(undefined);
-      return;
-    }
-
-    setIsLoading(true);
-    setError(undefined);
-
-    const db = getDatabase(getClientApp());
-    const allGoalsRef = ref(db, `users/${uid}/budgetLedgerSavingsGoals`);
-
-    const unsubscribe = onValue(
-      allGoalsRef,
-      (snapshot) => {
-        if (!snapshot.exists()) {
-          setGoal(undefined);
-        } else {
-          const data = snapshot.val() as Record<
-            string,
-            Record<string, unknown>
-          >;
-          let found: BudgetLedgerSavingsGoal | undefined;
-          for (const [ledgerId, ledgerGoals] of Object.entries(data)) {
-            const entry = ledgerGoals[goalId];
-            if (entry !== undefined) {
-              found = firebaseToBudgetLedgerSavingsGoal(
-                goalId,
-                ledgerId,
-                entry,
-              );
-              break;
-            }
-          }
-          setGoal(found);
-        }
-        setIsLoading(false);
-      },
-      (err) => {
-        setError(err);
-        setIsLoading(false);
-      },
-    );
-
-    return unsubscribe;
-  }, [uid, goalId]);
-
-  return { goal, isLoading, error };
+  return {
+    goal: data && goalId ? findGoal(data, goalId) : undefined,
+    isLoading,
+    error,
+  };
 }
