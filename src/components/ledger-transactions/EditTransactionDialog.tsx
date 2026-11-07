@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -226,9 +226,7 @@ export function EditTransactionDialog({
   );
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
 
-  // Sync local state when the dialog is reused for a different transaction
-  // (initial* props change while the component stays mounted).
-  useEffect(() => {
+  const resetForm = () => {
     setDate(toDateInputValue(initialDate));
     setAmount(String(initialAmount));
     setDescription(initialDescription);
@@ -236,16 +234,20 @@ export function EditTransactionDialog({
     setAmountError(undefined);
     setDescriptionError(undefined);
     setSubmitError(undefined);
-  }, [initialDate, initialAmount, initialDescription]);
+  };
+
+  // Reset local state when the dialog is reused for a different transaction
+  // (initial* props change while the component stays mounted). Adjusting
+  // state during render avoids an extra effect-driven render pass.
+  const initialKey = `${String(initialDate.getTime())}|${String(initialAmount)}|${initialDescription}`;
+  const [syncedInitialKey, setSyncedInitialKey] = useState(initialKey);
+  if (initialKey !== syncedInitialKey) {
+    setSyncedInitialKey(initialKey);
+    resetForm();
+  }
 
   const handleClose = () => {
-    setDate(toDateInputValue(initialDate));
-    setAmount(String(initialAmount));
-    setDescription(initialDescription);
-    setDateError(undefined);
-    setAmountError(undefined);
-    setDescriptionError(undefined);
-    setSubmitError(undefined);
+    resetForm();
     onOpenChange(false);
   };
 

@@ -1,63 +1,29 @@
 "use client";
 
-import { getDatabase, onValue, ref } from "firebase/database";
-import { useEffect, useState } from "react";
-
-import { getClientApp } from "@/lib/firebase/client";
 import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
   type BudgetLedgerSavingsGoal,
   firebaseToBudgetLedgerSavingsGoal,
 } from "@/lib/firebase/schema/savings-goals";
 
+import { useRealtimeSubscription } from "./use-realtime-subscription";
+
+const NO_GOALS: BudgetLedgerSavingsGoal[] = [];
+
 export function useAllSavingsGoals(uid: string) {
-  const [goals, setGoals] = useState<BudgetLedgerSavingsGoal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | undefined>(undefined);
-
-  useEffect(() => {
-    if (!uid) {
-      setGoals([]);
-      setIsLoading(false);
-      setError(undefined);
-      return;
-    }
-
-    setIsLoading(true);
-    setError(undefined);
-
-    const db = getDatabase(getClientApp());
-    const allGoalsRef = ref(db, `users/${uid}/budgetLedgerSavingsGoals`);
-
-    const unsubscribe = onValue(
-      allGoalsRef,
-      (snapshot) => {
-        if (!snapshot.exists()) {
-          setGoals([]);
-        } else {
-          const data = snapshot.val() as Record<
-            string,
-            Record<string, unknown>
-          >;
-          const flattened: BudgetLedgerSavingsGoal[] = Object.entries(
-            data,
+  const { data, isLoading, error } = useRealtimeSubscription(
+    uid ? `users/${uid}/budgetLedgerSavingsGoals` : undefined,
+    (snapshot) =>
+      snapshot.exists()
+        ? Object.entries(
+            snapshot.val() as Record<string, Record<string, unknown>>,
           ).flatMap(([ledgerId, ledgerGoals]) =>
             parseCollection(ledgerGoals, (id, entry) =>
               firebaseToBudgetLedgerSavingsGoal(id, ledgerId, entry),
             ),
-          );
-          setGoals(flattened);
-        }
-        setIsLoading(false);
-      },
-      (err) => {
-        setError(err);
-        setIsLoading(false);
-      },
-    );
+          )
+        : NO_GOALS,
+  );
 
-    return unsubscribe;
-  }, [uid]);
-
-  return { goals, isLoading, error };
+  return { goals: data ?? NO_GOALS, isLoading, error };
 }

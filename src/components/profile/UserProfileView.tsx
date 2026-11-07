@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -52,13 +52,18 @@ export function UserProfileView({
     initialPasswordError,
   );
 
-  useEffect(() => {
+  // Follow prop updates (e.g. after a save refreshes the user), adjusting
+  // state during render rather than in an effect.
+  const [syncedDisplayName, setSyncedDisplayName] = useState(displayName);
+  if (displayName !== syncedDisplayName) {
+    setSyncedDisplayName(displayName);
     setDisplayNameValue(displayName);
-  }, [displayName]);
-
-  useEffect(() => {
+  }
+  const [syncedEmail, setSyncedEmail] = useState(email);
+  if (email !== syncedEmail) {
+    setSyncedEmail(email);
     setEmailValue(email);
-  }, [email]);
+  }
 
   async function submitDisplayName() {
     try {

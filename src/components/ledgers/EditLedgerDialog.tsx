@@ -1,7 +1,7 @@
 "use client";
 
 import { Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,16 +41,6 @@ export function EditLedgerDialog({
   const [submitError, setSubmitError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync form field values from props whenever the dialog is closed so the next
-  // open always shows the current ledger values (e.g. after a successful save
-  // causes React Query to update the parent's data).
-  useEffect(() => {
-    if (!open) {
-      setName(initialName);
-      setCashCapRaw(initialCashCap !== undefined ? String(initialCashCap) : "");
-    }
-  }, [initialName, initialCashCap, open]);
-
   const nameInputId = `edit-ledger-name-${ledgerId}`;
   const nameErrorId = `edit-ledger-name-error-${ledgerId}`;
   const cashCapInputId = `edit-ledger-cash-cap-${ledgerId}`;
@@ -67,9 +57,9 @@ export function EditLedgerDialog({
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && isSubmitting) return;
-    if (!nextOpen) {
-      resetForm();
-    }
+    // Reset on open as well as close, so the form always starts from the
+    // current props (e.g. after a save updates the parent's data).
+    resetForm();
     setOpen(nextOpen);
   };
 

@@ -1,49 +1,26 @@
 "use client";
 
-import { getDatabase, onValue, ref } from "firebase/database";
-import { useEffect, useState } from "react";
-
-import { getClientApp } from "@/lib/firebase/client";
 import {
   type Annuity,
   firebaseToAnnuity,
 } from "@/lib/firebase/schema/annuities";
 import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 
+import { useRealtimeSubscription } from "./use-realtime-subscription";
+
+const NO_ANNUITIES: Annuity[] = [];
+
 export function useAnnuities(uid: string) {
-  const [annuities, setAnnuities] = useState<Annuity[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | undefined>(undefined);
+  const { data, isLoading, error } = useRealtimeSubscription(
+    uid ? `users/${uid}/annuities` : undefined,
+    (snapshot) =>
+      snapshot.exists()
+        ? parseCollection(
+            snapshot.val() as Record<string, unknown>,
+            firebaseToAnnuity,
+          )
+        : NO_ANNUITIES,
+  );
 
-  useEffect(() => {
-    if (!uid) {
-      setAnnuities([]);
-      setIsLoading(false);
-      return;
-    }
-
-    const db = getDatabase(getClientApp());
-    const annuitiesRef = ref(db, `users/${uid}/annuities`);
-
-    const unsubscribe = onValue(
-      annuitiesRef,
-      (snapshot) => {
-        if (!snapshot.exists()) {
-          setAnnuities([]);
-        } else {
-          const data = snapshot.val() as Record<string, unknown>;
-          setAnnuities(parseCollection(data, firebaseToAnnuity));
-        }
-        setIsLoading(false);
-      },
-      (err) => {
-        setError(err);
-        setIsLoading(false);
-      },
-    );
-
-    return unsubscribe;
-  }, [uid]);
-
-  return { annuities, isLoading, error };
+  return { annuities: data ?? NO_ANNUITIES, isLoading, error };
 }
