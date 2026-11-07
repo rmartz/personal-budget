@@ -7,7 +7,7 @@ import { PUBLIC_HEADER_COPY } from "./PublicHeader.copy";
 afterEach(cleanup);
 
 describe("PublicHeader — brand", () => {
-  it("renders the Ledgerly wordmark", () => {
+  it("renders the brand wordmark", () => {
     render(<PublicHeader />);
     expect(screen.getByText(PUBLIC_HEADER_COPY.brand)).toBeDefined();
   });
