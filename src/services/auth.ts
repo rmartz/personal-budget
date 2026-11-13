@@ -1,9 +1,11 @@
 import {
   createUserWithEmailAndPassword,
   EmailAuthProvider,
+  GoogleAuthProvider,
   reauthenticateWithCredential,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
   updateEmail as firebaseUpdateEmail,
   updatePassword as firebaseUpdatePassword,
@@ -44,6 +46,19 @@ export async function signUp(email: string, password: string) {
     getClientAuth(),
     email,
     password,
+  );
+  await establishServerSession(credential.user);
+  return credential;
+}
+
+// Signs in, or creates the account on first use. A popup rather than a
+// redirect: the redirect flow loses its result under third-party storage
+// partitioning (Safari, Chrome) whenever `authDomain` (*.firebaseapp.com)
+// differs from the app's own host.
+export async function signInWithGoogle() {
+  const credential = await signInWithPopup(
+    getClientAuth(),
+    new GoogleAuthProvider(),
   );
   await establishServerSession(credential.user);
   return credential;
