@@ -45,4 +45,6 @@ permissions:
 jobs:
   screenshots:
     uses: rmartz/storybook-ci/.github/workflows/storybook-screenshots.yml@652cb863dd5fca4df6cdc56b0ccc698efb7b80e6 # v2.0.2
+    with:
+      node-version: 26.x
     secrets: inherit
