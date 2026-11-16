@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   sendPasswordReset,
   signIn,
+  signInWithGoogle,
   signOut,
   signUp,
   updateDisplayName,
@@ -12,6 +13,10 @@ import {
 
 vi.mock("firebase/auth", () => ({
   signInWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  GoogleAuthProvider: vi.fn(function GoogleAuthProvider() {
+    return { providerId: "google.com" };
+  }),
   createUserWithEmailAndPassword: vi.fn(),
   sendPasswordResetEmail: vi.fn(),
   signOut: vi.fn(),
@@ -33,6 +38,7 @@ import {
   reauthenticateWithCredential,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
   updateEmail as firebaseUpdateEmail,
   updatePassword as firebaseUpdatePassword,
@@ -142,6 +148,47 @@ describe("auth service", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken: "tok-2" }),
       });
+    });
+  });
+
+  describe("signInWithGoogle", () => {
+    it("opens the Google popup with the client auth", async () => {
+      const mockResult = {
+        user: { uid: "uid-3", getIdToken: vi.fn().mockResolvedValue("tok-3") },
+      };
+      vi.mocked(signInWithPopup).mockResolvedValue(mockResult as never);
+
+      await signInWithGoogle();
+
+      expect(signInWithPopup).toHaveBeenCalledWith(mockAuth, {
+        providerId: "google.com",
+      });
+    });
+
+    it("establishes the server session with the user's ID token", async () => {
+      const mockResult = {
+        user: { uid: "uid-3", getIdToken: vi.fn().mockResolvedValue("tok-3") },
+      };
+      vi.mocked(signInWithPopup).mockResolvedValue(mockResult as never);
+
+      await signInWithGoogle();
+
+      expect(fetch).toHaveBeenCalledWith("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: "tok-3" }),
+      });
+    });
+
+    it("does not establish a session when the popup is rejected", async () => {
+      vi.mocked(signInWithPopup).mockRejectedValue({
+        code: "auth/popup-closed-by-user",
+      });
+
+      await expect(signInWithGoogle()).rejects.toEqual({
+        code: "auth/popup-closed-by-user",
+      });
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 

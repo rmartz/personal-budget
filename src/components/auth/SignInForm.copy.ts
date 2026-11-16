@@ -1,6 +1,6 @@
 export const SIGN_IN_FORM_COPY = {
   title: "Sign in",
-  description: "Enter your email and password to access your account.",
+  description: "Sign in to access your account.",
   emailLabel: "Email",
   emailPlaceholder: "you@example.com",
   passwordLabel: "Password",
