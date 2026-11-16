@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { SignUpFormView } from "@/components/auth/SignUpForm";
 import { SIGN_UP_FORM_COPY } from "@/components/auth/SignUpForm.copy";
+import { AUTHENTICATED_HOME_PATH } from "@/lib/auth-constants";
 import { signUp } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
@@ -32,7 +33,7 @@ export default function SignUpPage() {
     setError(undefined);
     try {
       await signUp(email, password);
-      router.push("/");
+      router.push(AUTHENTICATED_HOME_PATH);
     } catch (err) {
       const code =
         err !== null &&

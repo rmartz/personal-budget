@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
+/*
+ * `dark:` utilities only apply under an explicit `.dark` class, never from the
+ * OS preference. The app ships a single light, neutral theme for now.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Neutral theme: dark text on a mid-light cool-grey page, graded greys for
+ * surfaces of differing prominence, blue for primary actions, red for
+ * destructive ones.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  --background: oklch(0.945 0.004 250);
+  --foreground: oklch(0.24 0.012 255);
+
+  --card: oklch(0.985 0.002 250);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.985 0.002 250);
+  --popover-foreground: var(--foreground);
+
+  --primary: oklch(0.44 0.15 258);
+  --primary-foreground: oklch(0.985 0.005 250);
+
+  --secondary: oklch(0.895 0.006 250);
+  --secondary-foreground: oklch(0.28 0.012 255);
+
+  --muted: oklch(0.91 0.005 250);
+  --muted-foreground: oklch(0.47 0.012 255);
+
+  --accent: oklch(0.9 0.03 255);
+  --accent-foreground: oklch(0.36 0.11 258);
+
+  --destructive: oklch(0.44 0.19 25);
+  --destructive-foreground: oklch(0.985 0.005 25);
+
+  --border: oklch(0.86 0.006 250);
+  --input: oklch(0.6 0.008 250);
+  --ring: oklch(0.6 0.13 258);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }

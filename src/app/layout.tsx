@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Firebase + Next.js Template",
-  description: "A Next.js application built on Firebase",
+  title: "Personal Budget",
+  description: "Helping guide your savings toward your goals.",
 };
 
 export default function RootLayout({

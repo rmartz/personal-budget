@@ -1,6 +1,6 @@
 export const APP_SHELL_COPY = {
   avatarFallback: "?",
-  brand: "Ledgerly",
+  brand: "Budget",
   linkAccounts: "Accounts",
   linkAnnuities: "Annuities",
   linkGoals: "Goals",
