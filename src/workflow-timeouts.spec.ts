@@ -29,12 +29,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-policy.yml": {
     "pr-policy": 5,
   },
-  // rmartz/pr-lifecycle-action caller: the action is a step, so the
-  // `reconcile` job is ours and carries a real timeout. It covers the CLI's
-  // settle wait (up to 30s) with room to spare.
-  "pr-lifecycle.yml": {
-    reconcile: 5,
-  },
   "repo-hygiene.yml": {
     hygiene: 5,
   },
@@ -42,8 +36,10 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     "create-release": 2,
   },
   // Caller-only workflows: their single job calls a reusable workflow
-  // (rmartz/storybook-ci, rmartz/vercel-preview-ci via `uses:`), which owns its
-  // own timeouts, so there is no non-reusable job to cap here.
+  // (rmartz/bot-automerge-action, rmartz/storybook-ci, rmartz/vercel-preview-ci
+  // via `uses:`), which owns its own timeouts, so there is no non-reusable job
+  // to cap here.
+  "bot-automerge.yml": {},
   "preview-deploy.yml": {},
   "staging-deploy.yml": {},
   "storybook-screenshots.yml": {},
