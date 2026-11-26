@@ -2,7 +2,7 @@ export const GOOGLE_SIGN_IN_COPY = {
   button: "Continue with Google",
   divider: "or",
   errorAccountExistsWithDifferentCredential:
-    "An account already exists for this email. Sign in with your email and password instead.",
+    "An account already exists for this email. Sign in the way you did before.",
   errorDefault: "Google sign-in failed. Please try again.",
   errorPopupBlocked:
     "Your browser blocked the Google sign-in window. Allow pop-ups for this site and try again.",

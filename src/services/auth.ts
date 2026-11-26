@@ -32,7 +32,11 @@ async function establishServerSession(user: User): Promise<void> {
       throw new Error("Failed to establish session");
     }
   } catch (err) {
-    await firebaseSignOut(getClientAuth());
+    try {
+      await firebaseSignOut(getClientAuth());
+    } catch {
+      // Keep the original error: it is the one the caller needs to report.
+    }
     throw err;
   }
 }

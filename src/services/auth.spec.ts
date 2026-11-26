@@ -208,7 +208,7 @@ describe("auth service", () => {
       });
     });
 
-    it("does not establish a session when the popup is rejected", async () => {
+    it("rethrows the popup error", async () => {
       vi.mocked(signInWithPopup).mockRejectedValue({
         code: "auth/popup-closed-by-user",
       });
@@ -216,6 +216,15 @@ describe("auth service", () => {
       await expect(signInWithGoogle()).rejects.toEqual({
         code: "auth/popup-closed-by-user",
       });
+    });
+
+    it("does not establish a session when the popup is rejected", async () => {
+      vi.mocked(signInWithPopup).mockRejectedValue({
+        code: "auth/popup-closed-by-user",
+      });
+
+      await signInWithGoogle().catch(() => undefined);
+
       expect(fetch).not.toHaveBeenCalled();
     });
 
@@ -241,6 +250,21 @@ describe("auth service", () => {
       await signInWithGoogle().catch(() => undefined);
 
       expect(firebaseSignOut).toHaveBeenCalledWith(mockAuth);
+    });
+
+    it("keeps the session error when the sign-out also fails", async () => {
+      const mockResult = {
+        user: { uid: "uid-3", getIdToken: vi.fn().mockResolvedValue("tok-3") },
+      };
+      vi.mocked(signInWithPopup).mockResolvedValue(mockResult as never);
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+      vi.mocked(firebaseSignOut).mockRejectedValue(
+        new Error("sign-out failed"),
+      );
+
+      await expect(signInWithGoogle()).rejects.toThrow(
+        "Failed to establish session",
+      );
     });
   });
 

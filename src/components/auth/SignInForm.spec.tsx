@@ -94,6 +94,22 @@ describe("SignInFormView", () => {
       );
       expect(screen.getByText(SIGN_IN_FORM_COPY.loadingButton)).toBeDefined();
     });
+
+    it("disables the Google button", () => {
+      render(
+        <SignInFormView
+          isLoading={true}
+          error={undefined}
+          onSubmit={vi.fn()}
+          onGoogleSignIn={vi.fn()}
+        />,
+      );
+      expect(
+        screen
+          .getByRole("button", { name: GOOGLE_SIGN_IN_COPY.button })
+          .hasAttribute("disabled"),
+      ).toBe(true);
+    });
   });
 
   describe("error state", () => {
