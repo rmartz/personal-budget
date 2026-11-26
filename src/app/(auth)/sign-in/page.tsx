@@ -5,7 +5,7 @@ import { Suspense, useState } from "react";
 
 import { SignInFormView } from "@/components/auth/SignInForm";
 import { SIGN_IN_FORM_COPY } from "@/components/auth/SignInForm.copy";
-import { AUTHENTICATED_HOME_PATH } from "@/lib/auth-constants";
+import { postAuthPath } from "@/lib/auth/post-auth-path";
 import { signIn } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
@@ -23,16 +23,6 @@ function getAuthErrorMessage(code: string): string {
   }
 }
 
-function sanitizeNext(raw: string | null): string {
-  if (raw !== null && raw.startsWith("/") && !raw.startsWith("//")) {
-    return raw;
-  }
-  // Navigate straight to the dashboard rather than `/`: the client router may
-  // still hold the unauthenticated landing page for `/` in its cache, which
-  // would skip the middleware's `/` → dashboard redirect.
-  return AUTHENTICATED_HOME_PATH;
-}
-
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -44,7 +34,7 @@ function SignInContent() {
     setError(undefined);
     try {
       await signIn(email, password);
-      router.push(sanitizeNext(searchParams.get("next")));
+      router.replace(postAuthPath(searchParams.get("next")));
     } catch (err) {
       const code =
         err !== null &&

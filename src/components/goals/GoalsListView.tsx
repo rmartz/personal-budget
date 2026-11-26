@@ -96,7 +96,7 @@ export function GoalsListView({
           </Card>
         </div>
       ) : goals.length === 0 ? (
-        <p className="py-12 text-center text-zinc-500 dark:text-zinc-400">
+        <p className="py-12 text-center text-muted-foreground">
           {GOALS_LIST_COPY.emptyStateMessage}
         </p>
       ) : (

@@ -12,7 +12,7 @@ function DropdownMenuPopup({ className, ...props }: Menu.Popup.Props) {
   return (
     <Menu.Popup
       className={cn(
-        "z-50 min-w-[8rem] rounded-lg border border-border bg-background p-1 shadow-md",
+        "z-50 min-w-[8rem] rounded-lg border border-border bg-popover text-popover-foreground p-1 shadow-md",
         className,
       )}
       {...props}

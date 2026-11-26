@@ -33,7 +33,7 @@ export default function SignUpPage() {
     setError(undefined);
     try {
       await signUp(email, password);
-      router.push(AUTHENTICATED_HOME_PATH);
+      router.replace(AUTHENTICATED_HOME_PATH);
     } catch (err) {
       const code =
         err !== null &&

@@ -30,7 +30,7 @@ export function SavingsGoalListView({
         {SAVINGS_GOAL_LIST_COPY.title}
       </h2>
       {sorted.length === 0 ? (
-        <p className="py-8 text-center text-zinc-500 dark:text-zinc-400">
+        <p className="py-8 text-center text-muted-foreground">
           {SAVINGS_GOAL_LIST_COPY.emptyStateMessage}
         </p>
       ) : (

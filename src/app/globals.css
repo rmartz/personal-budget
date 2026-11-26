@@ -67,7 +67,11 @@
 }
 
 @layer base {
-  * {
+  *,
+  ::before,
+  ::after,
+  ::backdrop,
+  ::file-selector-button {
     border-color: var(--border);
   }
 }
