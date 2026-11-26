@@ -45,6 +45,14 @@ describe("postAuthPath", () => {
     expect(postAuthPath("///")).toBe(AUTHENTICATED_HOME_PATH);
   });
 
+  it("rejects a value that is not a path", () => {
+    expect(postAuthPath("javascript:alert(1)")).toBe(AUTHENTICATED_HOME_PATH);
+  });
+
+  it("keeps percent-encoded slashes as an on-site path", () => {
+    expect(postAuthPath("/%2F%2Fevil.example")).toBe("/%2F%2Fevil.example");
+  });
+
   it("rejects an absolute URL", () => {
     expect(postAuthPath("https://evil.example/")).toBe(AUTHENTICATED_HOME_PATH);
   });

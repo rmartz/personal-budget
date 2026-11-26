@@ -59,4 +59,13 @@ describe("SignInPage — redirect", () => {
       expect(router.replace).toHaveBeenCalledWith("/goals");
     });
   });
+
+  it("replaces the route with the dashboard for an off-site next param", async () => {
+    nav.search = "next=%2F%2Fevil.example";
+    render(<SignInPage />);
+    submitValidForm();
+    await waitFor(() => {
+      expect(router.replace).toHaveBeenCalledWith(AUTHENTICATED_HOME_PATH);
+    });
+  });
 });
