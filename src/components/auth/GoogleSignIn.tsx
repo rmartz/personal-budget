@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { GOOGLE_SIGN_IN_COPY } from "./GoogleSignIn.copy";
 
 export interface GoogleSignInProps {
-  disabled: boolean;
+  disabled?: boolean;
   onGoogleSignIn: () => void | Promise<void>;
 }
 
 // The "Continue with Google" button and the divider that separates it from the
 // email/password form below it.
-export function GoogleSignIn({ disabled, onGoogleSignIn }: GoogleSignInProps) {
+export function GoogleSignIn({
+  disabled = false,
+  onGoogleSignIn,
+}: GoogleSignInProps) {
   return (
     <div className="flex flex-col gap-4">
       <Button

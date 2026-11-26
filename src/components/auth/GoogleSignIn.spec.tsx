@@ -8,7 +8,7 @@ afterEach(cleanup);
 
 describe("GoogleSignIn", () => {
   it("renders the Continue with Google button", () => {
-    render(<GoogleSignIn disabled={false} onGoogleSignIn={vi.fn()} />);
+    render(<GoogleSignIn onGoogleSignIn={vi.fn()} />);
     expect(
       screen.getByRole("button", { name: GOOGLE_SIGN_IN_COPY.button }),
     ).toBeDefined();
@@ -16,7 +16,7 @@ describe("GoogleSignIn", () => {
 
   it("calls onGoogleSignIn when clicked", () => {
     const onGoogleSignIn = vi.fn();
-    render(<GoogleSignIn disabled={false} onGoogleSignIn={onGoogleSignIn} />);
+    render(<GoogleSignIn onGoogleSignIn={onGoogleSignIn} />);
     fireEvent.click(
       screen.getByRole("button", { name: GOOGLE_SIGN_IN_COPY.button }),
     );

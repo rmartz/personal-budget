@@ -18,16 +18,22 @@ import { getClientAuth } from "@/lib/firebase/client";
 // Exchange the freshly-signed-in user's ID token for the httpOnly session
 // cookie the middleware reads. Client Firebase auth alone leaves the server
 // unaware the user is signed in, so this must run before any navigation into a
-// middleware-gated route.
+// middleware-gated route. If the exchange fails, the client sign-in is undone
+// so the browser is never left signed in to Firebase without a server session.
 async function establishServerSession(user: User): Promise<void> {
-  const idToken = await user.getIdToken();
-  const response = await fetch("/api/auth/session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ idToken }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to establish session");
+  try {
+    const idToken = await user.getIdToken();
+    const response = await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to establish session");
+    }
+  } catch (err) {
+    await firebaseSignOut(getClientAuth());
+    throw err;
   }
 }
 

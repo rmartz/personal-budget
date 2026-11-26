@@ -112,6 +112,34 @@ describe("auth service", () => {
         "Failed to establish session",
       );
     });
+
+    it("signs the client out when the session endpoint rejects", async () => {
+      const mockResult = {
+        user: { uid: "uid-1", getIdToken: vi.fn().mockResolvedValue("tok-1") },
+      };
+      vi.mocked(signInWithEmailAndPassword).mockResolvedValue(
+        mockResult as never,
+      );
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+
+      await signIn(email, password).catch(() => undefined);
+
+      expect(firebaseSignOut).toHaveBeenCalledWith(mockAuth);
+    });
+
+    it("signs the client out when the session request fails to send", async () => {
+      const mockResult = {
+        user: { uid: "uid-1", getIdToken: vi.fn().mockResolvedValue("tok-1") },
+      };
+      vi.mocked(signInWithEmailAndPassword).mockResolvedValue(
+        mockResult as never,
+      );
+      vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("down")));
+
+      await signIn(email, password).catch(() => undefined);
+
+      expect(firebaseSignOut).toHaveBeenCalledWith(mockAuth);
+    });
   });
 
   describe("signUp", () => {
@@ -189,6 +217,30 @@ describe("auth service", () => {
         code: "auth/popup-closed-by-user",
       });
       expect(fetch).not.toHaveBeenCalled();
+    });
+
+    it("rejects when the session endpoint rejects after the popup succeeds", async () => {
+      const mockResult = {
+        user: { uid: "uid-3", getIdToken: vi.fn().mockResolvedValue("tok-3") },
+      };
+      vi.mocked(signInWithPopup).mockResolvedValue(mockResult as never);
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+
+      await expect(signInWithGoogle()).rejects.toThrow(
+        "Failed to establish session",
+      );
+    });
+
+    it("signs the client out when the session endpoint rejects", async () => {
+      const mockResult = {
+        user: { uid: "uid-3", getIdToken: vi.fn().mockResolvedValue("tok-3") },
+      };
+      vi.mocked(signInWithPopup).mockResolvedValue(mockResult as never);
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+
+      await signInWithGoogle().catch(() => undefined);
+
+      expect(firebaseSignOut).toHaveBeenCalledWith(mockAuth);
     });
   });
 

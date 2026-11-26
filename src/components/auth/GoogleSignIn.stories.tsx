@@ -14,11 +14,7 @@ export default meta;
 
 type Story = StoryObj<typeof GoogleSignIn>;
 
-export const Default: Story = {
-  args: {
-    disabled: false,
-  },
-};
+export const Default: Story = {};
 
 export const Disabled: Story = {
   args: {
