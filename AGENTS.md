@@ -57,17 +57,18 @@ tool rather than a project dependency. First-time local setup:
 pnpm add -g @rmartz/envctl@latest   # install the CLI globally
 pnpm add -g vercel@latest           # envctl delegates to the Vercel CLI on PATH
 vercel login                        # authenticate the Vercel CLI
-vercel link                         # from the repo root; pick the existing budget project
 envctl config pull                  # write .env.local from Vercel's development target
 ```
 
-The link lives in the gitignored `.vercel/` directory, so every fresh checkout or
-worktree needs its own `vercel link` (the global installs and login are once per
-machine). Use `envctl config pull --env staging` to pull the Preview (staging) values
-instead, and `--force` to overwrite an existing `.env.local`. There is no separate
-development Firebase project: the development target mirrors staging (public
-values from `deployment/staging.yml`, Admin SDK keys shared with Preview), so local
-runs talk to the **staging** Firebase project (`personal-budget-staging-a99af`).
+The installs and login are once per machine. No `vercel link` is needed: the
+repo commits its Vercel project link (`.vercel/project.json`), so every checkout
+and worktree already resolves the budget project. Run `envctl config pull` in each
+new worktree, since `.env.local` is gitignored. Use `envctl config pull --env staging`
+to pull the Preview (staging) values instead, and `--force` to overwrite an existing
+`.env.local`. There is no separate development Firebase project: the development
+target points at the staging project (its public values come from
+`deployment/staging.yml`), so local runs talk to the **staging** Firebase project
+(`personal-budget-staging-a99af`).
 `pnpm run env:validate` is the one env command in `package.json` (a local script
 with no external dependency).
 

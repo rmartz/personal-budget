@@ -5,9 +5,8 @@
 # will be rejected by the pre-commit hook and CI.
 #
 # Sensitive variables are managed directly in Vercel and are never committed.
-# Generating a local .env.local and syncing public values to Vercel were
-# provided by vercel-deploy-scripts (now removed); a local `envctl` CLI will
-# replace them (forthcoming).
+# Sync public values to Vercel with `envctl config push` (see AGENTS.md,
+# Deployment Config); pull a local .env.local with `envctl config pull`.
 
 environment: production
 

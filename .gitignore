@@ -9,7 +9,6 @@ tsconfig.tsbuildinfo
 .env.local
 .env*.local
 .env.sentry-build-plugin
-.vercel
 storybook-static
 screenshots
 next-env.d.ts
