@@ -64,7 +64,7 @@ The installs and login are once per machine. No `vercel link` is needed: the
 repo commits its Vercel project link (`.vercel/project.json`), so every checkout
 and worktree already resolves the budget project. Run `envctl config pull` in each
 new worktree, since `.env.local` is gitignored. Use `envctl config pull --env staging`
-to pull the Preview (staging) values instead, and `--force` to overwrite an existing
+to pull the Preview values (as PR previews see them) instead, and `--force` to overwrite an existing
 `.env.local`. There is no separate development Firebase project: the development
 target points at the staging project (its public values come from
 `deployment/staging.yml`), so local runs talk to the **staging** Firebase project
@@ -74,15 +74,15 @@ with no external dependency).
 
 ## Worktree Setup
 
-After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `pnpm install --frozen-lockfile` inside it before invoking any build, lint, format, type-check, or test commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. This step typically requires no network access when the global store is already populated, since only hardlinks are created — it takes a few seconds.
+After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `pnpm install --frozen-lockfile` inside it before invoking any build, lint, format, type-check, or test commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. This step typically requires no network access when the global store is already populated, since only hardlinks are created — it takes a few seconds. To run the app locally, also run `envctl config pull` to write the gitignored `.env.local` (see [Common Commands](#common-commands)).
 
 ## Deployment Config
 
 Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
 
 - To validate config files against schema locally: `pnpm run env:validate` (also runs in the pre-commit hook and the CI `Validate Config` workflow).
-- Sync config values to Vercel with `envctl config push` (preview with `--dry-run` first; it upserts and never deletes). Each `deployment/{env}.yml` maps to a Vercel target (`production` → Production, `staging` → Preview), and the Development target is populated implicitly from `staging.yml`. `envctl` is local-only — not wired into CI. See [Common Commands](#common-commands) for pulling a local `.env.local`.
-- Secret scanning (gitleaks) was provided by `vercel-deploy-scripts` and has been removed with it — there is currently **no** gitleaks scan locally or in CI. Restoring secret scanning is expected to come with the new env tooling. Until then, take extra care not to commit secrets (`.gitleaks.toml` is retained for when scanning returns).
+- Sync config values to Vercel with `envctl config push` (preview with `--dry-run` first; it upserts and never deletes). Each `deployment/{env}.yml` maps to a Vercel target (`production` → Production, `staging` → Preview), and the Development target is populated implicitly from `staging.yml`. Only the default (`--env all`) or `--env development` updates Development — `--env staging` alone leaves it stale, so after editing `staging.yml` run plain `envctl config push`. `envctl` is local-only — not wired into CI. See [Common Commands](#common-commands) for pulling a local `.env.local`.
+- Secret scanning (gitleaks) was provided by `vercel-deploy-scripts` and has been removed with it — there is currently **no** gitleaks scan locally or in CI. envctl does not provide secret scanning, so restoring it is still pending. Until then, take extra care not to commit secrets (`.gitleaks.toml` is retained for when scanning returns).
 
 ## TypeScript
 

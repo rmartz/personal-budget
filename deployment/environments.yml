@@ -16,5 +16,5 @@ active:
 # Staging re-enabled (#319): the staging Firebase project
 # (personal-budget-staging-a99af) has its Realtime Database created and its URL
 # populated in deployment/staging.yml. Push the staging config to Vercel's
-# Preview environment with `envctl config push --env staging`.
+# Preview and implicit Development environments with `envctl config push`.
 single_environment: false
