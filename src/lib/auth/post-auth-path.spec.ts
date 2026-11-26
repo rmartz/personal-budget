@@ -21,6 +21,18 @@ describe("postAuthPath", () => {
     expect(postAuthPath("//evil.example")).toBe(AUTHENTICATED_HOME_PATH);
   });
 
+  it("falls back to the dashboard for the landing page with a query", () => {
+    expect(postAuthPath("/?x=1")).toBe(AUTHENTICATED_HOME_PATH);
+  });
+
+  it("rejects a backslash host", () => {
+    expect(postAuthPath("/\\evil.example")).toBe(AUTHENTICATED_HOME_PATH);
+  });
+
+  it("rejects a host hidden behind a control character", () => {
+    expect(postAuthPath("/\t/evil.example")).toBe(AUTHENTICATED_HOME_PATH);
+  });
+
   it("rejects an absolute URL", () => {
     expect(postAuthPath("https://evil.example/")).toBe(AUTHENTICATED_HOME_PATH);
   });

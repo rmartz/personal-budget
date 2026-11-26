@@ -39,17 +39,17 @@ describe("LandingPage — public header", () => {
 
   it("renders a Sign in link pointing to /sign-in", () => {
     render(<LandingPage />);
-    const link = screen
-      .getAllByRole("link", { name: PUBLIC_HEADER_COPY.navSignIn })
-      .find((el) => el.getAttribute("href") === "/sign-in");
-    expect(link).toBeDefined();
+    const link = within(screen.getByRole("banner")).getByRole("link", {
+      name: PUBLIC_HEADER_COPY.navSignIn,
+    });
+    expect(link.getAttribute("href")).toBe("/sign-in");
   });
 
-  it("renders a Get started link pointing to /sign-up", () => {
+  it("renders a Get started link in the header pointing to /sign-up", () => {
     render(<LandingPage />);
-    const link = screen
-      .getAllByRole("link", { name: PUBLIC_HEADER_COPY.navGetStarted })
-      .find((el) => el.getAttribute("href") === "/sign-up");
-    expect(link).toBeDefined();
+    const link = within(screen.getByRole("banner")).getByRole("link", {
+      name: PUBLIC_HEADER_COPY.navGetStarted,
+    });
+    expect(link.getAttribute("href")).toBe("/sign-up");
   });
 });
