@@ -55,11 +55,15 @@ tool rather than a project dependency. First-time local setup:
 
 ```bash
 pnpm add -g @rmartz/envctl@latest   # install the CLI globally
-vercel login                        # authenticate the Vercel CLI envctl delegates to
+pnpm add -g vercel@latest           # envctl delegates to the Vercel CLI on PATH
+vercel login                        # authenticate the Vercel CLI
+vercel link                         # from the repo root; pick the existing budget project
 envctl config pull                  # write .env.local from Vercel's development target
 ```
 
-Use `envctl config pull --env staging` to pull the Preview (staging) values
+The link lives in the gitignored `.vercel/` directory, so every fresh checkout or
+worktree needs its own `vercel link` (the global installs and login are once per
+machine). Use `envctl config pull --env staging` to pull the Preview (staging) values
 instead, and `--force` to overwrite an existing `.env.local`. There is no separate
 development Firebase project: the development target mirrors staging (public
 values from `deployment/staging.yml`, Admin SDK keys shared with Preview), so local
