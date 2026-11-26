@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { ROOT_LAYOUT_COPY } from "./layout.copy";
 import { Providers } from "./providers";
 
 const geistSans = Geist({
@@ -16,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Personal Budget",
-  description: "Helping guide your savings toward your goals.",
+  title: ROOT_LAYOUT_COPY.title,
+  description: ROOT_LAYOUT_COPY.description,
 };
 
 export default function RootLayout({

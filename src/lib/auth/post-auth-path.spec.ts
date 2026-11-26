@@ -33,6 +33,18 @@ describe("postAuthPath", () => {
     expect(postAuthPath("/\t/evil.example")).toBe(AUTHENTICATED_HOME_PATH);
   });
 
+  it("rejects a host smuggled in through dot-segments", () => {
+    expect(postAuthPath("/.//evil.example")).toBe(AUTHENTICATED_HOME_PATH);
+  });
+
+  it("rejects a host smuggled in through encoded dot-segments", () => {
+    expect(postAuthPath("/%2e//evil.example")).toBe(AUTHENTICATED_HOME_PATH);
+  });
+
+  it("falls back to the dashboard for an unparseable path", () => {
+    expect(postAuthPath("///")).toBe(AUTHENTICATED_HOME_PATH);
+  });
+
   it("rejects an absolute URL", () => {
     expect(postAuthPath("https://evil.example/")).toBe(AUTHENTICATED_HOME_PATH);
   });
