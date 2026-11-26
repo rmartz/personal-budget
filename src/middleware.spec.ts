@@ -113,6 +113,15 @@ describe("middleware", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("location")).toBeNull();
   });
+
+  it("passes the request's session cookie value to verifySessionCookie", async () => {
+    await middleware(makeRequest("/ledgers", "session-cookie"));
+
+    expect(verifySessionCookie).toHaveBeenLastCalledWith(
+      "session-cookie",
+      process.env["NEXT_PUBLIC_FIREBASE_PROJECT_ID"],
+    );
+  });
 });
 
 describe("/api/auth and sub-paths are excluded from the session check", () => {
