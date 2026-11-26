@@ -1,58 +1,29 @@
 "use client";
 
-import { getDatabase, onValue, ref } from "firebase/database";
-import { useEffect, useState } from "react";
-
-import { getClientApp } from "@/lib/firebase/client";
 import { parseCollection } from "@/lib/firebase/schema/parse-collection";
 import {
   type BudgetLedgerSavingsGoal,
   firebaseToBudgetLedgerSavingsGoal,
 } from "@/lib/firebase/schema/savings-goals";
 
+import { useRealtimeSubscription } from "./use-realtime-subscription";
+
+const NO_GOALS: BudgetLedgerSavingsGoal[] = [];
+
 export function useSavingsGoals(uid: string, ledgerId: string) {
-  const [savingsGoals, setSavingsGoals] = useState<BudgetLedgerSavingsGoal[]>(
-    [],
-  );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | undefined>(undefined);
-
-  useEffect(() => {
-    if (!uid || !ledgerId) {
-      setSavingsGoals([]);
-      setIsLoading(false);
-      return;
-    }
-
-    const db = getDatabase(getClientApp());
-    const goalsRef = ref(
-      db,
-      `users/${uid}/budgetLedgerSavingsGoals/${ledgerId}`,
-    );
-
-    const unsubscribe = onValue(
-      goalsRef,
-      (snapshot) => {
-        if (!snapshot.exists()) {
-          setSavingsGoals([]);
-        } else {
-          const data = snapshot.val() as Record<string, unknown>;
-          setSavingsGoals(
-            parseCollection(data, (id, entry) =>
+  const { data, isLoading, error } = useRealtimeSubscription(
+    uid && ledgerId
+      ? `users/${uid}/budgetLedgerSavingsGoals/${ledgerId}`
+      : undefined,
+    (snapshot) =>
+      snapshot.exists()
+        ? parseCollection(
+            snapshot.val() as Record<string, unknown>,
+            (id, entry) =>
               firebaseToBudgetLedgerSavingsGoal(id, ledgerId, entry),
-            ),
-          );
-        }
-        setIsLoading(false);
-      },
-      (err) => {
-        setError(err);
-        setIsLoading(false);
-      },
-    );
+          )
+        : NO_GOALS,
+  );
 
-    return unsubscribe;
-  }, [uid, ledgerId]);
-
-  return { savingsGoals, isLoading, error };
+  return { savingsGoals: data ?? NO_GOALS, isLoading, error };
 }

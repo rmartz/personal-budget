@@ -131,8 +131,10 @@ export default tseslint.config(
     plugins: {
       "react-hooks": reactHooks,
     },
+    // The recommended preset adds the React Compiler rules (purity, refs,
+    // immutability, …) on top of the classic hooks rules.
     rules: {
-      "react-hooks/rules-of-hooks": "error",
+      ...reactHooks.configs["recommended-latest"].rules,
       "react-hooks/exhaustive-deps": "error",
       "@typescript-eslint/no-unused-vars": [
         "error",

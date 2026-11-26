@@ -30,6 +30,22 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    ignore:
+      # babel-plugin-react-compiler 1.0 silently skips any component with a
+      # destructured prop default under Babel 8 (react/react#37406). This
+      # @babel/core only drives the compiler in Vitest and Storybook (Next uses
+      # its own bundled Babel 7), so a Babel 8 bump would still pass CI while
+      # tests and stories quietly stop exercising compiled code. Remove this,
+      # and the exact @babel/core pin, once a compiler release fixes
+      # react/react#37406.
+      - dependency-name: "@babel/core"
+        versions: [">= 8.0.0"]
+      # @types/node tracks the Node runtime's major, which Dependabot never bumps
+      # (`.nvmrc`, the setup action's `node-version`, the Vercel project's Node
+      # version). A lone types major would type-check APIs the runtime lacks, so
+      # it moves by hand with the runtime upgrade. Minors and patches still flow.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     # Version-locked families (first below) group interdependent packages so they
     # bump atomically instead of scattering into separate PRs — chiefly for
     # majors, which break the build if split (each family's note below states how
@@ -148,6 +164,15 @@ updates:
     # own PR (like the npm catch-alls above), so a pending major never holds
     # routine bumps back from auto-merge.
     groups:
+      # rmartz/storybook-ci ships its two reusable workflows on one version
+      # line, so they always bump together. Dependabot names a reusable
+      # workflow by its full path and opens one PR per file once a major
+      # leaves the catch-all below; this group, listed first to win precedence
+      # and with no update-types filter, keeps every bump (majors included) in
+      # one PR titled by the group name.
+      storybook-ci:
+        patterns:
+          - "rmartz/storybook-ci/*"
       github-actions:
         patterns:
           - "*"

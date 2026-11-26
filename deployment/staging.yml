@@ -34,5 +34,9 @@ variables:
   # Sentry public DSN — safe to expose; matched by the NEXT_PUBLIC_* allowed_pattern in schema.yml.
   NEXT_PUBLIC_SENTRY_DSN: "https://39ad6a2f62056621e3452bee009c1afc@o4511071618072576.ingest.us.sentry.io/4511351011737600"
   # Sentry environment tag — passed to Sentry.init({ environment }) to separate
-  # staging errors from production in the Sentry dashboard.
-  NEXT_PUBLIC_APP_ENV: "staging"
+  # PR-preview errors from staging and production in the Sentry dashboard. This
+  # is the general Preview value, so PR previews report "preview". The staging
+  # deploy reports "staging" from a Preview variable scoped to the `staging`
+  # placeholder branch in Vercel, which staging-deploy.yml pulls via
+  # `env-branch: staging`. That branch-scoped override lives only in Vercel.
+  NEXT_PUBLIC_APP_ENV: "preview"

@@ -81,6 +81,16 @@ describe("buildReport", () => {
     expect(groups.get("individual")).toBeUndefined();
   });
 
+  it("attributes a storybook-ci group PR to storybook-ci, not the storybook family", () => {
+    const dep = makeDependabotPr({
+      number: 36,
+      title:
+        "chore(deps): bump the storybook-ci group across 1 directory with 2 updates",
+    });
+    const { groups } = buildReport([dep], []);
+    expect(groups.get("storybook-ci")?.clean).toBe(1);
+  });
+
   it("classifies a Dependabot-closed PR as churn", () => {
     const dep = makeDependabotPr({
       number: 40,

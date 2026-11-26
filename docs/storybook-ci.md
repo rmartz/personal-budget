@@ -30,8 +30,10 @@ Every other shared default already resolves here: `pnpm exec vitest run --projec
 storybook` matches the `storybook` project in
 [`vitest.config.mts`](../vitest.config.mts), `pnpm build-storybook` and
 `storybook-static` match `package.json`, the `src/**/*.stories.@(ts|tsx)` story
-glob matches this repo's co-located stories, and Node 24.x matches
-[`.github/actions/setup`](../.github/actions/setup/action.yml).
+glob matches this repo's co-located stories. The one exception is
+`node-version`: the shared default is 24.x, so both callers pass `26.x` to match
+[`.github/actions/setup`](../.github/actions/setup/action.yml) and the
+`engines` pin in `package.json`.
 
 ## The Storybook Build canary render check
 

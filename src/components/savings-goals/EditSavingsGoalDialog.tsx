@@ -1,7 +1,7 @@
 "use client";
 
 import { Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -47,13 +47,6 @@ export function EditSavingsGoalDialog({
   const targetAmountInputId = `edit-goal-target-${goal.id}`;
   const targetAmountErrorId = `edit-goal-target-error-${goal.id}`;
 
-  useEffect(() => {
-    if (!open) {
-      setName(goal.name);
-      setTargetAmountRaw(String(goal.targetAmount));
-    }
-  }, [goal.name, goal.targetAmount, open]);
-
   const resetForm = () => {
     setName(goal.name);
     setTargetAmountRaw(String(goal.targetAmount));
@@ -65,9 +58,9 @@ export function EditSavingsGoalDialog({
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && isSubmitting) return;
-    if (!nextOpen) {
-      resetForm();
-    }
+    // Reset on open as well as close, so the form always starts from the
+    // current props (e.g. after a save updates the parent's data).
+    resetForm();
     setOpen(nextOpen);
   };
 

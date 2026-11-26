@@ -108,7 +108,7 @@ When using Realtime Database, separate public and private data at the path level
 
 ### Real-Time Updates (Realtime Database)
 
-- Clients subscribe to Firebase RTDB paths via `onValue` (wrapped in custom hooks)
+- Clients subscribe to Firebase RTDB paths via `onValue`, through the shared `useRealtimeSubscription` hook (`src/hooks/use-realtime-subscription.ts`) that the per-domain hooks wrap
 - Server pre-computes per-user state and writes it to per-user paths — clients never need to derive state
 - TanStack Query caches Firebase data; mutations invalidate the cache
 
