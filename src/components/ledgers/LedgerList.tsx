@@ -75,7 +75,7 @@ export function LedgerList({
         </Card>
       ) : ledgers.length === 0 ? (
         /* Empty state */
-        <p className="py-8 text-center text-zinc-500 dark:text-zinc-400">
+        <p className="py-8 text-center text-muted-foreground">
           {LEDGERS_PAGE_COPY.emptyStateMessage}
         </p>
       ) : (
