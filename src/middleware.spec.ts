@@ -1,4 +1,4 @@
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { verifySessionCookie } from "@/lib/auth/verify-session-cookie";
@@ -18,18 +18,12 @@ function setAuthenticated(value: boolean): void {
 }
 
 function makeRequest(pathname: string, sessionCookie?: string): NextRequest {
-  return {
-    url: `https://example.com${pathname}`,
-    nextUrl: new URL(`https://example.com${pathname}`),
-    cookies: {
-      get(name: string) {
-        if (name === SESSION_COOKIE_NAME && sessionCookie !== undefined) {
-          return { value: sessionCookie };
-        }
-        return undefined;
-      },
-    },
-  } as NextRequest;
+  return new NextRequest(`https://example.com${pathname}`, {
+    headers:
+      sessionCookie === undefined
+        ? {}
+        : { cookie: `${SESSION_COOKIE_NAME}=${sessionCookie}` },
+  });
 }
 
 beforeEach(() => {
@@ -118,6 +112,15 @@ describe("middleware", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("passes the request's session cookie value to verifySessionCookie", async () => {
+    await middleware(makeRequest("/ledgers", "session-cookie"));
+
+    expect(verifySessionCookie).toHaveBeenLastCalledWith(
+      "session-cookie",
+      process.env["NEXT_PUBLIC_FIREBASE_PROJECT_ID"],
+    );
   });
 });
 
