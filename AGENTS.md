@@ -50,7 +50,7 @@ pnpm run env:validate # Validate deployment config files against schema
 ```
 
 Local environment-config management (pulling `.env.local`, syncing values to
-Vercel) previously ran through `vercel-deploy-scripts`; it is being replaced by a
+Vercel) previously ran through a shared deploy-scripts package; it is being replaced by a
 local `envctl` CLI (forthcoming). `pnpm run env:validate` is the one env command
 that remains in `package.json` (a local script with no external dependency).
 
@@ -63,8 +63,8 @@ After creating a git worktree (`git worktree add .git-worktrees/<name>`), run `p
 Public (non-secret) environment config lives in `deployment/{env}.yml` and is validated against `deployment/schema.yml`. Only `NEXT_PUBLIC_*` and explicitly allowlisted keys are permitted; patterns matching `*SECRET*`, `*_TOKEN*`, or `*PRIVATE_KEY*` are hard-denied.
 
 - To validate config files against schema locally: `pnpm run env:validate` (also runs in the pre-commit hook and the CI `Validate Config` workflow).
-- Syncing config values to Vercel and pulling a local `.env.local` were provided by `vercel-deploy-scripts` (now removed); a local `envctl` CLI will replace them (forthcoming, local-only — not wired into CI).
-- Secret scanning (gitleaks) was provided by `vercel-deploy-scripts` and has been removed with it — there is currently **no** gitleaks scan locally or in CI. Restoring secret scanning is expected to come with the new env tooling. Until then, take extra care not to commit secrets (`.gitleaks.toml` is retained for when scanning returns).
+- Syncing config values to Vercel and pulling a local `.env.local` were provided by the shared deploy-scripts package (now removed); a local `envctl` CLI will replace them (forthcoming, local-only — not wired into CI).
+- Secret scanning (gitleaks) was provided by the shared deploy-scripts package and has been removed with it — there is currently **no** gitleaks scan locally or in CI. Restoring secret scanning is expected to come with the new env tooling. Until then, take extra care not to commit secrets (`.gitleaks.toml` is retained for when scanning returns).
 
 ## TypeScript
 
