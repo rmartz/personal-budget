@@ -6,8 +6,8 @@
 #
 # Sensitive variables are managed directly in Vercel and are never committed.
 # Generating a local .env.local and syncing public values to Vercel were
-# provided by a shared deploy-scripts package (now removed); a local `envctl` CLI will
-# replace them (forthcoming).
+# provided by a shared deploy-scripts package (now removed); a local `envctl`
+# CLI will replace them (forthcoming).
 
 environment: production
 
