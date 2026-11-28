@@ -2,7 +2,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { verifySessionCookie } from "@/lib/auth/verify-session-cookie";
-import { SESSION_COOKIE_NAME } from "@/lib/auth-constants";
+import {
+  AUTHENTICATED_HOME_PATH,
+  SESSION_COOKIE_NAME,
+} from "@/lib/auth-constants";
 
 function isAuthRoute(pathname: string): boolean {
   return (
@@ -36,14 +39,18 @@ export async function middleware(request: NextRequest) {
 
   if (isAuthRoute(pathname)) {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/ledgers", request.url));
+      return NextResponse.redirect(
+        new URL(AUTHENTICATED_HOME_PATH, request.url),
+      );
     }
     return NextResponse.next();
   }
 
   if (pathname === "/") {
     if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/ledgers", request.url));
+      return NextResponse.redirect(
+        new URL(AUTHENTICATED_HOME_PATH, request.url),
+      );
     }
     return NextResponse.next();
   }

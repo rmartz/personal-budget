@@ -1,0 +1,31 @@
+name: bot-automerge
+
+# Enables GitHub-native auto-merge for green Dependabot patch/minor bumps (majors
+# stay manual) through the SHA-pinned rmartz/bot-automerge-action reusable
+# workflow. The wrapper carries the skip guard, so a human PR resolves as a free
+# `skipped`. See
+# https://github.com/rmartz/bot-automerge-action/blob/main/docs/consuming.md.
+#
+# It mints a token from the rmartz-merge-bot GitHub App (MERGE_BOT_CLIENT_ID /
+# MERGE_BOT_PRIVATE_KEY, set as both Actions and Dependabot secrets) so a merge
+# fires the push workflows on main; GITHUB_TOKEN-enabled merges fire none.
+#
+# SAFETY: auto-merge lands the moment the default-branch ruleset's required
+# checks pass (CI, merge-safety, pr-policy including its UAT gate, repo
+# hygiene). This is only safe while those checks are REQUIRED on main.
+#
+# pull_request_target (not pull_request) gives Dependabot's PRs base-context
+# write. No PR code is checked out or run.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bot-automerge:
+    uses: rmartz/bot-automerge-action/.github/workflows/bot-automerge-reusable.yml@48d54c1608287e1f48a4e14568f07b6e5ca806b7 # v2.3.0
+    secrets: inherit

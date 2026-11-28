@@ -1,6 +1,5 @@
 export const PUBLIC_HEADER_COPY = {
-  brand: "Ledgerly",
+  brand: "Budget",
   navGetStarted: "Get started",
-  navPricing: "Pricing",
   navSignIn: "Sign in",
 } as const;

@@ -2,7 +2,7 @@
 # https://github.com/gitleaks/gitleaks
 #
 # Extends the gitleaks default ruleset and includes rules inlined from the
-# vercel-deploy-scripts shared ruleset (rmartz/vercel-deploy-scripts).
+# shared ruleset of the former deploy tooling.
 # Rules are inlined rather than referenced via node_modules so that gitleaks
 # can run in CI without requiring a prior `pnpm install`.
 
@@ -26,7 +26,7 @@ regexes = [
   '''firebase-adminsdk-xxx''',
   # Example/truncated keys in ARCHITECTURE.md and README
   '''xxx@o\w+\.ingest\.sentry\.io''',
-  # Allowlists inlined from vercel-deploy-scripts shared ruleset
+  # Allowlists inlined from the former deploy tooling's shared ruleset
   '''YOUR_[A-Z0-9_]*''',
   '''PLACEHOLDER_[A-Z0-9_]*''',
   '''<[^>]+>''',
@@ -42,7 +42,7 @@ paths = [
   "deployment/staging.yml",
 ]
 
-# Rules inlined from vercel-deploy-scripts shared ruleset
+# Rules inlined from the former deploy tooling's shared ruleset
 
 [[rules]]
 id = "firebase-private-key"
@@ -71,7 +71,7 @@ tags = ["vercel", "token"]
 [rules.allowlist]
 regexes = ['''vercel_YOUR_.*''', '''vercel_PLACEHOLDER_.*''', '''<vercel[_-]token>''']
 
-# Project-specific rules not covered by the shared vercel-deploy-scripts ruleset
+# Project-specific rules not covered by the shared ruleset
 
 [[rules]]
 id = "firebase-admin-json"

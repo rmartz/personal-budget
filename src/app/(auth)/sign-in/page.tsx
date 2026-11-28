@@ -7,6 +7,7 @@ import { getFirebaseErrorCode } from "@/components/auth/firebase-error-code";
 import { getGoogleSignInErrorMessage } from "@/components/auth/google-sign-in-error";
 import { SignInFormView } from "@/components/auth/SignInForm";
 import { SIGN_IN_FORM_COPY } from "@/components/auth/SignInForm.copy";
+import { postAuthPath } from "@/lib/auth/post-auth-path";
 import { signIn, signInWithGoogle } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
@@ -24,13 +25,6 @@ function getAuthErrorMessage(code: string): string {
   }
 }
 
-function sanitizeNext(raw: string | null): string {
-  if (raw !== null && raw.startsWith("/") && !raw.startsWith("//")) {
-    return raw;
-  }
-  return "/";
-}
-
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,7 +36,7 @@ function SignInContent() {
     setError(undefined);
     try {
       await signIn(email, password);
-      router.push(sanitizeNext(searchParams.get("next")));
+      router.replace(postAuthPath(searchParams.get("next")));
     } catch (err) {
       setError(getAuthErrorMessage(getFirebaseErrorCode(err)));
     } finally {
@@ -55,7 +49,7 @@ function SignInContent() {
     setError(undefined);
     try {
       await signInWithGoogle();
-      router.push(sanitizeNext(searchParams.get("next")));
+      router.replace(postAuthPath(searchParams.get("next")));
     } catch (err) {
       setError(getGoogleSignInErrorMessage(err));
     } finally {

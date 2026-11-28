@@ -68,7 +68,7 @@ export function AppShellNavView({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="hidden border-b bg-background md:flex">
+      <header className="hidden border-b bg-card md:flex">
         <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
           <Link
             href="/reconcile"
@@ -105,7 +105,7 @@ export function AppShellNavView({
         </nav>
       </header>
 
-      <header className="flex h-14 items-center justify-between border-b bg-background px-4 md:hidden">
+      <header className="flex h-14 items-center justify-between border-b bg-card px-4 md:hidden">
         <button
           type="button"
           aria-label={APP_SHELL_COPY.menuButtonLabel}
@@ -132,7 +132,7 @@ export function AppShellNavView({
 
       <nav
         aria-label={APP_SHELL_COPY.mobileNavLabel}
-        className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-stretch border-t bg-background md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-stretch border-t bg-card md:hidden"
       >
         {MOBILE_TABS.map((tab) => {
           const active = isActiveRoute(pathname, tab.href);
