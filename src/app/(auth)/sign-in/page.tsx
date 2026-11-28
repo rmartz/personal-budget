@@ -5,6 +5,7 @@ import { Suspense, useState } from "react";
 
 import { SignInFormView } from "@/components/auth/SignInForm";
 import { SIGN_IN_FORM_COPY } from "@/components/auth/SignInForm.copy";
+import { postAuthPath } from "@/lib/auth/post-auth-path";
 import { signIn } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
@@ -22,13 +23,6 @@ function getAuthErrorMessage(code: string): string {
   }
 }
 
-function sanitizeNext(raw: string | null): string {
-  if (raw !== null && raw.startsWith("/") && !raw.startsWith("//")) {
-    return raw;
-  }
-  return "/";
-}
-
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -40,7 +34,7 @@ function SignInContent() {
     setError(undefined);
     try {
       await signIn(email, password);
-      router.push(sanitizeNext(searchParams.get("next")));
+      router.replace(postAuthPath(searchParams.get("next")));
     } catch (err) {
       const code =
         err !== null &&

@@ -53,7 +53,7 @@ export function AnnuityListView({
           </div>
         </Card>
       ) : annuities.length === 0 ? (
-        <p className="py-8 text-center text-zinc-500 dark:text-zinc-400">
+        <p className="py-8 text-center text-muted-foreground">
           {ANNUITY_LIST_COPY.emptyStateMessage}
         </p>
       ) : (

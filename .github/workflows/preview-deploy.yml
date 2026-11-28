@@ -1,16 +1,18 @@
 name: Preview Deploy
 
-# Label-driven Vercel preview deploy via the shared rmartz/vercel-preview-ci
-# reusable workflow. A PR gets a preview only while it carries `UAT ready` (the
-# legacy `ready for UAT` is also accepted during the fleet rename); it is
-# redeployed on each new push and the URL is posted as a sticky PR comment. The
-# gate, fork safety, and per-PR concurrency live in the shared workflow:
-# https://github.com/rmartz/vercel-preview-ci/blob/main/docs/consuming.md
+# Vercel preview deploy via the shared rmartz/vercel-preview-ci reusable
+# workflow. A PR gets a preview when its title has a functional Conventional
+# Commit type (`feat`, `fix`, `perf`, `revert`) or it carries `preview`;
+# `no preview` and `do not merge` always skip, and Dependabot PRs need
+# `preview`. It is redeployed on each new push and the URL is posted as a sticky
+# PR comment. The gate, fork safety, and per-PR concurrency live in the shared
+# workflow:
+# https://github.com/rmartz/vercel-preview-ci/blob/main/docs/gating.md
 #
 # This is the sole preview path: vercel.json's `git.deploymentEnabled` disables
 # Vercel's Git-integration deploys for every branch except `main`.
 #
-# Each UAT deploy is also aliased to its own host, pr-<N>.preview.budget.reedmartz.com,
+# Each preview is also aliased to its own host, pr-<N>.preview.budget.reedmartz.com,
 # so every PR has a stable address under a domain we own (Firebase's authorized
 # domains and Google sign-in accept it) and the hostname itself says which PR it
 # serves. The `*.preview.budget.reedmartz.com` domain is connected to the
@@ -23,7 +25,7 @@ name: Preview Deploy
 
 on:
   pull_request:
-    types: [labeled, unlabeled, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -33,11 +35,9 @@ permissions:
 jobs:
   preview:
     # `[WIP]`-titled PRs are held as unfinished work and get no preview. The
-    # shared workflow gates on draft status but not the title, so it is kept here.
+    # shared workflow does not gate on the title marker, so it is kept here.
     if: ${{ !contains(github.event.pull_request.title, '[WIP]') }}
-    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@a8d050a79e096643d7b0d01ff205e6e454ceb47d # v1.4.2
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@52dca86876bf76f85b11a8fe0365879ab7e0f110 # v3.0.0
     with:
-      # Match the runtime package.json `engines` pins on Vercel.
-      node-version: 26.x
       alias-domain: pr-${{ github.event.pull_request.number }}.preview.budget.reedmartz.com
     secrets: inherit

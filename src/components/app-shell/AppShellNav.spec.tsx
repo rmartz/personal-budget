@@ -13,7 +13,7 @@ import { APP_SHELL_COPY } from "./copy";
 afterEach(cleanup);
 
 describe("AppShellNavView — desktop top nav", () => {
-  it("renders the Ledgerly wordmark", () => {
+  it("renders the brand wordmark", () => {
     render(<AppShellNavView pathname="/reconcile">content</AppShellNavView>);
     expect(screen.getAllByText(APP_SHELL_COPY.brand).length).toBeGreaterThan(0);
   });
