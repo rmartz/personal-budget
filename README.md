@@ -26,7 +26,10 @@ A template repository for building Next.js applications with Firebase, deployed 
 
 - [Node.js](https://nodejs.org/) v24+
 - [pnpm](https://pnpm.io/) v10+
-- A [Firebase project](https://console.firebase.google.com/) with Realtime Database enabled
+- A [Firebase project](https://console.firebase.google.com/) with Realtime Database enabled, and in Authentication:
+  - the **Email/Password** and **Google** sign-in providers enabled (Sign-in method)
+  - every host the app is served from listed under Settings → Authorized domains (`localhost` is listed by default). An entry also authorizes its subdomains, so one entry for your preview parent domain covers every per-PR preview host. Google sign-in shows an "isn't available on this address" error on any other host.
+  - Note: the app does not verify email addresses. With Firebase's default one-account-per-email setting, signing in with Google using the address of an existing, unverified email/password account takes over that account and removes its password sign-in. The data is kept, and "Forgot password" restores the password.
 - A [Vercel account](https://vercel.com/) (for deployment)
 
 ### Create a New Project

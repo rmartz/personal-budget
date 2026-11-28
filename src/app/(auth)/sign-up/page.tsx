@@ -3,10 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { getFirebaseErrorCode } from "@/components/auth/firebase-error-code";
+import { getGoogleSignInErrorMessage } from "@/components/auth/google-sign-in-error";
 import { SignUpFormView } from "@/components/auth/SignUpForm";
 import { SIGN_UP_FORM_COPY } from "@/components/auth/SignUpForm.copy";
 import { AUTHENTICATED_HOME_PATH } from "@/lib/auth-constants";
-import { signUp } from "@/services/auth";
+import { signInWithGoogle, signUp } from "@/services/auth";
 
 function getAuthErrorMessage(code: string): string {
   switch (code) {
@@ -35,14 +37,20 @@ export default function SignUpPage() {
       await signUp(email, password);
       router.replace(AUTHENTICATED_HOME_PATH);
     } catch (err) {
-      const code =
-        err !== null &&
-        typeof err === "object" &&
-        "code" in err &&
-        typeof err.code === "string"
-          ? err.code
-          : "";
-      setError(getAuthErrorMessage(code));
+      setError(getAuthErrorMessage(getFirebaseErrorCode(err)));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setIsLoading(true);
+    setError(undefined);
+    try {
+      await signInWithGoogle();
+      router.replace(AUTHENTICATED_HOME_PATH);
+    } catch (err) {
+      setError(getGoogleSignInErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -53,6 +61,7 @@ export default function SignUpPage() {
       isLoading={isLoading}
       error={error}
       onSubmit={handleSubmit}
+      onGoogleSignIn={handleGoogleSignIn}
     />
   );
 }

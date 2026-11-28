@@ -1,9 +1,11 @@
 import {
   createUserWithEmailAndPassword,
   EmailAuthProvider,
+  GoogleAuthProvider,
   reauthenticateWithCredential,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
   updateEmail as firebaseUpdateEmail,
   updatePassword as firebaseUpdatePassword,
@@ -16,16 +18,26 @@ import { getClientAuth } from "@/lib/firebase/client";
 // Exchange the freshly-signed-in user's ID token for the httpOnly session
 // cookie the middleware reads. Client Firebase auth alone leaves the server
 // unaware the user is signed in, so this must run before any navigation into a
-// middleware-gated route.
+// middleware-gated route. If the exchange fails, the client sign-in is undone
+// so the browser is never left signed in to Firebase without a server session.
 async function establishServerSession(user: User): Promise<void> {
-  const idToken = await user.getIdToken();
-  const response = await fetch("/api/auth/session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ idToken }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to establish session");
+  try {
+    const idToken = await user.getIdToken();
+    const response = await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to establish session");
+    }
+  } catch (err) {
+    try {
+      await firebaseSignOut(getClientAuth());
+    } catch {
+      // Keep the original error: it is the one the caller needs to report.
+    }
+    throw err;
   }
 }
 
@@ -44,6 +56,19 @@ export async function signUp(email: string, password: string) {
     getClientAuth(),
     email,
     password,
+  );
+  await establishServerSession(credential.user);
+  return credential;
+}
+
+// Signs in, or creates the account on first use. A popup rather than a
+// redirect: the redirect flow loses its result under third-party storage
+// partitioning (Safari, Chrome) whenever `authDomain` (*.firebaseapp.com)
+// differs from the app's own host.
+export async function signInWithGoogle() {
+  const credential = await signInWithPopup(
+    getClientAuth(),
+    new GoogleAuthProvider(),
   );
   await establishServerSession(credential.user);
   return credential;

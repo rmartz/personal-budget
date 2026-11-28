@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { getFirebaseErrorCode } from "@/components/auth/firebase-error-code";
 import { ForgotPasswordFormView } from "@/components/auth/ForgotPasswordForm";
 import { FORGOT_PASSWORD_FORM_COPY } from "@/components/auth/ForgotPasswordForm.copy";
 import { sendPasswordReset } from "@/services/auth";
@@ -27,13 +28,7 @@ export default function ForgotPasswordPage() {
       await sendPasswordReset(email);
       setIsSubmitted(true);
     } catch (err) {
-      const code =
-        err !== null &&
-        typeof err === "object" &&
-        "code" in err &&
-        typeof err.code === "string"
-          ? err.code
-          : "";
+      const code = getFirebaseErrorCode(err);
       if (code === "auth/user-not-found") {
         setIsSubmitted(true);
       } else {
